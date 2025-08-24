@@ -1,0 +1,268 @@
+service: fedeira-investment-services
+frameworkVersion: '4'
+
+# Serverless plugins:
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+  # - serverless-secrets-plugin
+
+# AWS provider configuration:
+provider:
+  name: aws
+  runtime: nodejs18.x
+  profile: Developer-PPI
+  region: us-east-2
+  deploymentBucket:
+    name: investment-fedeira-bucket
+  apiGateway:
+    minimumCompressionSize: 1024
+    binaryMediaTypes:
+      - 'application/json'
+  # Tags for better resource management in AWS:
+  tags:
+    Project: 'IS'
+    Service: 'Investment-services'
+    Environment: "${opt:stage, 'dev'}"
+  # Environment variables available for Lambda functions:
+  environment:
+    IS_OFFLINE: ${opt:isOffline, 'false'}
+    API_VERSION_PPI: ${env:API_VERSION_PPI}
+    API_KEY_PPI_TEST: ${env:API_KEY_PPI_TEST}
+    API_SECRET_PPI_TEST: ${env:API_SECRET_PPI_TEST}
+    AUTHORIZED_CLIENT_PPI: ${env:AUTHORIZED_CLIENT_PPI}
+    CLIENT_KEY_PPI_TEST: ${env:CLIENT_KEY_PPI_TEST}
+    ACCOUNT_NUMBER_PPI: ${env:ACCOUNT_NUMBER_PPI}
+    INVESTMENT_TABLE: ${self:custom.variables.INVESTMENT_TABLE}
+    BASE_URL_PPI_TEST: ${env:BASE_URL_PPI_TEST}
+    JWT_SECRET: ${env:JWT_SECRET}
+    USER_EMAIL: ${env:USER_EMAIL}
+    USER_PASSWORD: ${env:USER_PASSWORD}
+    ENCRYPTION_KEY: ${env:ENCRYPTION_KEY}
+    ENCRYPTION_ALGORITHM: ${env:ENCRYPTION_ALGORITHM, 'aes-256-cbc'}
+    ENCRYPTION_RANDOM_BYTES: ${env:ENCRYPTION_RANDOM_BYTES, '16'}
+
+  # Monitoring & Logging:
+  tracing:
+    apiGateway: false
+    lambda: false
+  logs:
+    restApi: false
+
+  # IAM role permissions for Lambda functions:
+  iam:
+    role:
+      statements:
+        # Permit for ssm operations
+        - Effect: 'Allow'
+          Action:
+            - 'ssm:GetParameter'
+            - 'ssm:PutParameter'
+          Resource:
+            - 'arn:aws:ssm:us-east-2:${aws:accountId}:parameter/ppi'
+            - 'arn:aws:ssm:us-east-2:${aws:accountId}:parameter/ppi/token'
+            - 'arn:aws:ssm:us-east-2:${aws:accountId}:parameter/ppi/refreshToken'
+        # Permit for dynamodb operations
+        - Effect: 'Allow'
+          Action:
+            - 'dynamodb:Query'
+            - 'dynamodb:Scan'
+            - 'dynamodb:GetItem'
+            - 'dynamodb:PutItem'
+            - 'dynamodb:UpdateItem'
+            - 'dynamodb:DeleteItem'
+          Resource:
+            - arn:aws:dynamodb:us-east-2:${aws:accountId}:table/${self:provider.environment.INVESTMENT_TABLE}
+            - arn:aws:dynamodb:us-east-2:${aws:accountId}:table/UserCredentials
+            - arn:aws:dynamodb:us-east-2:${aws:accountId}:table/Accounts
+        # Permit for logs operations in cloudwatch
+        - Effect: 'Allow'
+          Action:
+            - 'logs:CreateLogGroup'
+            - 'logs:CreateLogStream'
+            - 'logs:PutLogEvents'
+          Resource: 'arn:aws:logs:us-east-2:${aws:accountId}:log-group:/aws/lambda/fedeira-investment-services:*'
+        # Permit for ses operations
+        - Effect: 'Allow'
+          Action:
+            - 'ses:SendEmail'
+            - 'ses:SendRawEmail'
+          Resource: 'arn:aws:ses:us-east-2:${aws:accountId}:identity/my-secure-domain.com'
+        # Permit for S3 operations
+        - Effect: 'Allow'
+          Action:
+            - 's3:CreateBucket'
+            - 's3:DeleteBucket'
+            - 's3:ListBucket'
+            - 's3:GetBucketLocation'
+            - 's3:GetObject'
+            - 's3:PutObject'
+          Resource:
+            - 'arn:aws:s3:::investment-fedeira-bucket'
+            - 'arn:aws:s3:::investment-fedeira-bucket/*'
+# Lambda functions definitions:
+functions:
+  #  Authorizer lambda:
+  authorize:
+    handler: authorization-services/handler.authorizer
+    timeout: 10
+    memorySize: 1028
+
+  # Login:
+  login:
+    handler: authorization-services/handler.login
+    timeout: 29
+    memorySize: 1028
+    events:
+      - http:
+          path: login
+          method: post
+          cors: true
+
+  getAvailableBalance:
+    handler: investment-services/handler.getAvailableBalance
+    timeout: 29
+    memorySize: 1028
+    events:
+      - http:
+          path: investment/available-balance
+          method: get
+          cors: true
+          authorizer:
+            name: authorize
+            type: TOKEN
+
+  getAccounts:
+    handler: account-services/handler.getAccounts
+    timeout: 29
+    memorySize: 1028
+    events:
+      - http:
+          path: accounts
+          method: get
+          cors: true
+          authorizer:
+            name: authorize
+            type: TOKEN
+
+# AWS Resources: DynamoDB Table & S3 Bucket:
+resources:
+  Resources:
+    InvestmentRecordsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.variables.INVESTMENT_TABLE}
+        AttributeDefinitions:
+          - AttributeName: investmentId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: investmentId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    UserCredentialsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: UserCredentials
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+    AccountsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Accounts
+        AttributeDefinitions:
+          - AttributeName: account
+            AttributeType: S
+          - AttributeName: user
+            AttributeType: S
+        KeySchema:
+          - AttributeName: account
+            KeyType: HASH
+          - AttributeName: user
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+
+    # Bucket creation
+    # S3InvestmentBucket:
+    #   Type: AWS::S3::Bucket
+    #   Properties:
+    #     BucketName: investment-fedeira-bucket
+    #     PublicAccessBlockConfiguration:
+    #       BlockPublicAcls: true
+    #       BlockPublicPolicy: true
+    #       IgnorePublicAcls: true
+    #       RestrictPublicBuckets: true
+    #     BucketEncryption:
+    #       ServerSideEncryptionConfiguration:
+    #         - ServerSideEncryptionByDefault:
+    #             SSEAlgorithm: AES256
+
+  Outputs:
+    DynamoDBEndpoint:
+      Description: 'DynamoDB Host Endpoint'
+      Value: !Sub 'https://dynamodb.${AWS::Region}.amazonaws.com'
+
+# Custom configurations:
+custom:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: false
+    target: node20
+    platform: node
+    exclude: ['aws-sdk']
+  secrets:
+    parameters:
+      '/ppi/token': '{"token":"mi-token-prueba","expiration":1700000000000,"refreshToken":"mi-refresh"}'
+
+  # Load environment variables from .env file:
+  dotenv:
+    path: .env
+    include:
+      - ACCOUNT_NUMBER_PPI
+      - AUTHORIZED_CLIENT_PPI
+      - API_VERSION_PPI
+      - API_KEY_PPI_TEST
+      - API_SECRET_PPI_TEST
+      - CLIENT_KEY_PPI_TEST
+      - BASE_URL_PPI_TEST
+      - JWT_SECRET
+      - USER_EMAIL
+      - USER_PASSWORD
+      - ENCRYPTION_KEY
+      - ENCRYPTION_ALGORITHM
+      - ENCRYPTION_RANDOM_BYTES
+
+  # Custom variables used throughout the configuration:
+  variables:
+    PPI_API_VERSION: ${ssm:/ppi/apiVersion}
+    PPI_API_KEY: ${ssm:/ppi/apiKey}
+    PPI_API_SECRET: ${ssm:/ppi/apiSecret}
+    PPI_AUTHORIZED_CLIENT: ${ssm:/ppi/authorizedClient}
+    PPI_CLIENT_KEY: ${ssm:/ppi/clientKey}
+    PPI_ACCOUNT_NUMBER: ${ssm:/ppi/accountNumber}
+    INVESTMENT_TABLE: InvestmentRecords
+
+  # DynamoDB local settings for offline development:
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      seed: true
+      convertEmptyValues: true
+
+  # Packaging settings:
+  package:
+    individually: true
+    include:
+      - authorization-services/**
+      - investment-services/**
+      - account-services/**
+      - node_modules/**
+      - dist/**

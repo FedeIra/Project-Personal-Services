@@ -1,0 +1,356 @@
+{
+  "info": {
+    "_postman_id": "0156c6e8-ec0e-4ade-8835-0ecddff4755a",
+    "name": "Project Personal Services API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "26253923"
+  },
+  "item": [
+    {
+      "name": "authorization-services-lambda",
+      "item": [
+        {
+          "name": "login",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"xxxx\",\r\n    \"password\": \"xxxx\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/dev/login",
+              "host": ["{{BASE_URL}}"],
+              "path": ["dev", "login"]
+            }
+          },
+          "response": [
+            {
+              "name": "login",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"xxxx\",\r\n    \"password\": \"xxxx\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/dev/login",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["dev", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "vary",
+                  "value": "origin"
+                },
+                {
+                  "key": "access-control-expose-headers",
+                  "value": "WWW-Authenticate,Server-Authorization"
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "content-length",
+                  "value": "215"
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 21 Mar 2025 19:54:06 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"token\": \"xxxx\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "investment-services-lambda",
+      "item": [
+        {
+          "name": "get available balance",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/dev/investment/available-balance",
+              "host": ["{{BASE_URL}}"],
+              "path": ["dev", "investment", "available-balance"]
+            }
+          },
+          "response": [
+            {
+              "name": "get investments",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/dev/investment/available-balance",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["dev", "investment", "available-balance"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "vary",
+                  "value": "origin"
+                },
+                {
+                  "key": "access-control-expose-headers",
+                  "value": "WWW-Authenticate,Server-Authorization"
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "content-length",
+                  "value": "67"
+                },
+                {
+                  "key": "accept-ranges",
+                  "value": "bytes"
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 02 Mar 2025 20:27:52 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"codeStatus\": 200,\n    \"data\": [],\n    \"errorMessage\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "account-services-lambda",
+      "item": [
+        {
+          "name": "get accounts",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/dev/accounts?pageSize=10",
+              "host": ["{{BASE_URL}}"],
+              "path": ["dev", "accounts"],
+              "query": [
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                },
+                {
+                  "key": "filter[account][eq]",
+                  "value": "banco",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "get accounts",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/dev/accounts?pageSize=10&filter[account][eq]=google",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["dev", "accounts"],
+                  "query": [
+                    {
+                      "key": "pageSize",
+                      "value": "10"
+                    },
+                    {
+                      "key": "filter[account][eq]",
+                      "value": "google"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "vary",
+                  "value": "origin"
+                },
+                {
+                  "key": "access-control-expose-headers",
+                  "value": "WWW-Authenticate,Server-Authorization"
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "content-length",
+                  "value": "346"
+                },
+                {
+                  "key": "accept-ranges",
+                  "value": "bytes"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 24 Jul 2025 15:01:38 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"status\": \"success\",\n    \"codeStatus\": 200,\n    \"data\": {\n        \"items\": [\n            {\n                \"user\": \"xxxx\",\n                \"account\": \"xxxx\",\n                \"password\": \"xxxx\"\n            },\n            {\n                \"user\": \"xxxx\",\n                \"account\": \"xxxx\",\n                \"password\": \"xxxx\"\n            },\n            {\n                \"user\": \"xxxx\",\n                \"account\": \"xxxx\",\n                \"password\": \"xxxx\"\n            }\n        ],\n        \"nextPageToken\": null\n    },\n    \"errorMessage\": null\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:3000",
+      "disabled": true
+    },
+    {
+      "key": "BASE_URL",
+      "value": "https://bk7xpquf2k.execute-api.us-east-2.amazonaws.com"
+    },
+    {
+      "key": "TOKEN",
+      "value": "xxxx"
+    }
+  ]
+}

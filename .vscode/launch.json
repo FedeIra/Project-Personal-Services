@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Serverless Offline (npx)",
+      "runtimeExecutable": "npx",
+      "args": ["serverless", "offline"],
+      "cwd": "${workspaceFolder}",
+      "protocol": "inspector",
+      "console": "integratedTerminal",
+      "autoAttachChildProcesses": true,
+      "env": {
+        "IS_OFFLINE": "true"
+      }
+    }
+  ]
+}

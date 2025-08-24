@@ -1,0 +1,39 @@
+{
+  "name": "fedeira-ppi-services",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "tsc -b",
+    "package": "serverless package",
+    "offline-db-init": "serverless dynamodb start",
+    "offline-db-verify": "aws dynamodb list-tables --endpoint-url http://localhost:8000",
+    "offline-db-migrate": "ts-node dynamodb-config.ts",
+    "offline": "serverless offline",
+    "deploy": "serverless deploy",
+    "nodemon": "nodemon --watch . --ext ts,js,json --exec \"npm run offline\"",
+    "insert-user": "ts-node scripts/insert-user.ts"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1692.0",
+    "axios": "^1.7.9",
+    "axios-retry": "^4.5.0",
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.147",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^22.13.5",
+    "dotenv": "^16.4.7",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.5.2",
+    "serverless-dynamodb-local": "^0.2.40",
+    "serverless-offline": "^14.4.0",
+    "serverless-secrets-plugin": "^0.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
