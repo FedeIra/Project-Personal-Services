@@ -1,6 +1,12 @@
-# Fedeira Investment Services
+# Fedeira Personal Services
 
-A serverless backend for investment services using PPI API's, AWS Lambda, DynamoDB, and S3.
+A serverless backend for personal services using PPI API's, AWS Lambda, API Gateway, DynamoDB, and S3.
+
+Services are as follows:
+
+- **Authorization Service**: Handles user authentication and authorization.
+- **Investment Service**: Manages investment-related operations.
+- **Account Service**: Manages user accounts.
 
 ## 🚀 Getting Started
 
@@ -117,15 +123,18 @@ serverless logs -f getAvailableBalance View logs for a function
 
 - 🟦 Node.js + TypeScript
 - ⚙️ Serverless Framework
+- 🔗 Axios (for HTTP requests)
+- 🛡️ JWT (for authentication)
 - 🟢 AWS Lambda
 - 📦 AWS DynamoDB
 - ☁️ AWS S3
 - 🔐 AWS SSM Parameter Store
+- 🔗 AWS API Gateway
 - 🧪 Serverless Offline (local testing)
 
 ## 🗂 Project Structure
 
-fedeira-investment-services/services/
+fedeira-personal-services/services/
 ├── application/ # Business logic (use cases and interfaces)
 │ ├── interfaces/ # Abstract interfaces (repositories, services)
 │ └── usecases/ # Application use cases (e.g., Login, Authorize, GetBalance)
@@ -139,15 +148,12 @@ fedeira-investment-services/services/
 │ ├── services/ # Internal services (e.g., JWT, caching, SSM access)
 │ └── factories/ # Functions that instantiate and wire dependencies
 │
-├── config/ # Shared config (axios setup, constants, etc.)
-│
-├── utils/ # Utility functions and helpers
-│
+├── config/
 ├── handler.ts # Main Lambda handler
 ├── serverless.yml # Serverless Framework configuration
 ├── tsconfig.json # TypeScript compiler configuration
 ├── .env # Local environment variables (ignored in production)
 ├── package.json # Project metadata and scripts
-└── docs/ # Project documentation and architecture diagrams
+└── common/ # Project documentation and architecture diagrams plus shared utilities
 
 This structure follows the principles of Clean Architecture, ensuring separation of concerns and maintainability.

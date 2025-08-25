@@ -9,7 +9,7 @@
     "offline-db-verify": "aws dynamodb list-tables --endpoint-url http://localhost:8000",
     "offline-db-migrate": "ts-node dynamodb-config.ts",
     "offline": "serverless offline",
-    "deploy": "serverless deploy",
+    "deploy": "npm run build && serverless deploy",
     "nodemon": "nodemon --watch . --ext ts,js,json --exec \"npm run offline\"",
     "insert-user": "ts-node scripts/insert-user.ts"
   },

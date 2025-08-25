@@ -1,7 +1,7 @@
 // Internal Dependencies:
 import { TokenCacheService } from './PPITokenCacheService';
 import { LoginResponsePPI } from '../../domain/entities/account/LoginResponsePPI';
-import { axiosConfiguration } from '../../config/axiosConfiguration';
+import { axiosConfiguration } from '../../../common/utils/axiosConfiguration';
 import { CONFIG } from '../../config/constants';
 
 // External Dependencies:

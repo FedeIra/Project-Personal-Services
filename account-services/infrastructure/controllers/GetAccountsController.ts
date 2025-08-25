@@ -1,5 +1,8 @@
 import { APIGatewayEvent } from 'aws-lambda';
-import { buildResponse, ErrorHandler } from '../../utils/ResponseBuilder';
+import {
+  buildResponse,
+  ErrorHandler,
+} from '../../../common/utils/ResponseBuilder';
 import { GetAccountsUseCase } from '../../application/usecases/GetAccountUseCase';
 import { IDBAccountRepository } from '../../application/interfaces/IGetAccountRepository';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';

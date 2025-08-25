@@ -3,6 +3,7 @@ frameworkVersion: '4'
 
 # Serverless plugins:
 plugins:
+  - serverless-esbuild
   - serverless-dynamodb-local
   - serverless-offline
   # - serverless-secrets-plugin
@@ -11,7 +12,7 @@ plugins:
 provider:
   name: aws
   runtime: nodejs18.x
-  profile: Fedeira-Personal-Services
+  profile: Fedeira-Developer
   region: us-east-2
   apiName: "${opt:stage, 'dev'}-fedeira-personal-services"
   deploymentBucket:
@@ -22,8 +23,8 @@ provider:
       - 'application/json'
   # Tags for better resource management in AWS:
   tags:
-    Project: 'IS'
-    Service: 'Investment-services'
+    Project: 'Fedeira Personal Services'
+    Service: 'Personal-services'
     Environment: "${opt:stage, 'dev'}"
   # Environment variables available for Lambda functions:
   environment:
@@ -44,10 +45,10 @@ provider:
 
   # Monitoring & Logging:
   tracing:
-    apiGateway: false
-    lambda: false
+    apiGateway: true
+    lambda: true
   logs:
-    restApi: false
+    restApi: true
 
   # IAM role permissions for Lambda functions:
   iam:
@@ -118,6 +119,7 @@ functions:
           path: login
           method: post
           cors: true
+          authorizer: none
   # Investment domain Lambda:
   investmentService:
     handler: investment-services/handler.getAvailableBalance
@@ -194,8 +196,8 @@ resources:
 
   Outputs:
     DynamoDBEndpoint:
-      Description: 'DynamoDB Host Endpoint'
-      Value: !Sub 'https://dynamodb.${AWS::Region}.amazonaws.com'
+      Description: DynamoDB Local Endpoint (for offline reference)
+      Value: 'http://localhost:8000'
 
 # Custom configurations:
 custom:
@@ -251,6 +253,7 @@ custom:
   package:
     individually: true
     include:
+      - common/**
       - authorization-services/**
       - investment-services/**
       - account-services/**
