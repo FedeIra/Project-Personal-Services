@@ -56,9 +56,16 @@ This will create required tables in the local DynamoDB instance.
 
 You can use scripts in the `scripts/` directory to insert initial data into your local or remote DynamoDB instance. Command example to add accounts:
 
+To insert user:
+
 ```bash
-cd scripts
-npx ts-node insert-accounts.ts
+npx ts-node common\scripts\insert-user.ts
+```
+
+To insert accounts:
+
+```bash
+npx ts-node common\scripts\insert-accounts.ts
 ```
 
 ### 5. Create a .env file in the root directory:

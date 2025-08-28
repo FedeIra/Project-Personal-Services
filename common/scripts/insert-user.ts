@@ -16,11 +16,11 @@ if (!email || !plainPassword) {
 
 // Configurar DynamoDB para entorno local
 const dynamoDb = new AWS.DynamoDB.DocumentClient({
-  region: 'us-east-2',
-  // region: 'localhost',
-  // endpoint: 'http://localhost:8000',
-  // accessKeyId: 'fakeMyKeyId',
-  // secretAccessKey: 'fakeSecretAccessKey',
+  // region: 'us-east-2',
+  region: 'localhost',
+  endpoint: 'http://localhost:8000',
+  accessKeyId: 'fakeMyKeyId',
+  secretAccessKey: 'fakeSecretAccessKey',
 });
 
 // Encriptar la contraseña

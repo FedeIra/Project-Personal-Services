@@ -5,10 +5,10 @@
   "scripts": {
     "build": "tsc -b",
     "package": "serverless package",
-    "offline-db-init": "serverless dynamodb start",
+    "offline-db-init": "dotenv -e .env -- serverless dynamodb start --config serverless.offline.yml --stage dev",
     "offline-db-verify": "aws dynamodb list-tables --endpoint-url http://localhost:8000",
-    "offline-db-migrate": "ts-node dynamodb-config.ts",
-    "offline": "serverless offline",
+    "offline-db-migrate": "dotenv -e .env -- ts-node dynamodb-config.ts",
+    "offline": "dotenv -e .env -- serverless offline --config serverless.offline.yml --stage dev",
     "deploy": "npm run build && serverless deploy",
     "nodemon": "nodemon --watch . --ext ts,js,json --exec \"npm run offline\"",
     "insert-user": "ts-node scripts/insert-user.ts"
@@ -25,6 +25,7 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.13.5",
     "dotenv": "^16.4.7",
+    "dotenv-cli": "^10.0.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.3",

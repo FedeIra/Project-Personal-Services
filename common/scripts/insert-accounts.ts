@@ -3,9 +3,9 @@
 import AWS from 'aws-sdk';
 import dotenv from 'dotenv';
 
-import { EncryptionService } from '../account-services/infrastructure/services/EncryptionService';
+import { EncryptionService } from '../../account-services/infrastructure/services/EncryptionService';
 
-dotenv.config({ path: __dirname + '/../.env' });
+dotenv.config();
 
 // DynamoDB configuration:
 const dynamoDb = new AWS.DynamoDB.DocumentClient({

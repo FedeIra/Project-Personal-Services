@@ -1,0 +1,117 @@
+# Offline configuration:
+service: fedeira-personal-services-offline
+frameworkVersion: '4'
+useDotenv: true
+
+# Serverless plugins:
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+
+# AWS provider configuration:
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-2
+  stage: dev
+  timeout: 29
+  # Environment variables available for Lambda functions:
+  environment:
+    IS_OFFLINE: 'true'
+
+    ACCOUNT_NUMBER_PPI: ${env:ACCOUNT_NUMBER_PPI}
+    AUTHORIZED_CLIENT_PPI: ${env:AUTHORIZED_CLIENT_PPI}
+
+    CLIENT_KEY_PPI_PROD: ${env:CLIENT_KEY_PPI_PROD}
+    API_KEY_PPI_PROD: ${env:API_KEY_PPI_PROD}
+    API_SECRET_PPI_PROD: ${env:API_SECRET_PPI_PROD}
+
+    JWT_SECRET: ${env:JWT_SECRET}
+    USER_EMAIL: ${env:USER_EMAIL}
+    USER_PASSWORD: ${env:USER_PASSWORD}
+
+    ENCRYPTION_KEY: ${env:ENCRYPTION_KEY}
+    API_VERSION_PPI: ${env:API_VERSION_PPI}
+    API_KEY_PPI_TEST: ${env:API_KEY_PPI_TEST}
+    API_SECRET_PPI_TEST: ${env:API_SECRET_PPI_TEST}
+    CLIENT_KEY_PPI_TEST: ${env:CLIENT_KEY_PPI_TEST}
+    BASE_URL_PPI_TEST: ${env:BASE_URL_PPI_TEST}
+    BASE_URL_PPI_PROD: ${env:BASE_URL_PPI_PROD}
+    ENCRYPTION_ALGORITHM: ${env:ENCRYPTION_ALGORITHM, 'aes-256-cbc'}
+    ENCRYPTION_RANDOM_BYTES: ${env:ENCRYPTION_RANDOM_BYTES, '16'}
+    USER_EMAIL_TEST: ${env:USER_EMAIL}
+    USER_PASSWORD_TEST: ${env:USER_PASSWORD}
+
+# Lambda functions:
+functions:
+  authServiceAuthorizer:
+    handler: authorization-services/handler.authorizer
+  authorizationService:
+    handler: authorization-services/handler.login
+    events:
+      - http:
+          path: login
+          method: post
+          cors: true
+  investmentService:
+    handler: investment-services/handler.getAvailableBalance
+    events:
+      - http:
+          path: investment/available-balance
+          method: get
+          cors: true
+          authorizer:
+            name: authServiceAuthorizer
+            type: TOKEN
+  accountService:
+    handler: account-services/handler.getAccounts
+    events:
+      - http:
+          path: accounts
+          method: get
+          cors: true
+          authorizer:
+            name: authServiceAuthorizer
+            type: TOKEN
+
+# DynamoDB resources:
+resources:
+  Resources:
+    UserCredentialsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: UserCredentials
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    AccountsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Accounts
+        AttributeDefinitions:
+          - AttributeName: account
+            AttributeType: S
+          - AttributeName: user
+            AttributeType: S
+        KeySchema:
+          - AttributeName: account
+            KeyType: HASH
+          - AttributeName: user
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+
+# Custom settings:
+custom:
+  dynamodb:
+    stages: [dev]
+    start:
+      port: 8000
+      inMemory: true
+      migrate: false
+      seed: false
+      convertEmptyValues: true
