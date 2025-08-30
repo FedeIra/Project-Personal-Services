@@ -1,5 +1,13 @@
 service: fedeira-personal-services
 frameworkVersion: '4'
+useDotenv: true
+
+# Serverless plugins:
+plugins:
+  - serverless-esbuild
+  - serverless-dynamodb-local
+  - serverless-offline
+  - serverless-secrets-plugin
 
 # AWS provider configuration:
 provider:
@@ -7,20 +15,21 @@ provider:
   runtime: nodejs18.x
   profile: Fedeira-Developer
   region: us-east-2
-  stage: dev
-  apiName: 'dev-fedeira-personal-services'
+  apiName: "${opt:stage, 'dev'}-fedeira-personal-services"
   deploymentBucket:
-    name: dev-fedeira-personal-services-bucket
+    name: fedeira-personal-services-bucket
   apiGateway:
     minimumCompressionSize: 1024
+    binaryMediaTypes:
+      - 'application/json'
   # Tags for better resource management in AWS:
   tags:
     Project: 'Fedeira Personal Services'
     Service: 'Personal-services'
-    Environment: 'dev'
+    Environment: "${opt:stage, 'dev'}"
   # Environment variables available for Lambda functions:
   environment:
-    IS_OFFLINE: 'false'
+    IS_OFFLINE: ${opt:isOffline, 'false'}
 
     # SSM
     ACCOUNT_NUMBER_PPI: ${env:ACCOUNT_NUMBER_PPI, ${ssm:/fedeira-personal-services/ppi/accountNumber}}
@@ -55,7 +64,6 @@ provider:
     lambda: true
   logs:
     restApi: true
-    logRetentionInDays: 30
 
   # IAM role permissions for Lambda functions:
   iam:
@@ -65,9 +73,8 @@ provider:
         - Effect: 'Allow'
           Action:
             - 'ssm:GetParameter'
-            - 'ssm:GetParameters'
           Resource:
-            - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/fedeira-personal-services/*'
+            - 'arn:aws:ssm:${self:provider.region}:${self:custom.accountId}:parameter/fedeira-personal-services/*'
         # Permit for dynamodb operations
         - Effect: 'Allow'
           Action:
@@ -78,24 +85,26 @@ provider:
             - 'dynamodb:UpdateItem'
             - 'dynamodb:DeleteItem'
           Resource:
-            - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/UserCredentials'
-            - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Accounts'
+            - 'arn:aws:dynamodb:${self:provider.region}:${self:custom.accountId}:table/UserCredentials'
+            - 'arn:aws:dynamodb:${self:provider.region}:${self:custom.accountId}:table/Accounts'
         # Permit for logs operations in cloudwatch
         - Effect: 'Allow'
           Action:
             - 'logs:CreateLogGroup'
             - 'logs:CreateLogStream'
             - 'logs:PutLogEvents'
-          Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*'
+          Resource: 'arn:aws:logs:${self:provider.region}:${self:custom.accountId}:log-group:/aws/lambda/*'
         # Permit for ses operations
         - Effect: 'Allow'
           Action:
             - 'ses:SendEmail'
             - 'ses:SendRawEmail'
-          Resource: !Sub 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/my-secure-domain.com'
+          Resource: 'arn:aws:ses:${self:provider.region}:${self:custom.accountId}:identity/my-secure-domain.com'
         # Permit for S3 operations
         - Effect: 'Allow'
           Action:
+            - 's3:CreateBucket'
+            - 's3:DeleteBucket'
             - 's3:ListBucket'
             - 's3:GetBucketLocation'
             - 's3:GetObject'
@@ -108,13 +117,13 @@ functions:
   # Custom authorizer Lambda for API Gateway (verifies JWT tokens)
   authServiceAuthorizer:
     handler: authorization-services/handler.authorizer
-    name: 'dev-fedeira-authorization-services-authorizer'
+    name: "${opt:stage, 'dev'}-fedeira-authorization-services-authorizer"
     memorySize: 1024
     timeout: 10
   #  Authorizer lambda: Lambda for authorization-related endpoints
   authorizationService:
     handler: authorization-services/handler.login
-    name: 'dev-fedeira-authorization-services'
+    name: "${opt:stage, 'dev'}-fedeira-authorization-services"
     timeout: 29
     memorySize: 1024
     events:
@@ -126,7 +135,7 @@ functions:
   # Investment domain Lambda:
   investmentService:
     handler: investment-services/handler.getAvailableBalance
-    name: 'dev-fedeira-investment-services'
+    name: "${opt:stage, 'dev'}-fedeira-investment-services"
     timeout: 29
     memorySize: 1024
     events:
@@ -140,7 +149,7 @@ functions:
   # Account domain Lambda:
   accountService:
     handler: account-services/handler.getAccounts
-    name: 'dev-fedeira-account-services'
+    name: "${opt:stage, 'dev'}-fedeira-account-services"
     timeout: 29
     memorySize: 1024
     events:
@@ -197,9 +206,42 @@ resources:
             - ServerSideEncryptionByDefault:
                 SSEAlgorithm: AES256
 
-    ApiGatewayAccessLogs:
-      Type: AWS::Logs::LogGroup
-      Properties:
-        LogGroupName:
-          Fn::Sub: 'API-Gateway-Execution-Logs_${ApiGatewayRestApi}/dev'
-        RetentionInDays: 30
+  Outputs:
+    DynamoDBEndpoint:
+      Description: DynamoDB Local Endpoint (for offline reference)
+      Value: 'http://localhost:8000'
+
+# Custom configurations:
+custom:
+  accountId: ${env:AWS_ACCOUNT_ID}
+
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: false
+    target: node18
+    platform: node
+    exclude: ['aws-sdk']
+  secrets:
+    parameters:
+      '/ppi/token': '{"token":"mi-token-prueba","expiration":1700000000000,"refreshToken":"mi-refresh"}'
+
+  # DynamoDB local settings for offline development:
+  dynamodb:
+    stages: [dev]
+    start:
+      port: 8000
+      inMemory: true
+      seed: true
+      convertEmptyValues: true
+
+  # Packaging settings:
+  package:
+    individually: true
+    include:
+      - common/**
+      - authorization-services/**
+      - investment-services/**
+      - account-services/**
+      - node_modules/**
+      - dist/**

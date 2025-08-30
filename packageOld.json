@@ -2,25 +2,16 @@
   "name": "fedeira-ppi-services",
   "version": "0.0.1",
   "private": true,
-  "engines": {
-    "node": ">=18 <21"
-  },
   "scripts": {
-    "clean": "rimraf dist",
     "build": "tsc -b",
-    "typecheck": "tsc -b --pretty false",
-    "lint": "eslint . --ext .ts,.js",
-    "format": "prettier --loglevel warn --write \"**/*.{ts,js,json,md,yml,yaml}\"",
+    "package": "serverless package",
     "offline-db-init": "dotenv -e .env -- serverless dynamodb start --config serverless.offline.yml --stage dev",
     "offline-db-verify": "aws dynamodb list-tables --endpoint-url http://localhost:8000",
     "offline-db-migrate": "dotenv -e .env -- ts-node dynamodb-config.ts",
     "offline": "dotenv -e .env -- serverless offline --config serverless.offline.yml --stage dev",
-    "nodemon": "nodemon --watch . --ext ts,js,json --exec \"npm run offline\"",
-    "package": "serverless package",
-    "predeploy": "npm run build && npm run typecheck && npm run lint",
     "deploy": "npm run build && serverless deploy",
-    "insert-user": "ts-node scripts/insert-user.ts",
-    "insert-account": "ts-node scripts/insert-account.ts"
+    "nodemon": "nodemon --watch . --ext ts,js,json --exec \"npm run offline\"",
+    "insert-user": "ts-node scripts/insert-user.ts"
   },
   "dependencies": {
     "aws-sdk": "^2.1692.0",
@@ -40,10 +31,9 @@
     "eslint-plugin-prettier": "^5.2.3",
     "nodemon": "^3.1.9",
     "prettier": "^3.5.2",
-    "rimraf": "^6.0.1",
-    "serverless": "^4.1.0",
     "serverless-dynamodb-local": "^0.2.40",
     "serverless-offline": "^14.4.0",
+    "serverless-secrets-plugin": "^0.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
   }
