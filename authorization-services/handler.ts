@@ -3,6 +3,7 @@ import {
   APIGatewayTokenAuthorizerEvent,
   APIGatewayAuthorizerResult,
   APIGatewayEvent,
+  APIGatewayProxyResult,
 } from 'aws-lambda';
 
 // Internal Dependencies:
@@ -31,6 +32,8 @@ export const authorizer = async (
 };
 
 // Login Handler:
-export const login = async (event: APIGatewayEvent) => {
+export const login = async (
+  event: APIGatewayEvent
+): Promise<APIGatewayProxyResult> => {
   return loginController.handle(event);
 };

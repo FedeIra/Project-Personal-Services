@@ -1,5 +1,8 @@
 # Add files here to ignore them from prettier formatting
-
 build
 /dist
 /coverage
+node_modules/
+dist/
+.serverless/
+.eslintcache

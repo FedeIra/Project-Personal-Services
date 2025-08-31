@@ -6,14 +6,21 @@
       "request": "launch",
       "name": "Serverless Offline (npx)",
       "runtimeExecutable": "npx",
-      "args": ["serverless", "offline"],
+      "args": [
+        "serverless",
+        "offline",
+        "--config",
+        "serverless.offline.yml",
+        "--stage",
+        "dev"
+      ],
       "cwd": "${workspaceFolder}",
-      "protocol": "inspector",
       "console": "integratedTerminal",
       "autoAttachChildProcesses": true,
       "env": {
         "IS_OFFLINE": "true"
-      }
+      },
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"]
     }
   ]
 }

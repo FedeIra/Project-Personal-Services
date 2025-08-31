@@ -1,53 +1,62 @@
-service: fedeira-investment-services
+service: fedeira-personal-services
 frameworkVersion: '4'
-
-# Serverless plugins:
-plugins:
-  - serverless-dynamodb-local
-  - serverless-offline
-  # - serverless-secrets-plugin
+variablesResolutionMode: 20210326
 
 # AWS provider configuration:
 provider:
   name: aws
   runtime: nodejs18.x
-  profile: Developer-PPI
+  profile: Developer-Fedeira
   region: us-east-2
+  stage: dev
+  apiName: 'dev-fedeira-personal-services'
   deploymentBucket:
-    name: investment-fedeira-bucket
+    name: dev-fedeira-personal-services-bucket
   apiGateway:
     minimumCompressionSize: 1024
-    binaryMediaTypes:
-      - 'application/json'
-  # Tags for better resource management in AWS:
   tags:
-    Project: 'IS'
-    Service: 'Investment-services'
-    Environment: "${opt:stage, 'dev'}"
-  # Environment variables available for Lambda functions:
+    Project: 'Fedeira Personal Services'
+    Service: 'Personal-services'
+    Environment: 'dev'
+
   environment:
-    IS_OFFLINE: ${opt:isOffline, 'false'}
+    IS_OFFLINE: 'false'
+
+    # SSM
+    ACCOUNT_NUMBER_PPI: ${env:ACCOUNT_NUMBER_PPI, ssm:/fedeira-personal-services/ppi/accountNumber}
+    AUTHORIZED_CLIENT_PPI: ${env:AUTHORIZED_CLIENT_PPI, ssm:/fedeira-personal-services/ppi/authorizedClient}
+
+    CLIENT_KEY_PPI_PROD: ${env:CLIENT_KEY_PPI_PROD, ssm:/fedeira-personal-services/prod/ppi/clientKey}
+    API_KEY_PPI_PROD: ${env:API_KEY_PPI_PROD, ssm:/fedeira-personal-services/prod/ppi/apiKey}
+    API_SECRET_PPI_PROD: ${env:API_SECRET_PPI_PROD, ssm:/fedeira-personal-services/prod/ppi/apiSecret}
+
+    JWT_SECRET: ${env:JWT_SECRET, ssm:/fedeira-personal-services/auth/jwt/secret}
+    USER_EMAIL: ${env:USER_EMAIL, ssm:/fedeira-personal-services/user/email}
+    USER_PASSWORD: ${env:USER_PASSWORD, ssm:/fedeira-personal-services/user/password}
+
+    ENCRYPTION_KEY: ${env:ENCRYPTION_KEY, ssm:/fedeira-personal-services/crypto/encryptionKey}
+
+    # ENV locales
     API_VERSION_PPI: ${env:API_VERSION_PPI}
     API_KEY_PPI_TEST: ${env:API_KEY_PPI_TEST}
     API_SECRET_PPI_TEST: ${env:API_SECRET_PPI_TEST}
-    AUTHORIZED_CLIENT_PPI: ${env:AUTHORIZED_CLIENT_PPI}
     CLIENT_KEY_PPI_TEST: ${env:CLIENT_KEY_PPI_TEST}
-    ACCOUNT_NUMBER_PPI: ${env:ACCOUNT_NUMBER_PPI}
-    INVESTMENT_TABLE: ${self:custom.variables.INVESTMENT_TABLE}
+    ACCOUNT_NUMBER_PPI_TEST: ${env:ACCOUNT_NUMBER_PPI}
+    AUTHORIZED_CLIENT_PPI_TEST: ${env:AUTHORIZED_CLIENT_PPI}
     BASE_URL_PPI_TEST: ${env:BASE_URL_PPI_TEST}
-    JWT_SECRET: ${env:JWT_SECRET}
-    USER_EMAIL: ${env:USER_EMAIL}
-    USER_PASSWORD: ${env:USER_PASSWORD}
-    ENCRYPTION_KEY: ${env:ENCRYPTION_KEY}
+    BASE_URL_PPI_PROD: ${env:BASE_URL_PPI_PROD}
     ENCRYPTION_ALGORITHM: ${env:ENCRYPTION_ALGORITHM, 'aes-256-cbc'}
     ENCRYPTION_RANDOM_BYTES: ${env:ENCRYPTION_RANDOM_BYTES, '16'}
+    USER_EMAIL_TEST: ${env:USER_EMAIL}
+    USER_PASSWORD_TEST: ${env:USER_PASSWORD}
 
   # Monitoring & Logging:
   tracing:
-    apiGateway: false
-    lambda: false
+    apiGateway: true
+    lambda: true
   logs:
-    restApi: false
+    restApi: true
+    logRetentionInDays: 30
 
   # IAM role permissions for Lambda functions:
   iam:
@@ -57,11 +66,9 @@ provider:
         - Effect: 'Allow'
           Action:
             - 'ssm:GetParameter'
-            - 'ssm:PutParameter'
+            - 'ssm:GetParameters'
           Resource:
-            - 'arn:aws:ssm:us-east-2:${aws:accountId}:parameter/ppi'
-            - 'arn:aws:ssm:us-east-2:${aws:accountId}:parameter/ppi/token'
-            - 'arn:aws:ssm:us-east-2:${aws:accountId}:parameter/ppi/refreshToken'
+            - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/fedeira-personal-services/*'
         # Permit for dynamodb operations
         - Effect: 'Allow'
           Action:
@@ -72,93 +79,82 @@ provider:
             - 'dynamodb:UpdateItem'
             - 'dynamodb:DeleteItem'
           Resource:
-            - arn:aws:dynamodb:us-east-2:${aws:accountId}:table/${self:provider.environment.INVESTMENT_TABLE}
-            - arn:aws:dynamodb:us-east-2:${aws:accountId}:table/UserCredentials
-            - arn:aws:dynamodb:us-east-2:${aws:accountId}:table/Accounts
+            - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/UserCredentials'
+            - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Accounts'
         # Permit for logs operations in cloudwatch
         - Effect: 'Allow'
           Action:
             - 'logs:CreateLogGroup'
             - 'logs:CreateLogStream'
             - 'logs:PutLogEvents'
-          Resource: 'arn:aws:logs:us-east-2:${aws:accountId}:log-group:/aws/lambda/fedeira-investment-services:*'
+          Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*'
         # Permit for ses operations
         - Effect: 'Allow'
           Action:
             - 'ses:SendEmail'
             - 'ses:SendRawEmail'
-          Resource: 'arn:aws:ses:us-east-2:${aws:accountId}:identity/my-secure-domain.com'
+          Resource: '*'
         # Permit for S3 operations
         - Effect: 'Allow'
           Action:
-            - 's3:CreateBucket'
-            - 's3:DeleteBucket'
             - 's3:ListBucket'
             - 's3:GetBucketLocation'
             - 's3:GetObject'
             - 's3:PutObject'
           Resource:
-            - 'arn:aws:s3:::investment-fedeira-bucket'
-            - 'arn:aws:s3:::investment-fedeira-bucket/*'
+            - 'arn:aws:s3:::dev-fedeira-personal-services-bucket'
+            - 'arn:aws:s3:::dev-fedeira-personal-services-bucket/*'
 # Lambda functions definitions:
 functions:
-  #  Authorizer lambda:
-  authorize:
+  # Custom authorizer Lambda for API Gateway (verifies JWT tokens)
+  auth-service-authorizer:
     handler: authorization-services/handler.authorizer
+    name: 'dev-fedeira-authorization-services-authorizer'
+    memorySize: 1024
     timeout: 10
-    memorySize: 1028
-
-  # Login:
-  login:
+  #  Authorizer lambda: Lambda for authorization-related endpoints
+  authorization-service:
     handler: authorization-services/handler.login
+    name: 'dev-fedeira-authorization-services'
     timeout: 29
-    memorySize: 1028
+    memorySize: 1024
     events:
       - http:
           path: login
           method: post
           cors: true
-
-  getAvailableBalance:
+  # Investment domain Lambda:
+  investment-service:
     handler: investment-services/handler.getAvailableBalance
+    name: 'dev-fedeira-investment-services'
     timeout: 29
-    memorySize: 1028
+    memorySize: 1024
     events:
       - http:
           path: investment/available-balance
           method: get
           cors: true
           authorizer:
-            name: authorize
+            name: auth-service-authorizer
             type: TOKEN
-
-  getAccounts:
+  # Account domain Lambda:
+  account-service:
     handler: account-services/handler.getAccounts
+    name: 'dev-fedeira-account-services'
     timeout: 29
-    memorySize: 1028
+    memorySize: 1024
     events:
       - http:
           path: accounts
           method: get
           cors: true
           authorizer:
-            name: authorize
+            name: auth-service-authorizer
             type: TOKEN
 
 # AWS Resources: DynamoDB Table & S3 Bucket:
 resources:
   Resources:
-    InvestmentRecordsTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:custom.variables.INVESTMENT_TABLE}
-        AttributeDefinitions:
-          - AttributeName: investmentId
-            AttributeType: S
-        KeySchema:
-          - AttributeName: investmentId
-            KeyType: HASH
-        BillingMode: PAY_PER_REQUEST
     UserCredentialsTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -186,83 +182,10 @@ resources:
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
 
-    # Bucket creation
-    # S3InvestmentBucket:
-    #   Type: AWS::S3::Bucket
-    #   Properties:
-    #     BucketName: investment-fedeira-bucket
-    #     PublicAccessBlockConfiguration:
-    #       BlockPublicAcls: true
-    #       BlockPublicPolicy: true
-    #       IgnorePublicAcls: true
-    #       RestrictPublicBuckets: true
-    #     BucketEncryption:
-    #       ServerSideEncryptionConfiguration:
-    #         - ServerSideEncryptionByDefault:
-    #             SSEAlgorithm: AES256
-
-  Outputs:
-    DynamoDBEndpoint:
-      Description: 'DynamoDB Host Endpoint'
-      Value: !Sub 'https://dynamodb.${AWS::Region}.amazonaws.com'
-
-# Custom configurations:
-custom:
-  esbuild:
-    bundle: true
-    minify: false
-    sourcemap: false
-    target: node20
-    platform: node
-    exclude: ['aws-sdk']
-  secrets:
-    parameters:
-      '/ppi/token': '{"token":"mi-token-prueba","expiration":1700000000000,"refreshToken":"mi-refresh"}'
-
-  # Load environment variables from .env file:
-  dotenv:
-    path: .env
-    include:
-      - ACCOUNT_NUMBER_PPI
-      - AUTHORIZED_CLIENT_PPI
-      - API_VERSION_PPI
-      - API_KEY_PPI_TEST
-      - API_SECRET_PPI_TEST
-      - CLIENT_KEY_PPI_TEST
-      - BASE_URL_PPI_TEST
-      - JWT_SECRET
-      - USER_EMAIL
-      - USER_PASSWORD
-      - ENCRYPTION_KEY
-      - ENCRYPTION_ALGORITHM
-      - ENCRYPTION_RANDOM_BYTES
-
-  # Custom variables used throughout the configuration:
-  variables:
-    PPI_API_VERSION: ${ssm:/ppi/apiVersion}
-    PPI_API_KEY: ${ssm:/ppi/apiKey}
-    PPI_API_SECRET: ${ssm:/ppi/apiSecret}
-    PPI_AUTHORIZED_CLIENT: ${ssm:/ppi/authorizedClient}
-    PPI_CLIENT_KEY: ${ssm:/ppi/clientKey}
-    PPI_ACCOUNT_NUMBER: ${ssm:/ppi/accountNumber}
-    INVESTMENT_TABLE: InvestmentRecords
-
-  # DynamoDB local settings for offline development:
-  dynamodb:
-    stages:
-      - dev
-    start:
-      port: 8000
-      inMemory: true
-      seed: true
-      convertEmptyValues: true
-
-  # Packaging settings:
-  package:
-    individually: true
-    include:
-      - authorization-services/**
-      - investment-services/**
-      - account-services/**
-      - node_modules/**
-      - dist/**
+    # API Gateway access logs:
+    ApiGatewayAccessLogs:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName:
+          Fn::Sub: 'API-Gateway-Execution-Logs_${ApiGatewayRestApi}/dev'
+        RetentionInDays: 30

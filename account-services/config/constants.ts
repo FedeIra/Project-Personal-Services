@@ -2,8 +2,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-console.log('🔐 ENCRYPTION_KEY from .env:', process.env.ENCRYPTION_KEY);
-
 type Environment = 'development' | 'production';
 export const ENV: Environment =
   (process.env.NODE_ENV as Environment) || 'development';

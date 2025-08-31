@@ -17,17 +17,6 @@ const dynamoDb = new AWS.DynamoDB({
 
 const tables: TableDefinition[] = [
   {
-    TableName: 'InvestmentRecords',
-    KeySchema: [{ AttributeName: 'investmentId', KeyType: 'HASH' }],
-    AttributeDefinitions: [
-      { AttributeName: 'investmentId', AttributeType: 'S' },
-    ],
-    ProvisionedThroughput: {
-      ReadCapacityUnits: 5,
-      WriteCapacityUnits: 5,
-    },
-  },
-  {
     TableName: 'UserCredentials',
     KeySchema: [{ AttributeName: 'email', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: 'email', AttributeType: 'S' }],
@@ -59,6 +48,7 @@ const createTables = async (): Promise<void> => {
       console.log(`Creating table: ${table.TableName}`);
       await dynamoDb.createTable(table).promise();
       console.log(`Table created: ${table.TableName}`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.code === 'ResourceInUseException') {
         console.log(`Table already exists: ${table.TableName}`);

@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 // Internal dependencies:
 import { IUserRepository } from '../../application/interfaces/IUserRepository';
 
+// Handle local/production environment:
 const isOffline = process.env.IS_OFFLINE === 'true';
 
 let dynamoDb: DynamoDB.DocumentClient;
@@ -22,7 +23,9 @@ if (isOffline) {
 
 const TABLE_NAME = 'UserCredentials';
 
+// DynamoDB user repository implementation:
 export class DynamoUserRepository implements IUserRepository {
+  // Validate user credentials:
   async validateCredentials(email: string, password: string): Promise<boolean> {
     try {
       const result = await dynamoDb
@@ -36,7 +39,10 @@ export class DynamoUserRepository implements IUserRepository {
 
       if (!user || !user.password) return false;
 
-      const isPasswordValid = await bcrypt.compare(password, user.password);
+      const isPasswordValid: boolean = await bcrypt.compare(
+        password,
+        user.password
+      );
 
       return isPasswordValid;
     } catch (error) {

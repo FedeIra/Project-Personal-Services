@@ -1,6 +1,5 @@
 {
   "env": {
-    "browser": true,
     "es2021": true,
     "node": true
   },
@@ -8,7 +7,7 @@
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "prettier"
+    "plugin:prettier/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -27,5 +26,6 @@
       }
     ],
     "prettier/prettier": ["error", { "trailingComma": "es5" }]
-  }
+  },
+  "ignorePatterns": ["dist/", ".serverless/", "node_modules/"]
 }

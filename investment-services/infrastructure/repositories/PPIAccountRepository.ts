@@ -2,7 +2,7 @@
 import { IPPIAccountRepository } from '../../application/interfaces/IGetAvailableBalanceRepository';
 import { PPITokenService } from '../services/PPITokenServices';
 import { AccountBalanceResponsePPI } from '../../domain/entities/account/AccountBalanceResponsePPI';
-import { axiosConfiguration } from '../../config/axiosConfiguration';
+import { axiosConfiguration } from '../../../common/utils/axiosConfiguration';
 import { CONFIG } from '../../config/constants';
 
 // PPI Account repository:
@@ -30,8 +30,10 @@ export class PPIAccountRepository implements IPPIAccountRepository {
         response.data;
 
       return ppiAccountBalanceResponse;
-    } catch (error: any) {
-      throw new Error(`Error getting balance: ${error.message}`);
+    } catch (error: unknown) {
+      throw new Error(
+        `Error getting balance: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 }

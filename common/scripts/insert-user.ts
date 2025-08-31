@@ -1,5 +1,6 @@
-// Script to add user credentials to DynamoDB:
+// Script to add user to DynamoDB:
 
+// External Dependencies:
 import AWS from 'aws-sdk';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
@@ -14,19 +15,21 @@ if (!email || !plainPassword) {
   process.exit(1);
 }
 
-// Configurar DynamoDB para entorno local
+// DynamoDB configuration:
 const dynamoDb = new AWS.DynamoDB.DocumentClient({
+  // Prod:
   region: 'us-east-2',
+  // Test:
   // region: 'localhost',
   // endpoint: 'http://localhost:8000',
   // accessKeyId: 'fakeMyKeyId',
   // secretAccessKey: 'fakeSecretAccessKey',
 });
 
-// Encriptar la contraseña
 const saltRounds = 10;
 
-const insertUser = async () => {
+// Method to insert user into DynamoDB:
+const insertUser = async (): Promise<void> => {
   try {
     const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
 

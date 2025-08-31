@@ -10,12 +10,14 @@ export class LoginController {
 
   async handle(event: APIGatewayEvent): Promise<APIGatewayProxyResult> {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let body: any = {};
 
       if (event.isBase64Encoded) {
-        const decoded = Buffer.from(event.body || '', 'base64').toString(
-          'utf-8'
-        );
+        const decoded: string = Buffer.from(
+          event.body || '',
+          'base64'
+        ).toString('utf-8');
         body = JSON.parse(decoded);
       } else {
         body =
@@ -33,7 +35,8 @@ export class LoginController {
         };
       }
 
-      const token = await this.loginUseCase.execute(email, password);
+      // Execute the login use case:
+      const token: string = await this.loginUseCase.execute(email, password);
 
       return {
         statusCode: 200,

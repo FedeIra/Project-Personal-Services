@@ -1,21 +1,21 @@
 // Script to add accounts to DynamoDB:
 
+// External Dependencies:
 import AWS from 'aws-sdk';
 import dotenv from 'dotenv';
+import { EncryptionService } from '../../account-services/infrastructure/services/EncryptionService';
 
-import { EncryptionService } from '../account-services/infrastructure/services/EncryptionService';
-
-dotenv.config({ path: __dirname + '/../.env' });
+dotenv.config();
 
 // DynamoDB configuration:
 const dynamoDb = new AWS.DynamoDB.DocumentClient({
   // Prod:
-  // region: 'us-east-2',
+  region: 'us-east-2',
   // Test:
-  region: 'localhost',
-  endpoint: 'http://localhost:8000',
-  accessKeyId: 'fakeMyKeyId',
-  secretAccessKey: 'fakeSecretAccessKey',
+  // region: 'localhost',
+  // endpoint: 'http://localhost:8000',
+  // accessKeyId: 'fakeMyKeyId',
+  // secretAccessKey: 'fakeSecretAccessKey',
 });
 
 if (!process.env.ENCRYPTION_KEY || process.env.ENCRYPTION_KEY.length !== 64) {
@@ -30,7 +30,8 @@ const accounts = [
   },
 ];
 
-const insertAccounts = async () => {
+// Method to insert accounts into DynamoDB:
+const insertAccounts = async (): Promise<void> => {
   try {
     for (const entry of accounts) {
       const encryptedPassword = EncryptionService.encrypt(entry.password);
