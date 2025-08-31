@@ -10,12 +10,12 @@ dotenv.config();
 // DynamoDB configuration:
 const dynamoDb = new AWS.DynamoDB.DocumentClient({
   // Prod:
-  // region: 'us-east-2',
+  region: 'us-east-2',
   // Test:
-  region: 'localhost',
-  endpoint: 'http://localhost:8000',
-  accessKeyId: 'fakeMyKeyId',
-  secretAccessKey: 'fakeSecretAccessKey',
+  // region: 'localhost',
+  // endpoint: 'http://localhost:8000',
+  // accessKeyId: 'fakeMyKeyId',
+  // secretAccessKey: 'fakeSecretAccessKey',
 });
 
 if (!process.env.ENCRYPTION_KEY || process.env.ENCRYPTION_KEY.length !== 64) {

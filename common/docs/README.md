@@ -1,11 +1,25 @@
 # Fedeira Personal Services
 
-A serverless backend for personal services using PPI API's, AWS Lambda, API Gateway, DynamoDB, and S3.
+A serverless backend for personal services powered by AWS Lambda, API Gateway, DynamoDB, S3, and SSM, integrating with the PPI APIs.
 
-Services are as follows:
+The system follows Clean Architecture: domain/use-cases/infrastructure layering with controllers and explicit repositories/services.
+
+The project is deployed using the Serverless Framework in the dev stage on AWS us-east-2, leveraging a fully managed serverless stack.
+
+Core business logic is executed in AWS Lambda functions grouped by domain (Authorization, Investment, Account), and exposed through API Gateway with CORS enabled and a custom JWT Authorizer.
+
+Data is persisted in two DynamoDB tables (UserCredentials, Accounts), while an S3 bucket (fedeira-personal-services-bucket) is used for storage with server-side encryption (AES256).
+
+Sensitive secrets (PPI API keys, JWT secrets, encryption keys) are securely managed in AWS Systems Manager (SSM) Parameter Store.
+
+CloudWatch Logs provide monitoring and retention (30 days) for both Lambda and API Gateway, while SES is integrated for sending email notifications.
+
+All resources are tagged for project/service/environment tracking, ensuring observability, maintainability, and cost management across the stack.
+
+Services are the following:
 
 - **Authorization Service**: Handles user authentication and authorization.
-- **Investment Service**: Manages investment-related operations.
+- **Investment Service**: Manages investment-related operations against PPI.
 - **Account Service**: Manages user accounts.
 
 ## 🚀 Getting Started
@@ -20,7 +34,7 @@ Ensure you have the following installed:
 - **npm** (or **yarn**)
 - **AWS CLI** (with configured credentials)
 - **Serverless Framework** (`npm install -g serverless`)
-- **Docker** (for local DynamoDB)
+- **Docker** Docker (only if you will run local DynamoDB)
 - **TypeScript** (`npm install -D typescript`)
 
 ## 🏗 Installation
@@ -28,14 +42,14 @@ Ensure you have the following installed:
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/your-repo/fedeira-investment-services.git
-cd fedeira-investment-services
+git clone https://github.com/FedeIra/project-personal-services.git
+cd project-personal-services
 npm install
 ```
 
 ## 🔧 Running Locally (Test Mode)
 
-To run the project locally, follow these steps:
+You can run the API locally using Serverless Offline and DynamoDB local. To run the project locally, follow these steps:
 
 ### 1. Start Local DynamoDB:
 
@@ -52,20 +66,20 @@ This ensures that DynamoDB is running and accessible and that the required table
 npm run offline-db-migrate
 This will create required tables in the local DynamoDB instance.
 
-### 4. Insert records into database:
+### 4. Insert records into database / Seed data:
 
-You can use scripts in the `scripts/` directory to insert initial data into your local or remote DynamoDB instance. Command example to add accounts:
+You can use scripts in the `scripts/` directory to insert initial data into your local or remote DynamoDB instance. Command examples:
 
 To insert user:
 
 ```bash
-npx ts-node common\scripts\insert-user.ts
+npm run insert-user
 ```
 
 To insert accounts:
 
 ```bash
-npx ts-node common\scripts\insert-accounts.ts
+npm run insert-accounts
 ```
 
 ### 5. Create a .env file in the root directory:
@@ -92,39 +106,37 @@ Set up your AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_REGION.
 npm run deploy
 This will package and deploy your services to AWS.
 
-Check Deployed API Gateway URL: After deployment, Serverless will output the API URL. You can verify with the AWS Console and postman.
-
-## 🔍 Debugging
-
-Use serverless logs -f getAvailableBalance to check logs.
-If an issue occurs in AWS Lambda, enable logging in CloudWatch.
+Check Deployed API Gateway URL: After deployment, Serverless will output the API URL. You can verify with the AWS Console and Postman.
 
 ## 📜 Environment Variables
 
-The project relies on AWS Systems Manager (SSM) Parameter Store for environment variables.
+The project relies on AWS Systems Manager (SSM) Parameter Store for sensitive environment variables.
 
 To check the stored variables in AWS:
 
-aws ssm get-parameters-by-path --path /ppi
+aws ssm get-parameters-by-path --path /...
 
-For local testing, you can create a .env file with the following variables and adjust serverless.yml to use them:
-
-PPI_API_VERSION=your_api_version
-PPI_API_KEY=your_api_key
-PPI_API_SECRET=your_api_secret
-PPI_ACCOUNT_NUMBER=your_account_number
-IS_OFFLINE=true
+For local testing, you can create a .env file using the .env.example file as a guide.
 
 ## 📌 Useful Commands
 
 Command Description:
-npm run build Compile TypeScript files
-npm run offline-db-init Start local DynamoDB
-npm run offline-db-verify Verify local DynamoDB tables
-npm run offline-db-migrate Run database migrations locally
-npm run offline Run API locally
-npm run deploy Deploy to AWS
-serverless logs -f getAvailableBalance View logs for a function
+
+- npm run clean → Removes the dist folder to ensure a fresh build.
+- npm run build → Compiles TypeScript code into JavaScript.
+- npm run typecheck → Runs TypeScript type checking without emitting files.
+- npm run lint → Runs ESLint to check code style and quality.
+- npm run format → Formats code using Prettier.
+- npm run offline-db-init → Starts a local DynamoDB instance (via Docker).
+- npm run offline-db-verify → Lists local DynamoDB tables to confirm availability.
+- npm run offline-db-migrate → Runs migrations to create required DynamoDB tables locally.
+- npm run offline → Starts the API locally with Serverless Offline.
+- npm run nodemon → Runs the API locally with automatic reload on file changes.
+- npm run package → Packages the Serverless service for deployment (without deploying).
+- npm run predeploy → Runs build, typecheck, and lint before deployment.
+- npm run deploy → Deploys the service to AWS.
+- npm run insert-user → Runs a script to insert a test user into DynamoDB.
+- npm run insert-accounts → Runs a script to insert test accounts into DynamoDB.
 
 ## 📚 Technologies Used
 
@@ -135,13 +147,16 @@ serverless logs -f getAvailableBalance View logs for a function
 - 🟢 AWS Lambda
 - 📦 AWS DynamoDB
 - ☁️ AWS S3
+- 📧 AWS SES (for notifications)
 - 🔐 AWS SSM Parameter Store
 - 🔗 AWS API Gateway
+- 🔧 AWS Systems Manager (SSM)
 - 🧪 Serverless Offline (local testing)
 
 ## 🗂 Project Structure
 
-fedeira-personal-services/services/
+```
+projecto-personal-services/xxxx-services/
 ├── application/ # Business logic (use cases and interfaces)
 │ ├── interfaces/ # Abstract interfaces (repositories, services)
 │ └── usecases/ # Application use cases (e.g., Login, Authorize, GetBalance)
@@ -162,5 +177,6 @@ fedeira-personal-services/services/
 ├── .env # Local environment variables (ignored in production)
 ├── package.json # Project metadata and scripts
 └── common/ # Project documentation and architecture diagrams plus shared utilities
+```
 
 This structure follows the principles of Clean Architecture, ensuring separation of concerns and maintainability.

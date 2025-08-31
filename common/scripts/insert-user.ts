@@ -18,12 +18,12 @@ if (!email || !plainPassword) {
 // DynamoDB configuration:
 const dynamoDb = new AWS.DynamoDB.DocumentClient({
   // Prod:
-  // region: 'us-east-2',
+  region: 'us-east-2',
   // Test:
-  region: 'localhost',
-  endpoint: 'http://localhost:8000',
-  accessKeyId: 'fakeMyKeyId',
-  secretAccessKey: 'fakeSecretAccessKey',
+  // region: 'localhost',
+  // endpoint: 'http://localhost:8000',
+  // accessKeyId: 'fakeMyKeyId',
+  // secretAccessKey: 'fakeSecretAccessKey',
 });
 
 const saltRounds = 10;

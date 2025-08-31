@@ -1,5 +1,5 @@
 // External Dependencies:
-import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayProxyResult } from 'aws-lambda';
 import {
   buildResponse,
   ErrorHandler,

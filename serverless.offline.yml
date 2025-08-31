@@ -44,16 +44,16 @@ provider:
 
 # Lambda functions:
 functions:
-  authServiceAuthorizer:
+  auth-service-authorizer:
     handler: authorization-services/handler.authorizer
-  authorizationService:
+  authorization-service:
     handler: authorization-services/handler.login
     events:
       - http:
           path: login
           method: post
           cors: true
-  investmentService:
+  investment-service:
     handler: investment-services/handler.getAvailableBalance
     events:
       - http:
@@ -61,9 +61,9 @@ functions:
           method: get
           cors: true
           authorizer:
-            name: authServiceAuthorizer
+            name: auth-service-authorizer
             type: TOKEN
-  accountService:
+  account-service:
     handler: account-services/handler.getAccounts
     events:
       - http:
@@ -71,7 +71,7 @@ functions:
           method: get
           cors: true
           authorizer:
-            name: authServiceAuthorizer
+            name: auth-service-authorizer
             type: TOKEN
 
 # DynamoDB resources:

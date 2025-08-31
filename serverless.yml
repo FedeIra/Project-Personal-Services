@@ -1,11 +1,12 @@
 service: fedeira-personal-services
 frameworkVersion: '4'
+variablesResolutionMode: 20210326
 
 # AWS provider configuration:
 provider:
   name: aws
   runtime: nodejs18.x
-  profile: Fedeira-Developer
+  profile: Developer-Fedeira
   region: us-east-2
   stage: dev
   apiName: 'dev-fedeira-personal-services'
@@ -13,29 +14,29 @@ provider:
     name: dev-fedeira-personal-services-bucket
   apiGateway:
     minimumCompressionSize: 1024
-  # Tags for better resource management in AWS:
   tags:
     Project: 'Fedeira Personal Services'
     Service: 'Personal-services'
     Environment: 'dev'
-  # Environment variables available for Lambda functions:
+
   environment:
     IS_OFFLINE: 'false'
 
     # SSM
-    ACCOUNT_NUMBER_PPI: ${env:ACCOUNT_NUMBER_PPI, ${ssm:/fedeira-personal-services/ppi/accountNumber}}
-    AUTHORIZED_CLIENT_PPI: ${env:AUTHORIZED_CLIENT_PPI, ${ssm:/fedeira-personal-services/ppi/authorizedClient}}
+    ACCOUNT_NUMBER_PPI: ${env:ACCOUNT_NUMBER_PPI, ssm:/fedeira-personal-services/ppi/accountNumber}
+    AUTHORIZED_CLIENT_PPI: ${env:AUTHORIZED_CLIENT_PPI, ssm:/fedeira-personal-services/ppi/authorizedClient}
 
-    CLIENT_KEY_PPI_PROD: ${env:CLIENT_KEY_PPI_PROD, ${ssm:/fedeira-personal-services/prod/ppi/clientKey~true}}
-    API_KEY_PPI_PROD: ${env:API_KEY_PPI_PROD, ${ssm:/fedeira-personal-services/prod/ppi/apiKey~true}}
-    API_SECRET_PPI_PROD: ${env:API_SECRET_PPI_PROD, ${ssm:/fedeira-personal-services/prod/ppi/apiSecret~true}}
+    CLIENT_KEY_PPI_PROD: ${env:CLIENT_KEY_PPI_PROD, ssm:/fedeira-personal-services/prod/ppi/clientKey}
+    API_KEY_PPI_PROD: ${env:API_KEY_PPI_PROD, ssm:/fedeira-personal-services/prod/ppi/apiKey}
+    API_SECRET_PPI_PROD: ${env:API_SECRET_PPI_PROD, ssm:/fedeira-personal-services/prod/ppi/apiSecret}
 
-    JWT_SECRET: ${env:JWT_SECRET, ${ssm:/fedeira-personal-services/auth/jwt/secret~true}}
-    USER_EMAIL: ${env:USER_EMAIL, ${ssm:/fedeira-personal-services/user/email}}
-    USER_PASSWORD: ${env:USER_PASSWORD, ${ssm:/fedeira-personal-services/user/password~true}}
+    JWT_SECRET: ${env:JWT_SECRET, ssm:/fedeira-personal-services/auth/jwt/secret}
+    USER_EMAIL: ${env:USER_EMAIL, ssm:/fedeira-personal-services/user/email}
+    USER_PASSWORD: ${env:USER_PASSWORD, ssm:/fedeira-personal-services/user/password}
 
-    ENCRYPTION_KEY: ${env:ENCRYPTION_KEY, ${ssm:/fedeira-personal-services/crypto/encryptionKey~true}}
-    # ENV
+    ENCRYPTION_KEY: ${env:ENCRYPTION_KEY, ssm:/fedeira-personal-services/crypto/encryptionKey}
+
+    # ENV locales
     API_VERSION_PPI: ${env:API_VERSION_PPI}
     API_KEY_PPI_TEST: ${env:API_KEY_PPI_TEST}
     API_SECRET_PPI_TEST: ${env:API_SECRET_PPI_TEST}
@@ -92,7 +93,7 @@ provider:
           Action:
             - 'ses:SendEmail'
             - 'ses:SendRawEmail'
-          Resource: !Sub 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/my-secure-domain.com'
+          Resource: '*'
         # Permit for S3 operations
         - Effect: 'Allow'
           Action:
@@ -101,8 +102,8 @@ provider:
             - 's3:GetObject'
             - 's3:PutObject'
           Resource:
-            - 'arn:aws:s3:::fedeira-personal-services-bucket'
-            - 'arn:aws:s3:::fedeira-personal-services-bucket/*'
+            - 'arn:aws:s3:::dev-fedeira-personal-services-bucket'
+            - 'arn:aws:s3:::dev-fedeira-personal-services-bucket/*'
 # Lambda functions definitions:
 functions:
   # Custom authorizer Lambda for API Gateway (verifies JWT tokens)
@@ -122,7 +123,6 @@ functions:
           path: login
           method: post
           cors: true
-          authorizer: none
   # Investment domain Lambda:
   investment-service:
     handler: investment-services/handler.getAvailableBalance
@@ -135,7 +135,7 @@ functions:
           method: get
           cors: true
           authorizer:
-            name: authServiceAuthorizer
+            name: auth-service-authorizer
             type: TOKEN
   # Account domain Lambda:
   account-service:
@@ -149,7 +149,7 @@ functions:
           method: get
           cors: true
           authorizer:
-            name: authServiceAuthorizer
+            name: auth-service-authorizer
             type: TOKEN
 
 # AWS Resources: DynamoDB Table & S3 Bucket:
@@ -182,21 +182,7 @@ resources:
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
 
-    # Bucket creation
-    PersonalServicesBucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: fedeira-personal-services-bucket
-        PublicAccessBlockConfiguration:
-          BlockPublicAcls: true
-          BlockPublicPolicy: true
-          IgnorePublicAcls: true
-          RestrictPublicBuckets: true
-        BucketEncryption:
-          ServerSideEncryptionConfiguration:
-            - ServerSideEncryptionByDefault:
-                SSEAlgorithm: AES256
-
+    # API Gateway access logs:
     ApiGatewayAccessLogs:
       Type: AWS::Logs::LogGroup
       Properties:
