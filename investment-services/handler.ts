@@ -1,5 +1,5 @@
 // External Dependencies:
-import { APIGatewayEvent } from 'aws-lambda';
+import { APIGatewayProxyResult } from 'aws-lambda';
 
 // Internal Dependencies:
 import { GetAvailableBalanceController } from './infrastructure/controllers/GetAvailableBalanceController';
@@ -12,6 +12,6 @@ const getAvailableBalanceController = new GetAvailableBalanceController(
 );
 
 // Get Balance handler:
-export const getAvailableBalance = async (event: APIGatewayEvent) => {
-  return getAvailableBalanceController.handle(event);
+export const getAvailableBalance = async (): Promise<APIGatewayProxyResult> => {
+  return getAvailableBalanceController.handle();
 };

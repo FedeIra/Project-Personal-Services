@@ -1,8 +1,8 @@
 // Script to add accounts to DynamoDB:
 
+// External Dependencies:
 import AWS from 'aws-sdk';
 import dotenv from 'dotenv';
-
 import { EncryptionService } from '../../account-services/infrastructure/services/EncryptionService';
 
 dotenv.config();
@@ -30,7 +30,8 @@ const accounts = [
   },
 ];
 
-const insertAccounts = async () => {
+// Method to insert accounts into DynamoDB:
+const insertAccounts = async (): Promise<void> => {
   try {
     for (const entry of accounts) {
       const encryptedPassword = EncryptionService.encrypt(entry.password);

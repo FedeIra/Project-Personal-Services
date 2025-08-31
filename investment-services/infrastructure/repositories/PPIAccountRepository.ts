@@ -30,8 +30,10 @@ export class PPIAccountRepository implements IPPIAccountRepository {
         response.data;
 
       return ppiAccountBalanceResponse;
-    } catch (error: any) {
-      throw new Error(`Error getting balance: ${error.message}`);
+    } catch (error: unknown) {
+      throw new Error(
+        `Error getting balance: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 }

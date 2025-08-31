@@ -106,13 +106,13 @@ provider:
 # Lambda functions definitions:
 functions:
   # Custom authorizer Lambda for API Gateway (verifies JWT tokens)
-  authServiceAuthorizer:
+  auth-service-authorizer:
     handler: authorization-services/handler.authorizer
     name: 'dev-fedeira-authorization-services-authorizer'
     memorySize: 1024
     timeout: 10
   #  Authorizer lambda: Lambda for authorization-related endpoints
-  authorizationService:
+  authorization-service:
     handler: authorization-services/handler.login
     name: 'dev-fedeira-authorization-services'
     timeout: 29
@@ -124,7 +124,7 @@ functions:
           cors: true
           authorizer: none
   # Investment domain Lambda:
-  investmentService:
+  investment-service:
     handler: investment-services/handler.getAvailableBalance
     name: 'dev-fedeira-investment-services'
     timeout: 29
@@ -138,7 +138,7 @@ functions:
             name: authServiceAuthorizer
             type: TOKEN
   # Account domain Lambda:
-  accountService:
+  account-service:
     handler: account-services/handler.getAccounts
     name: 'dev-fedeira-account-services'
     timeout: 29

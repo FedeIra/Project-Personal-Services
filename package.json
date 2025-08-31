@@ -19,8 +19,8 @@
     "package": "serverless package",
     "predeploy": "npm run build && npm run typecheck && npm run lint",
     "deploy": "npm run build && serverless deploy",
-    "insert-user": "ts-node scripts/insert-user.ts",
-    "insert-account": "ts-node scripts/insert-account.ts"
+    "insert-user": "ts-node common/scripts/insert-user.ts",
+    "insert-accounts": "ts-node common/scripts/insert-accounts.ts"
   },
   "dependencies": {
     "aws-sdk": "^2.1692.0",
@@ -33,6 +33,8 @@
     "@types/aws-lambda": "^8.10.147",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.13.5",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
     "dotenv": "^16.4.7",
     "dotenv-cli": "^10.0.0",
     "eslint": "^8.57.1",

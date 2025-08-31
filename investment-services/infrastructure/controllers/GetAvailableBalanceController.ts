@@ -1,11 +1,10 @@
 // External Dependencies:
-import { APIGatewayEvent } from 'aws-lambda';
-
-// Internal Dependencies:
+import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
 import {
   buildResponse,
   ErrorHandler,
 } from '../../../common/utils/ResponseBuilder';
+// Internal Dependencies:
 import { GetAvailableBalanceUseCase } from '../../application/usecases/GetAvailableBalanceUseCase';
 import { AccountBalanceResponsePPI } from '../../domain/entities/account/AccountBalanceResponsePPI';
 import { IPPIAccountRepository } from '../../application/interfaces/IGetAvailableBalanceRepository';
@@ -20,7 +19,7 @@ export class GetAvailableBalanceController {
     );
   }
 
-  async handle(event: APIGatewayEvent) {
+  async handle(): Promise<APIGatewayProxyResult> {
     try {
       // Get PPI account balance:
       const data: AccountBalanceResponsePPI[] =

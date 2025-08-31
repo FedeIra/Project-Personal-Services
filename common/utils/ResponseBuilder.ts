@@ -2,11 +2,16 @@
 interface Response {
   status: string;
   codeStatus: number;
-  data?: any;
+  data?: unknown;
   errorMessage?: string;
 }
 
-export const buildResponse = (params: Response) => {
+export const buildResponse = (
+  params: Response
+): {
+  statusCode: number;
+  body: string;
+} => {
   return {
     statusCode: params.codeStatus,
     body: JSON.stringify({
@@ -20,12 +25,21 @@ export const buildResponse = (params: Response) => {
 
 // Response mapper for errors:
 export class ErrorHandler {
-  static handle(error: any) {
+  static handle(error: unknown): {
+    statusCode: number;
+    body: string;
+  } {
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'string'
+          ? error
+          : 'Internal Server Error';
     return {
       statusCode: 500,
       body: JSON.stringify({
         status: 'error',
-        message: error.message || 'Internal Server Error',
+        message: message,
       }),
     };
   }

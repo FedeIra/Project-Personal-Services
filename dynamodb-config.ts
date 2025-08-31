@@ -48,6 +48,7 @@ const createTables = async (): Promise<void> => {
       console.log(`Creating table: ${table.TableName}`);
       await dynamoDb.createTable(table).promise();
       console.log(`Table created: ${table.TableName}`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.code === 'ResourceInUseException') {
         console.log(`Table already exists: ${table.TableName}`);

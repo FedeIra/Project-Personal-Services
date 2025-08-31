@@ -2,7 +2,6 @@
 import AWS from 'aws-sdk';
 
 // Token cache service:
-
 const ssm = new AWS.SSM();
 export class TokenCacheService {
   private static token: string | null = null;
@@ -27,7 +26,7 @@ export class TokenCacheService {
   }
 
   // Set token in cache:
-  static setToken(token: string, expiresInMs: number) {
+  static setToken(token: string, expiresInMs: number): void {
     this.token = token;
     this.tokenExpiration = Date.now() + (expiresInMs ?? 0);
     this.saveTokenToSSM();
@@ -42,13 +41,13 @@ export class TokenCacheService {
   }
 
   // Set refresh token in cache and SSM:
-  static async setRefreshToken(refreshToken: string) {
+  static async setRefreshToken(refreshToken: string): Promise<void> {
     this.refreshToken = refreshToken;
     await this.saveTokenToSSM();
   }
 
   // Load token and refresh token from SSM:
-  private static async loadTokenFromSSM() {
+  private static async loadTokenFromSSM(): Promise<void> {
     try {
       const result = await ssm
         .getParameter({ Name: '/ppi/token', WithDecryption: true })
@@ -66,7 +65,7 @@ export class TokenCacheService {
   }
 
   // Store token and refresh token in SSM:
-  private static async saveTokenToSSM() {
+  private static async saveTokenToSSM(): Promise<void> {
     try {
       await ssm
         .putParameter({

@@ -12,6 +12,7 @@ import { AuthPolicy } from '../../infrastructure/auth/AuthPolicy';
 export class AuthorizerUseCase {
   constructor(private readonly tokenService: ITokenService) {}
 
+  // Execute the authorizer use case:
   async execute(
     event: APIGatewayTokenAuthorizerEvent
   ): Promise<APIGatewayAuthorizerResult> {

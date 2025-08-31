@@ -87,15 +87,15 @@ export class PPITokenService {
       const tokenInfo: LoginResponsePPI = response.data;
 
       return tokenInfo;
-    } catch (error: any) {
+    } catch (error: unknown) {
       throw new Error(
-        `Error getting token: ${error.response?.data || error.message}`
+        `Error getting token: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }
 
   // Store token in cache:
-  private static async storeToken(tokenInfo: LoginResponsePPI) {
+  private static async storeToken(tokenInfo: LoginResponsePPI): Promise<void> {
     const expirationTimeMs: number = tokenInfo.expires * 1000;
 
     await TokenCacheService.setToken(tokenInfo.accessToken, expirationTimeMs);
