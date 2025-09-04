@@ -151,6 +151,21 @@ functions:
           authorizer:
             name: auth-service-authorizer
             type: TOKEN
+  # Reports domain Lambda:
+  reports-service:
+    handler: reports-services/lambda.handler
+    name: 'dev-fedeira-reports-services'
+    runtime: nodejs18.x
+    timeout: 29
+    memorySize: 1024
+    events:
+      - http:
+          path: reports
+          method: post
+          cors: true
+          authorizer:
+            name: auth-service-authorizer
+            type: TOKEN
 
 # AWS Resources: DynamoDB Table & S3 Bucket:
 resources:
