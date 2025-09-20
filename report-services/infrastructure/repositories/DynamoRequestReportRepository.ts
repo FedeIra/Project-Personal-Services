@@ -1,9 +1,8 @@
 // External Dependencies:
 import { DynamoDB } from 'aws-sdk';
-import AWS from 'aws-sdk';
 
 // Internal Dependencies:
-import { IReportRequestRepository } from '../../application/interfaces/IRequestRepository';
+import { IReportRequestRepository } from '../../application/interfaces/IReportRequestRepository';
 import { ReportRequest } from '../../domain/ReportRequestResponseDB';
 
 // Handle local/production environment:

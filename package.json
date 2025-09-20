@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@fastify/aws-lambda": "^6.1.1",
+    "@fastify/multipart": "^9.2.1",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.7.9",
     "axios-retry": "^4.5.0",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.147",
+    "@types/fastify-multipart": "^0.7.2",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.13.5",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
