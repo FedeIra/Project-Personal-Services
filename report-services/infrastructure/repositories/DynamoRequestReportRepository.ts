@@ -29,7 +29,13 @@ export class ReportRequestRepository implements IReportRequestRepository {
       TableName: process.env.REPORT_REQUESTS_TABLE || '',
       Item: reportRequest,
     };
-    await dynamoDb.put(params).promise();
-    return reportRequest.id || '';
+    try {
+      await dynamoDb.put(params).promise();
+      return reportRequest.id;
+    } catch (err) {
+      throw new Error(
+        'Error saving report request to DynamoDB: ' + (err as Error).message
+      );
+    }
   }
 }

@@ -81,6 +81,7 @@ provider:
           Resource:
             - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/UserCredentials'
             - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Accounts'
+            - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ReportRequests'
         # Permit for logs operations in cloudwatch
         - Effect: 'Allow'
           Action:
@@ -104,6 +105,12 @@ provider:
           Resource:
             - 'arn:aws:s3:::dev-fedeira-personal-services-bucket'
             - 'arn:aws:s3:::dev-fedeira-personal-services-bucket/*'
+            # Permit for SQS operations:
+        - Effect: 'Allow'
+          Action:
+            - 'sqs:SendMessage'
+          Resource:
+            - !GetAtt ReportRequestsQueue.Arn
 # Lambda functions definitions:
 functions:
   # Custom authorizer Lambda for API Gateway (verifies JWT tokens)
@@ -152,9 +159,9 @@ functions:
             name: auth-service-authorizer
             type: TOKEN
   # Reports domain Lambda:
-  reports-service:
-    handler: reports-services/lambda.handler
-    name: 'dev-fedeira-reports-services'
+  report-service:
+    handler: report-services/lambda.handler
+    name: 'dev-fedeira-report-services'
     runtime: nodejs18.x
     timeout: 29
     memorySize: 1024
@@ -167,7 +174,7 @@ functions:
             name: auth-service-authorizer
             type: TOKEN
 
-# AWS Resources: DynamoDB Table & S3 Bucket:
+# AWS Resources: DynamoDB Tables, S3 Bucket and SQS Queue:
 resources:
   Resources:
     UserCredentialsTable:
@@ -196,6 +203,59 @@ resources:
           - AttributeName: user
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
+    ReportRequestsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ReportRequests
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+          - AttributeName: status
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+          - AttributeName: email
+            KeyType: RANGE
+        GlobalSecondaryIndexes:
+          - IndexName: StatusIndex
+            KeySchema:
+              - AttributeName: status
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+    S3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: dev-fedeira-personal-services-bucket
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              AllowedOrigins:
+                - '*'
+              MaxAge: 3000
+    ReportRequestsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ReportRequestsQueue
+        VisibilityTimeout: 60
+        MessageRetentionPeriod: 1209600
+        RedrivePolicy:
+          deadLetterTargetArn:
+            Fn::GetAtt:
+              - ReportRequestsDeadLetterQueue
+              - Arn
+          maxReceiveCount: 5
 
     # API Gateway access logs:
     ApiGatewayAccessLogs:

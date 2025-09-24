@@ -10,13 +10,21 @@ export class S3Repository {
   async uploadCSVFile(key: string, file: MultipartFile): Promise<void> {
     const buffer = await file.toBuffer();
 
-    await this.s3
-      .putObject({
-        Bucket: this.bucketName,
-        Key: key,
-        Body: buffer,
-        ContentType: 'text/csv',
-      })
-      .promise();
+    if (!buffer || buffer.length === 0) {
+      throw new Error('CSV file is empty.');
+    }
+
+    try {
+      await this.s3
+        .putObject({
+          Bucket: this.bucketName,
+          Key: key,
+          Body: buffer,
+          ContentType: 'text/csv',
+        })
+        .promise();
+    } catch (err) {
+      throw new Error('Error uploading file to S3: ' + (err as Error).message);
+    }
   }
 }

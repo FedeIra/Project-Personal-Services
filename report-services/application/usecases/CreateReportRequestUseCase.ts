@@ -13,17 +13,17 @@ import {
 
 export class CreateReportRequestUseCase {
   constructor(
-    private readonly s3Repo: S3Repository,
-    private readonly reportRepo: ReportRequestRepository,
-    private readonly sqsRepo: SQSRepository
+    private readonly s3Repository: S3Repository,
+    private readonly reportRequestRepository: ReportRequestRepository,
+    private readonly sqsRepository: SQSRepository
   ) {}
 
   async execute(email: string, file: MultipartFile): Promise<string> {
     // 1) Upload csv to S3:
     const date: string = new Date().toISOString().split('T')[0];
     const id: string = uuidv4();
-    const s3Key: string = `reports/request/${date}/${id}.csv`;
-    await this.s3Repo.uploadCSVFile(s3Key, file);
+    const s3Key: string = `reports/request/${date}/${encodeURIComponent(email)}/${id}.csv`;
+    await this.s3Repository.uploadCSVFile(s3Key, file);
 
     // 2) Create report request in DynamoDB:
     const reportRequest: ReportRequest = {
@@ -35,10 +35,10 @@ export class CreateReportRequestUseCase {
       request: s3Key,
       response: null,
     };
-    await this.reportRepo.createReportRequest(reportRequest);
+    await this.reportRequestRepository.createReportRequest(reportRequest);
 
     // 3) Send message to SQS FIFO queue:
-    await this.sqsRepo.sendMessageToFifoQueue(id, email);
+    await this.sqsRepository.sendMessageToFifoQueue(id, email);
 
     // 4) Return report request id
     return id;

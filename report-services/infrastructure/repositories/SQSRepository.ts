@@ -10,13 +10,23 @@ export class SQSRepository {
     messageBody: string,
     email: string
   ): Promise<void> {
-    await this.sqs
-      .sendMessage({
-        QueueUrl: this.queueUrl,
-        MessageBody: messageBody,
-        MessageGroupId: email, // Agrupador FIFO
-        MessageDeduplicationId: `${email}-${Date.now()}`, // Un identificador único
-      })
-      .promise();
+    if (!messageBody || !email) {
+      throw new Error('Message body and email are required for SQS FIFO.');
+    }
+
+    try {
+      await this.sqs
+        .sendMessage({
+          QueueUrl: this.queueUrl,
+          MessageBody: messageBody,
+          MessageGroupId: email,
+          MessageDeduplicationId: `${email}-${Date.now()}`,
+        })
+        .promise();
+    } catch (err) {
+      throw new Error(
+        'Error sending message to SQS: ' + (err as Error).message
+      );
+    }
   }
 }

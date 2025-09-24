@@ -1,24 +1,36 @@
+// External Dependencies:
 import Fastify, { FastifyInstance } from 'fastify';
+import multipart from '@fastify/multipart';
+import SQS from 'aws-sdk/clients/sqs';
+import { S3 } from 'aws-sdk';
 
-// (Tus deps)
-// import { DBReportRepository } from './infrastructure/repositories/DBReportRepository';
-// import { CreateReportController } from './infrastructure/controllers/CreateReportController';
-// import { GetReportByIdController } from './infrastructure/controllers/GetReportByIdController';
+// Internal Dependencies:
+import { ReportRequestRepository } from './infrastructure/repositories/DynamoRequestReportRepository';
+import { CreateReportRequestController } from './infrastructure/controllers/CreateReportRequestController';
+import { S3Repository } from './infrastructure/repositories/S3Repository';
+import { SQSRepository } from './infrastructure/repositories/SQSRepository';
+import { CreateReportRequestUseCase } from './application/usecases/CreateReportRequestUseCase';
 
 export async function buildApp(): Promise<FastifyInstance> {
-  const app = Fastify();
+  const app = Fastify({ logger: true });
+  await app.register(multipart);
 
-  // const repo = new DBReportRepository();
-  // const createCtrl = new CreateReportController(repo);
-  // const getByIdCtrl = new GetReportByIdController(repo);
+  const s3Repository = new S3Repository(new S3(), process.env.REPORTS_BUCKET!);
+  const reportRequestRepository = new ReportRequestRepository();
+  const sqsRepository = new SQSRepository(
+    new SQS(),
+    process.env.REPORT_REQUESTS_QUEUE_URL!
+  );
+  const useCase = new CreateReportRequestUseCase(
+    s3Repository,
+    reportRequestRepository,
+    sqsRepository
+  );
+  const controller = new CreateReportRequestController(useCase);
 
-  // POST /reports
-  app.post('/reports', async (request, reply) => {
-    const res = await createCtrl.handle(request.raw as any);
-    reply
-      .code(res.statusCode)
-      .headers(res.headers ?? {})
-      .send(res.body);
-  });
+  // Create report request:
+  app.post('/reports/:email', async (request, reply) =>
+    controller.handle(request, reply)
+  );
   return app;
 }
