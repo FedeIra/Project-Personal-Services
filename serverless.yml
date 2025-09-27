@@ -14,6 +14,8 @@ provider:
     name: dev-fedeira-personal-services-bucket
   apiGateway:
     minimumCompressionSize: 1024
+    binaryMediaTypes:
+      - 'multipart/form-data'
   tags:
     Project: 'Fedeira Personal Services'
     Service: 'Personal-services'
@@ -49,6 +51,9 @@ provider:
     ENCRYPTION_RANDOM_BYTES: ${env:ENCRYPTION_RANDOM_BYTES, '16'}
     USER_EMAIL_TEST: ${env:USER_EMAIL}
     USER_PASSWORD_TEST: ${env:USER_PASSWORD}
+    AWS_REPORTS_BUCKET: ${env:AWS_REPORTS_BUCKET}
+    AWS_REPORT_REQUESTS_QUEUE_URL: !Ref ReportRequestsQueue
+    REPORT_REQUESTS_TABLE: ReportRequests
 
   # Monitoring & Logging:
   tracing:
@@ -167,9 +172,13 @@ functions:
     memorySize: 1024
     events:
       - http:
-          path: reports
+          path: reports/{email}
           method: post
           cors: true
+          request:
+            parameters:
+              paths:
+                email: true
           authorizer:
             name: auth-service-authorizer
             type: TOKEN
@@ -207,6 +216,8 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ReportRequests
+        BillingMode: PAY_PER_REQUEST
+
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
@@ -214,19 +225,31 @@ resources:
             AttributeType: S
           - AttributeName: status
             AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+
         KeySchema:
           - AttributeName: id
             KeyType: HASH
-          - AttributeName: email
-            KeyType: RANGE
+
         GlobalSecondaryIndexes:
-          - IndexName: StatusIndex
+          - IndexName: ByEmail
+            KeySchema:
+              - AttributeName: email
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+          - IndexName: ByStatus
             KeySchema:
               - AttributeName: status
                 KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
             Projection:
               ProjectionType: ALL
-        BillingMode: PAY_PER_REQUEST
     S3Bucket:
       Type: AWS::S3::Bucket
       Properties:
@@ -247,15 +270,20 @@ resources:
     ReportRequestsQueue:
       Type: AWS::SQS::Queue
       Properties:
-        QueueName: ReportRequestsQueue
+        QueueName: ReportRequestsQueue.fifo
+        FifoQueue: true
+        ContentBasedDeduplication: true
         VisibilityTimeout: 60
         MessageRetentionPeriod: 1209600
         RedrivePolicy:
-          deadLetterTargetArn:
-            Fn::GetAtt:
-              - ReportRequestsDeadLetterQueue
-              - Arn
+          deadLetterTargetArn: !GetAtt ReportRequestsDeadLetterQueue.Arn
           maxReceiveCount: 5
+    ReportRequestsDeadLetterQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ReportRequestsDeadLetterQueue.fifo
+        FifoQueue: true
+        MessageRetentionPeriod: 1209600
 
     # API Gateway access logs:
     ApiGatewayAccessLogs:

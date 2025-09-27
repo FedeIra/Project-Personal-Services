@@ -66,6 +66,8 @@ This ensures that DynamoDB is running and accessible and that the required table
 npm run offline-db-migrate
 This will create required tables in the local DynamoDB instance.
 
+For this purpose, the project uses the document dynamodb-config.ts file located in the config/ directory to define the table schemas.
+
 ### 4. Insert records into database / Seed data:
 
 You can use scripts in the `scripts/` directory to insert initial data into your local or remote DynamoDB instance. Command examples:

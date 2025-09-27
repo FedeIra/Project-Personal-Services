@@ -20,7 +20,8 @@ export class CreateReportRequestUseCase {
 
   async execute(email: string, file: MultipartFile): Promise<string> {
     // 1) Upload csv to S3:
-    const date: string = new Date().toISOString().split('T')[0];
+    const now = new Date().toISOString();
+    const date: string = now.split('T')[0];
     const id: string = uuidv4();
     const s3Key: string = `reports/request/${date}/${encodeURIComponent(email)}/${id}.csv`;
     await this.s3Repository.uploadCSVFile(s3Key, file);
@@ -30,8 +31,8 @@ export class CreateReportRequestUseCase {
       id,
       email,
       status: ReportStatus.NEW,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
       request: s3Key,
       response: null,
     };

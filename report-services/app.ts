@@ -15,11 +15,14 @@ export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({ logger: true });
   await app.register(multipart);
 
-  const s3Repository = new S3Repository(new S3(), process.env.REPORTS_BUCKET!);
+  const s3Repository = new S3Repository(
+    new S3(),
+    process.env.AWS_REPORTS_BUCKET!
+  );
   const reportRequestRepository = new ReportRequestRepository();
   const sqsRepository = new SQSRepository(
     new SQS(),
-    process.env.REPORT_REQUESTS_QUEUE_URL!
+    process.env.AWS_REPORT_REQUESTS_QUEUE_URL!
   );
   const useCase = new CreateReportRequestUseCase(
     s3Repository,
