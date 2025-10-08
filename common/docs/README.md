@@ -88,7 +88,16 @@ npm run insert-accounts
 
 Use as guide the .env.example file to create your own .env file.
 
-### 6. Start the Serverless Offline API:
+### 6. Use node.js version 20.x
+
+The project is configured to use Node.js 20.x. Ensure you have this version installed and set as the active version in your environment.
+
+```bash
+nvm install 20
+nvm use 20
+```
+
+### 7. Start the Serverless Offline API:
 
 npm run offline
 This will start a local API endpoint at http://localhost:3000.

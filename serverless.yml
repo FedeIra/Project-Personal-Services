@@ -5,7 +5,7 @@ variablesResolutionMode: 20210326
 # AWS provider configuration:
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   profile: Developer-Fedeira
   region: us-east-2
   stage: dev
@@ -167,7 +167,6 @@ functions:
   report-service:
     handler: report-services/lambda.handler
     name: 'dev-fedeira-report-services'
-    runtime: nodejs18.x
     timeout: 29
     memorySize: 1024
     events:
