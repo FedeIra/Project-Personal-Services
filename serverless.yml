@@ -72,6 +72,7 @@ provider:
           Action:
             - 'ssm:GetParameter'
             - 'ssm:GetParameters'
+            - 'ssm:PutParameter'
           Resource:
             - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/fedeira-personal-services/*'
         # Permit for dynamodb operations
@@ -249,23 +250,23 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
-    S3Bucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: dev-fedeira-personal-services-bucket
-        CorsConfiguration:
-          CorsRules:
-            - AllowedHeaders:
-                - '*'
-              AllowedMethods:
-                - GET
-                - PUT
-                - POST
-                - DELETE
-                - HEAD
-              AllowedOrigins:
-                - '*'
-              MaxAge: 3000
+    # S3Bucket:
+    # Type: AWS::S3::Bucket
+    # Properties:
+    #   BucketName: dev-fedeira-personal-services-bucket
+    #   CorsConfiguration:
+    #     CorsRules:
+    #       - AllowedHeaders:
+    #           - '*'
+    #         AllowedMethods:
+    #           - GET
+    #           - PUT
+    #           - POST
+    #           - DELETE
+    #           - HEAD
+    #         AllowedOrigins:
+    #           - '*'
+    #         MaxAge: 3000
     ReportRequestsQueue:
       Type: AWS::SQS::Queue
       Properties:
