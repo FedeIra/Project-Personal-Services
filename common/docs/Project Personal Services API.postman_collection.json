@@ -97,7 +97,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"token\": \"xxxx\"\n}"
+              "body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlZGVpcmFyQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiYXNka2xqZjNrNGo1ISIsImlhdCI6MTc0MjU4Njg0NiwiZXhwIjoxNzQyNTkwNDQ2fQ.-qMBS5gWpQUJ3IHAzUbPoaLCeRRy-MoMZPGHyV117do\"\n}"
             }
           ]
         }
@@ -227,7 +227,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{BASE_URL}}/dev/accounts?pageSize=10",
+              "raw": "{{BASE_URL}}/dev/accounts?pageSize=10&filter[account][eq]=banco",
               "host": ["{{BASE_URL}}"],
               "path": ["dev", "accounts"],
               "query": [
@@ -237,7 +237,11 @@
                 },
                 {
                   "key": "filter[account][eq]",
-                  "value": "banco",
+                  "value": "banco"
+                },
+                {
+                  "key": "nextToken",
+                  "value": "eyJ1c2VyIjoiZmVkZWlyYXJAZ21haWwuY29tIiwiYWNjb3VudCI6ImlwaG9uZSJ9",
                   "disabled": true
                 }
               ]
@@ -318,6 +322,114 @@
           ]
         }
       ]
+    },
+    {
+      "name": "report-services",
+      "item": [
+        {
+          "name": "create report request",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "",
+                  "type": "file",
+                  "src": "/C:/Users/Usuario/Downloads/3ef27609-00ea-4e39-9876-82c448e642e8.csv"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/dev/reports/:email",
+              "host": ["{{BASE_URL}}"],
+              "path": ["dev", "reports", ":email"],
+              "variable": [
+                {
+                  "key": "email",
+                  "value": "xxxx"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "create report request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "",
+                      "type": "file",
+                      "src": "/C:/Users/Usuario/Downloads/3ef27609-00ea-4e39-9876-82c448e642e8.csv"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/dev/reports/:email",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["dev", "reports", ":email"],
+                  "variable": [
+                    {
+                      "key": "email",
+                      "value": "xxxx"
+                    }
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "content-type",
+                  "value": "text/plain; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "103"
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 30 Oct 2025 01:48:42 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "vary",
+                  "value": "origin"
+                },
+                {
+                  "key": "access-control-expose-headers",
+                  "value": "WWW-Authenticate,Server-Authorization"
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-cache"
+                }
+              ],
+              "cookie": [],
+              "body": "{\"status\":\"success\",\"codeStatus\":201,\"data\":\"17374dd9-38e1-4e50-bb96-5189bd90f3f0\",\"errorMessage\":null}"
+            }
+          ]
+        }
+      ]
     }
   ],
   "event": [
@@ -326,6 +438,7 @@
       "script": {
         "type": "text/javascript",
         "packages": {},
+        "requests": {},
         "exec": [""]
       }
     },
@@ -334,6 +447,7 @@
       "script": {
         "type": "text/javascript",
         "packages": {},
+        "requests": {},
         "exec": [""]
       }
     }
@@ -346,11 +460,11 @@
     },
     {
       "key": "BASE_URL",
-      "value": "https://bk7xpquf2k.execute-api.us-east-2.amazonaws.com"
+      "value": "https://f5tnbe0jn5.execute-api.us-east-2.amazonaws.com"
     },
     {
       "key": "TOKEN",
-      "value": "xxxx"
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlZGVpcmFyQGdtYWlsLmNvbSIsImlhdCI6MTc0MzIxNTYzMSwiZXhwIjoxNzQzMjE5MjMxfQ.UbBtatpcsCpD_ArcvM39F-vbSEyy-C7gGjnpXy7OYlk"
     }
   ]
 }
