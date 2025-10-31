@@ -11,10 +11,13 @@ plugins:
 # AWS provider configuration:
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   region: us-east-2
   stage: dev
   timeout: 29
+  apiGateway:
+    binaryMediaTypes:
+      - 'multipart/form-data'
   # Environment variables available for Lambda functions:
   environment:
     IS_OFFLINE: 'true'
@@ -41,6 +44,10 @@ provider:
     ENCRYPTION_RANDOM_BYTES: ${env:ENCRYPTION_RANDOM_BYTES, '16'}
     USER_EMAIL_TEST: ${env:USER_EMAIL}
     USER_PASSWORD_TEST: ${env:USER_PASSWORD}
+
+    AWS_REPORTS_BUCKET: ${env:AWS_REPORTS_BUCKET}
+    AWS_REPORT_REQUESTS_QUEUE_URL: ${env:AWS_REPORT_REQUESTS_QUEUE_URL}
+    REPORT_REQUESTS_TABLE: ReportRequests
 
 # Lambda functions:
 functions:
@@ -70,6 +77,20 @@ functions:
           path: accounts
           method: get
           cors: true
+          authorizer:
+            name: auth-service-authorizer
+            type: TOKEN
+  report-service:
+    handler: report-services/lambda.handler
+    events:
+      - http:
+          path: reports/{email}
+          method: post
+          cors: true
+          request:
+            parameters:
+              paths:
+                email: true
           authorizer:
             name: auth-service-authorizer
             type: TOKEN
@@ -104,6 +125,45 @@ resources:
           - AttributeName: user
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
+
+    ReportRequestsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ReportRequests
+        BillingMode: PAY_PER_REQUEST
+
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+          - AttributeName: status
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
+        GlobalSecondaryIndexes:
+          - IndexName: ByEmail
+            KeySchema:
+              - AttributeName: email
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+          - IndexName: ByStatus
+            KeySchema:
+              - AttributeName: status
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
 
 # Custom settings:
 custom:

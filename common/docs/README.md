@@ -66,6 +66,8 @@ This ensures that DynamoDB is running and accessible and that the required table
 npm run offline-db-migrate
 This will create required tables in the local DynamoDB instance.
 
+For this purpose, the project uses the document dynamodb-config.ts file located in the config/ directory to define the table schemas.
+
 ### 4. Insert records into database / Seed data:
 
 You can use scripts in the `scripts/` directory to insert initial data into your local or remote DynamoDB instance. Command examples:
@@ -86,7 +88,16 @@ npm run insert-accounts
 
 Use as guide the .env.example file to create your own .env file.
 
-### 6. Start the Serverless Offline API:
+### 6. Use node.js version 20.x
+
+The project is configured to use Node.js 20.x. Ensure you have this version installed and set as the active version in your environment.
+
+```bash
+nvm install 20
+nvm use 20
+```
+
+### 7. Start the Serverless Offline API:
 
 npm run offline
 This will start a local API endpoint at http://localhost:3000.

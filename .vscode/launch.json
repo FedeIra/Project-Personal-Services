@@ -4,7 +4,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Serverless Offline (npx)",
+      "name": "Debug Serverless Offline",
       "runtimeExecutable": "npx",
       "args": [
         "serverless",
@@ -18,9 +18,14 @@
       "console": "integratedTerminal",
       "autoAttachChildProcesses": true,
       "env": {
-        "IS_OFFLINE": "true"
+        "IS_OFFLINE": "true",
+        "NODE_OPTIONS": "--inspect=0"
       },
-      "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+      "skipFiles": ["<node_internals>/**"],
+      "outFiles": [
+        "${workspaceFolder}/**/*.ts",
+        "${workspaceFolder}/dist/**/*.js"
+      ]
     }
   ]
 }

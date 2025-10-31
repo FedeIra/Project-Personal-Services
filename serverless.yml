@@ -5,7 +5,7 @@ variablesResolutionMode: 20210326
 # AWS provider configuration:
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   profile: Developer-Fedeira
   region: us-east-2
   stage: dev
@@ -14,6 +14,8 @@ provider:
     name: dev-fedeira-personal-services-bucket
   apiGateway:
     minimumCompressionSize: 1024
+    binaryMediaTypes:
+      - 'multipart/form-data'
   tags:
     Project: 'Fedeira Personal Services'
     Service: 'Personal-services'
@@ -49,6 +51,9 @@ provider:
     ENCRYPTION_RANDOM_BYTES: ${env:ENCRYPTION_RANDOM_BYTES, '16'}
     USER_EMAIL_TEST: ${env:USER_EMAIL}
     USER_PASSWORD_TEST: ${env:USER_PASSWORD}
+    AWS_REPORTS_BUCKET: ${env:AWS_REPORTS_BUCKET}
+    AWS_REPORT_REQUESTS_QUEUE_URL: !Ref ReportRequestsQueue
+    REPORT_REQUESTS_TABLE: ReportRequests
 
   # Monitoring & Logging:
   tracing:
@@ -67,6 +72,7 @@ provider:
           Action:
             - 'ssm:GetParameter'
             - 'ssm:GetParameters'
+            - 'ssm:PutParameter'
           Resource:
             - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/fedeira-personal-services/*'
         # Permit for dynamodb operations
@@ -81,6 +87,7 @@ provider:
           Resource:
             - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/UserCredentials'
             - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Accounts'
+            - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ReportRequests'
         # Permit for logs operations in cloudwatch
         - Effect: 'Allow'
           Action:
@@ -104,6 +111,12 @@ provider:
           Resource:
             - 'arn:aws:s3:::dev-fedeira-personal-services-bucket'
             - 'arn:aws:s3:::dev-fedeira-personal-services-bucket/*'
+            # Permit for SQS operations:
+        - Effect: 'Allow'
+          Action:
+            - 'sqs:SendMessage'
+          Resource:
+            - !GetAtt ReportRequestsQueue.Arn
 # Lambda functions definitions:
 functions:
   # Custom authorizer Lambda for API Gateway (verifies JWT tokens)
@@ -151,8 +164,26 @@ functions:
           authorizer:
             name: auth-service-authorizer
             type: TOKEN
+  # Reports domain Lambda:
+  report-service:
+    handler: report-services/lambda.handler
+    name: 'dev-fedeira-report-services'
+    timeout: 29
+    memorySize: 1024
+    events:
+      - http:
+          path: reports/{email}
+          method: post
+          cors: true
+          request:
+            parameters:
+              paths:
+                email: true
+          authorizer:
+            name: auth-service-authorizer
+            type: TOKEN
 
-# AWS Resources: DynamoDB Table & S3 Bucket:
+# AWS Resources: DynamoDB Tables, S3 Bucket and SQS Queue:
 resources:
   Resources:
     UserCredentialsTable:
@@ -181,6 +212,78 @@ resources:
           - AttributeName: user
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
+    ReportRequestsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ReportRequests
+        BillingMode: PAY_PER_REQUEST
+
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+          - AttributeName: status
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
+        GlobalSecondaryIndexes:
+          - IndexName: ByEmail
+            KeySchema:
+              - AttributeName: email
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+          - IndexName: ByStatus
+            KeySchema:
+              - AttributeName: status
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+    # S3Bucket:
+    # Type: AWS::S3::Bucket
+    # Properties:
+    #   BucketName: dev-fedeira-personal-services-bucket
+    #   CorsConfiguration:
+    #     CorsRules:
+    #       - AllowedHeaders:
+    #           - '*'
+    #         AllowedMethods:
+    #           - GET
+    #           - PUT
+    #           - POST
+    #           - DELETE
+    #           - HEAD
+    #         AllowedOrigins:
+    #           - '*'
+    #         MaxAge: 3000
+    ReportRequestsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ReportRequestsQueue.fifo
+        FifoQueue: true
+        ContentBasedDeduplication: true
+        VisibilityTimeout: 60
+        MessageRetentionPeriod: 1209600
+        RedrivePolicy:
+          deadLetterTargetArn: !GetAtt ReportRequestsDeadLetterQueue.Arn
+          maxReceiveCount: 5
+    ReportRequestsDeadLetterQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ReportRequestsDeadLetterQueue.fifo
+        FifoQueue: true
+        MessageRetentionPeriod: 1209600
 
     # API Gateway access logs:
     ApiGatewayAccessLogs:

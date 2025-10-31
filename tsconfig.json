@@ -21,6 +21,7 @@
     "investment-services/**/*",
     "authorization-services/**/*",
     "account-services/**/*",
+    "report-services/**/*",
     "common/**/*"
   ],
   "exclude": ["node_modules", "dist"]

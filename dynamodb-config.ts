@@ -6,6 +6,7 @@ interface TableDefinition {
   KeySchema: AWS.DynamoDB.KeySchemaElement[];
   AttributeDefinitions: AWS.DynamoDB.AttributeDefinition[];
   ProvisionedThroughput: AWS.DynamoDB.ProvisionedThroughput;
+  GlobalSecondaryIndexes?: AWS.DynamoDB.GlobalSecondaryIndexList;
 }
 
 const dynamoDb = new AWS.DynamoDB({
@@ -39,6 +40,49 @@ const tables: TableDefinition[] = [
       ReadCapacityUnits: 5,
       WriteCapacityUnits: 5,
     },
+  },
+  {
+    TableName: 'Accounts',
+    KeySchema: [
+      { AttributeName: 'account', KeyType: 'HASH' },
+      { AttributeName: 'user', KeyType: 'RANGE' },
+    ],
+    AttributeDefinitions: [
+      { AttributeName: 'account', AttributeType: 'S' },
+      { AttributeName: 'user', AttributeType: 'S' },
+    ],
+    ProvisionedThroughput: { ReadCapacityUnits: 5, WriteCapacityUnits: 5 },
+  },
+  {
+    TableName: 'ReportRequests',
+    AttributeDefinitions: [
+      { AttributeName: 'id', AttributeType: 'S' },
+      { AttributeName: 'email', AttributeType: 'S' },
+      { AttributeName: 'status', AttributeType: 'S' },
+      { AttributeName: 'createdAt', AttributeType: 'S' },
+    ],
+    KeySchema: [{ AttributeName: 'id', KeyType: 'HASH' }],
+    GlobalSecondaryIndexes: [
+      {
+        IndexName: 'ByEmail',
+        KeySchema: [
+          { AttributeName: 'email', KeyType: 'HASH' },
+          { AttributeName: 'createdAt', KeyType: 'RANGE' },
+        ],
+        Projection: { ProjectionType: 'ALL' },
+        ProvisionedThroughput: { ReadCapacityUnits: 5, WriteCapacityUnits: 5 },
+      },
+      {
+        IndexName: 'ByStatus',
+        KeySchema: [
+          { AttributeName: 'status', KeyType: 'HASH' },
+          { AttributeName: 'createdAt', KeyType: 'RANGE' },
+        ],
+        Projection: { ProjectionType: 'ALL' },
+        ProvisionedThroughput: { ReadCapacityUnits: 5, WriteCapacityUnits: 5 },
+      },
+    ],
+    ProvisionedThroughput: { ReadCapacityUnits: 5, WriteCapacityUnits: 5 },
   },
 ];
 
