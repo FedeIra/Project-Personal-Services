@@ -7,6 +7,7 @@ useDotenv: true
 plugins:
   - serverless-dynamodb-local
   - serverless-offline
+  - serverless-offline-sqs
 
 # AWS provider configuration:
 provider:
@@ -94,6 +95,20 @@ functions:
           authorizer:
             name: auth-service-authorizer
             type: TOKEN
+  report-request-processor:
+    handler: report-services/handler.handler
+    name: 'dev-fedeira-report-request-processor'
+    memorySize: 1024
+    timeout: 300
+    environment:
+      AWS_REPORTS_BUCKET: ${env:AWS_REPORTS_BUCKET}
+      REPORT_REQUESTS_TABLE: ReportRequests
+    events:
+      - sqs:
+          arn: arn:aws:sqs:us-east-2:000000000000:ReportRequestsQueue.fifo
+          batchSize: 1
+          maximumBatchingWindow: 0
+          functionResponseType: ReportBatchItemFailures
 
 # DynamoDB resources:
 resources:
@@ -165,6 +180,14 @@ resources:
             Projection:
               ProjectionType: ALL
 
+    ReportRequestsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ReportRequestsQueue.fifo
+        FifoQueue: true
+        ContentBasedDeduplication: true
+        VisibilityTimeout: 300
+
 # Custom settings:
 custom:
   dynamodb:
@@ -175,3 +198,11 @@ custom:
       migrate: false
       seed: false
       convertEmptyValues: true
+
+  serverless-offline-sqs:
+    autoCreate: true
+    apiVersion: '2012-11-05'
+    endpoint: http://localhost:9324
+    region: us-east-2
+    accessKeyId: root
+    secretAccessKey: root

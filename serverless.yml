@@ -114,7 +114,13 @@ provider:
             # Permit for SQS operations:
         - Effect: 'Allow'
           Action:
-            - 'sqs:SendMessage'
+            [
+              'sqs:SendMessage',
+              'sqs:ReceiveMessage',
+              'sqs:DeleteMessage',
+              'sqs:GetQueueAttributes',
+              'sqs:ChangeMessageVisibility',
+            ]
           Resource:
             - !GetAtt ReportRequestsQueue.Arn
 # Lambda functions definitions:
@@ -182,6 +188,20 @@ functions:
           authorizer:
             name: auth-service-authorizer
             type: TOKEN
+  # Report request processor Lambda
+  report-request-processor:
+    handler: report-services/handler.handler
+    name: 'dev-fedeira-report-request-processor'
+    environment:
+      AWS_REPORTS_BUCKET: ${env:AWS_REPORTS_BUCKET}
+      REPORT_REQUESTS_TABLE: ReportRequests
+    events:
+      - sqs:
+          arn: !GetAtt ReportRequestsQueue.Arn
+          batchSize: 1
+          maximumBatchingWindow: 0
+          functionResponseType: ReportBatchItemFailures
+          maximumConcurrency: 10
 
 # AWS Resources: DynamoDB Tables, S3 Bucket and SQS Queue:
 resources:
@@ -273,7 +293,7 @@ resources:
         QueueName: ReportRequestsQueue.fifo
         FifoQueue: true
         ContentBasedDeduplication: true
-        VisibilityTimeout: 60
+        VisibilityTimeout: 300
         MessageRetentionPeriod: 1209600
         RedrivePolicy:
           deadLetterTargetArn: !GetAtt ReportRequestsDeadLetterQueue.Arn
