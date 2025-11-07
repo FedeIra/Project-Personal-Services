@@ -26,6 +26,25 @@
         "${workspaceFolder}/**/*.ts",
         "${workspaceFolder}/dist/**/*.js"
       ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug SQS Report Processor",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["ts-node"],
+      "args": [
+        "${workspaceFolder}/report-processor/test/execute-sqs-report-processor-handler.ts"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "AWS_REPORTS_BUCKET": "dev-fedeira-personal-services-bucket",
+        "REPORT_REQUESTS_TABLE": "ReportRequests",
+        "IS_OFFLINE": "true"
+      },
+      "skipFiles": ["<node_internals>/**"],
+      "outFiles": ["${workspaceFolder}/**/*.js"],
+      "console": "integratedTerminal"
     }
   ]
 }

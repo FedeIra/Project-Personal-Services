@@ -1,38 +1,82 @@
 import { Envelope, GenerateLiquidacionPayload } from './types/types';
 import { GenerateLiquidacionHandler } from './handlers/generateLiquidation';
 
-// Interface común de handlers:
-interface IMsgHandler<T> {
-  type: string;
+// Tipos para handlers
+export interface HandlerContext {
+  bucket: string;
+  table: string;
+}
+
+export interface IMsgHandler<T = unknown> {
+  readonly type: string;
   handle(payload: T): Promise<void>;
 }
 
-// Construimos el registry con dependencias compartidas:
-export function buildRegistry() {
-  const BUCKET = process.env.AWS_REPORTS_BUCKET!;
-  const TABLE = process.env.REPORT_REQUESTS_TABLE!;
+// Error personalizado para tipos desconocidos
+class UnknownMessageTypeError extends Error {
+  constructor(type: string) {
+    super(`Unknown message type: ${type}`);
+    this.name = 'UnknownMessageTypeError';
+  }
+}
 
-  const generate = new GenerateLiquidacionHandler({
-    bucket: BUCKET,
-    table: TABLE,
+// Registry con manejo de dependencias simplificado
+export function buildRegistry() {
+  // Verificación simple de variables de entorno requeridas
+  if (!process.env.AWS_REPORTS_BUCKET || !process.env.REPORT_REQUESTS_TABLE) {
+    throw new Error(
+      'Missing required environment variables: AWS_REPORTS_BUCKET and/or REPORT_REQUESTS_TABLE'
+    );
+  }
+
+  const context: HandlerContext = {
+    bucket: process.env.AWS_REPORTS_BUCKET,
+    table: process.env.REPORT_REQUESTS_TABLE,
+  };
+
+  // Registro de handlers
+  const handlers: IMsgHandler[] = [new GenerateLiquidacionHandler(context)];
+
+  // Construcción del mapa de handlers
+  const registry = new Map<string, IMsgHandler>();
+  handlers.forEach((handler) => {
+    registry.set(handler.type, handler);
+    console.info(`[Dispatcher] Registered handler for type: ${handler.type}`);
   });
 
-  const map = new Map<string, IMsgHandler<any>>();
-  map.set(generate.type, generate);
-  return map;
+  return registry;
 }
 
 export async function dispatch(
-  env: Envelope,
-  registry = buildRegistry()
+  envelope: Envelope,
+  registry: Map<string, IMsgHandler> = buildRegistry()
 ): Promise<void> {
-  const handler = registry.get(env.type);
-  if (!handler) throw new Error(`Unknown message type: ${env.type}`);
-  // Type narrowing “manual”:
-  switch (env.type) {
-    case 'GenerateLiquidacion':
-      return handler.handle(env.payload as GenerateLiquidacionPayload);
-    default:
-      throw new Error(`Unhandled type: ${env.type}`);
+  const handler = registry.get(envelope.type);
+
+  if (!handler) {
+    throw new UnknownMessageTypeError(envelope.type);
+  }
+
+  try {
+    console.info(`[Dispatcher] Processing message of type: ${envelope.type}`);
+
+    switch (envelope.type) {
+      case 'GenerateLiquidacion':
+        await handler.handle(envelope.payload as GenerateLiquidacionPayload);
+        break;
+      default:
+        throw new UnknownMessageTypeError(envelope.type);
+    }
+
+    console.info(
+      `[Dispatcher] Successfully processed message of type: ${envelope.type}`
+    );
+  } catch (error) {
+    // Enriquecer el error con contexto
+    const enrichedError =
+      error instanceof Error ? error : new Error(String(error));
+    enrichedError.message = `Error processing message type=${envelope.type}: ${enrichedError.message}`;
+    console.error('[Dispatcher] Error:', enrichedError);
+    throw enrichedError;
   }
 }
