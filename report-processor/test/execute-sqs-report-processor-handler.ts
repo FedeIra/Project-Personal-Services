@@ -9,10 +9,10 @@ async function executeHandler() {
 
   // Crea un mensaje SQS de ejemplo
   const messageBody = {
-    type: 'GenerateLiquidacion',
+    type: 'generateLiquidation',
     payload: {
-      id: uuidv4(),
-      email: 'test@example.com',
+      id: '17374dd9-38e1-4e50-bb96-5189bd90f3f0',
+      email: 'fedeirar@gmail.com',
     },
   };
 
