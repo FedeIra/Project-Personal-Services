@@ -7,7 +7,6 @@ useDotenv: true
 plugins:
   - serverless-dynamodb-local
   - serverless-offline
-  - serverless-offline-sqs
 
 # AWS provider configuration:
 provider:

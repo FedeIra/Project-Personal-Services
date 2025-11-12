@@ -1,5 +1,5 @@
-import { Envelope, GenerateLiquidacionPayload } from './types/types';
-import { GenerateLiquidacionHandler } from './handlers/generateLiquidation';
+import { Envelope, GenerateReport } from './types/types';
+import { GenerateLiquidationHandler } from './handlers/generateLiquidation';
 
 // Tipos para handlers
 export interface HandlerContext {
@@ -35,7 +35,7 @@ export function buildRegistry() {
   };
 
   // Registro de handlers
-  const handlers: IMsgHandler[] = [new GenerateLiquidacionHandler(context)];
+  const handlers: IMsgHandler[] = [new GenerateLiquidationHandler(context)];
 
   // Construcción del mapa de handlers
   const registry = new Map<string, IMsgHandler>();
@@ -51,31 +51,31 @@ export async function dispatch(
   envelope: Envelope,
   registry: Map<string, IMsgHandler> = buildRegistry()
 ): Promise<void> {
-  const handler = registry.get(envelope.type);
+  const reportType = (envelope.payload as GenerateReport).reportType;
+  const handler = registry.get(reportType);
 
   if (!handler) {
-    throw new UnknownMessageTypeError(envelope.type);
+    throw new UnknownMessageTypeError(reportType);
   }
 
   try {
-    console.info(`[Dispatcher] Processing message of type: ${envelope.type}`);
+    console.info(`[Dispatcher] Processing message of type: ${reportType}`);
 
-    switch (envelope.type) {
-      case 'GenerateLiquidacion':
-        await handler.handle(envelope.payload as GenerateLiquidacionPayload);
+    switch (reportType) {
+      case 'termination_liquidation':
+        await handler.handle(envelope.payload as GenerateReport);
         break;
       default:
-        throw new UnknownMessageTypeError(envelope.type);
+        throw new UnknownMessageTypeError(reportType);
     }
 
     console.info(
-      `[Dispatcher] Successfully processed message of type: ${envelope.type}`
+      `[Dispatcher] Successfully processed message of type: ${reportType}`
     );
   } catch (error) {
-    // Enriquecer el error con contexto
     const enrichedError =
       error instanceof Error ? error : new Error(String(error));
-    enrichedError.message = `Error processing message type=${envelope.type}: ${enrichedError.message}`;
+    enrichedError.message = `Error processing message type=${reportType}: ${enrichedError.message}`;
     console.error('[Dispatcher] Error:', enrichedError);
     throw enrichedError;
   }

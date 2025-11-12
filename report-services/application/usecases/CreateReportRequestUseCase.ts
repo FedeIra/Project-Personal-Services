@@ -39,7 +39,15 @@ export class CreateReportRequestUseCase {
     await this.reportRequestRepository.createReportRequest(reportRequest);
 
     // 3) Send message to SQS FIFO queue:
-    await this.sqsRepository.sendMessageToFifoQueue(id, email);
+    const sqsMessage = {
+      id,
+      reportType: 'termination_liquidation',
+    };
+
+    await this.sqsRepository.sendMessageToFifoQueue(
+      JSON.stringify(sqsMessage),
+      email
+    );
 
     // 4) Return report request id
     return id;
