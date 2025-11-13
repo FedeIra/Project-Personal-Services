@@ -1,9 +1,4 @@
-import { GenerateReport } from '../types/types';
-
-export interface HandlerContext {
-  bucket: string;
-  table: string;
-}
+import { GenerateReport, HandlerContext } from '../types/types';
 
 export class GenerateLiquidationHandler {
   public readonly type = 'termination_liquidation';
@@ -13,9 +8,7 @@ export class GenerateLiquidationHandler {
   async handle(payload: GenerateReport): Promise<void> {
     console.log('[GenerateLiquidationHandler] Processing payload:', {
       id: payload.id,
-      reportType: (payload as any).reportType,
-      bucket: this.ctx.bucket,
-      table: this.ctx.table,
+      reportType: payload.reportType,
     });
 
     // 1. Buscar el registro en DynamoDB usando payload.id

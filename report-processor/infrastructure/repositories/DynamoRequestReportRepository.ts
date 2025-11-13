@@ -3,7 +3,7 @@ import { DynamoDB } from 'aws-sdk';
 
 // Internal Dependencies:
 import { IReportRequestRepository } from '../../application/interfaces/IReportRequestRepository';
-import { ReportRequest } from '../../domain/ReportRequestResponseDB';
+import { ReportRequest } from '../../application/domain/ReportRequestResponseDB';
 
 // Handle local/production environment:
 const isOffline: boolean = process.env.IS_OFFLINE === 'true';
@@ -23,22 +23,6 @@ if (isOffline) {
 
 // DB Report Request repository:
 export class ReportRequestRepository implements IReportRequestRepository {
-  // Method to create a report request:
-  async createReportRequest(reportRequest: ReportRequest): Promise<string> {
-    const params: DynamoDB.DocumentClient.PutItemInput = {
-      TableName: process.env.REPORT_REQUESTS_TABLE || '',
-      Item: reportRequest,
-    };
-    try {
-      await dynamoDb.put(params).promise();
-      return reportRequest.id;
-    } catch (err) {
-      throw new Error(
-        'Error saving report request to DynamoDB: ' + (err as Error).message
-      );
-    }
-  }
-
   // Method to get a report request by ID:
   async getReportRequestById(id: string): Promise<ReportRequest | null> {
     const params: DynamoDB.DocumentClient.GetItemInput = {

@@ -1,10 +1,16 @@
 import { Envelope, GenerateReport } from './types/types';
 import { GenerateLiquidationHandler } from './handlers/generateLiquidation';
+import { ReportRequestRepository } from './infrastructure/repositories/DynamoRequestReportRepository';
+import { S3Repository } from './infrastructure/repositories/S3Repository';
+import { S3 } from 'aws-sdk';
 
 // Tipos para handlers
 export interface HandlerContext {
   bucket: string;
   table: string;
+  reportRequestRepository: ReportRequestRepository;
+  s3Repository: S3Repository;
+  // liquidacionService: LiquidationService;
 }
 
 export interface IMsgHandler<T = unknown> {
@@ -12,7 +18,6 @@ export interface IMsgHandler<T = unknown> {
   handle(payload: T): Promise<void>;
 }
 
-// Error personalizado para tipos desconocidos
 class UnknownMessageTypeError extends Error {
   constructor(type: string) {
     super(`Unknown message type: ${type}`);
@@ -20,18 +25,18 @@ class UnknownMessageTypeError extends Error {
   }
 }
 
-// Registry con manejo de dependencias simplificado
 export function buildRegistry() {
-  // Verificación simple de variables de entorno requeridas
-  if (!process.env.AWS_REPORTS_BUCKET || !process.env.REPORT_REQUESTS_TABLE) {
-    throw new Error(
-      'Missing required environment variables: AWS_REPORTS_BUCKET and/or REPORT_REQUESTS_TABLE'
-    );
-  }
+  const { AWS_REPORTS_BUCKET } = process.env;
+  if (!AWS_REPORTS_BUCKET) throw new Error('AWS_REPORTS_BUCKET requerido');
 
-  const context: HandlerContext = {
-    bucket: process.env.AWS_REPORTS_BUCKET,
-    table: process.env.REPORT_REQUESTS_TABLE,
+  const reportRepo = new ReportRequestRepository();
+  const s3 = new S3();
+  const s3Repo = new S3Repository(s3, AWS_REPORTS_BUCKET);
+
+  const context = {
+    reportRequestRepository: reportRepo,
+    s3Repository: s3Repo,
+    // liquidacionService,
   };
 
   // Registro de handlers
