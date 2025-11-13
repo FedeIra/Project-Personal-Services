@@ -11,7 +11,10 @@ export class GenerateLiquidationHandler {
       reportType: payload.reportType,
     });
 
-    // 1. Buscar el registro en DynamoDB usando payload.id
+    // 1. Buscar el registro en DynamoDB usando id:
+    const record = await this.ctx.reportRequestRepository.getReportRequestById(
+      payload.id
+    );
     // 2. Obtener el s3Key del registro
     // 3. Procesar el archivo CSV desde S3
     // 4. Generar el reporte de liquidación
