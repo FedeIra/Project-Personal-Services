@@ -1,5 +1,6 @@
-import { S3Repository } from '../infrastructure/repositories/S3Repository';
-import { ReportRequestRepository } from '../infrastructure/repositories/DynamoRequestReportRepository';
+import { IReportRequestRepository } from '../application/interfaces/IDynamoRequestReportRepository';
+import { IS3Repository } from '../application/interfaces/IS3Repository';
+import { ICSVServices } from '../application/interfaces/ICSVService';
 
 export type Envelope<T = unknown> = {
   version?: string;
@@ -12,6 +13,7 @@ export type GenerateReport = {
 };
 
 export interface HandlerContext {
-  reportRequestRepository: ReportRequestRepository;
-  s3Repository: S3Repository;
+  reportRequestRepository: IReportRequestRepository;
+  s3Repository: IS3Repository;
+  CSVService: ICSVServices;
 }

@@ -1,3 +1,4 @@
+import { ReportRequest } from '../application/domain/ReportRequestResponseDB';
 import { GenerateReport, HandlerContext } from '../types/types';
 
 export class GenerateLiquidationHandler {
@@ -12,10 +13,21 @@ export class GenerateLiquidationHandler {
     });
 
     // 1. Buscar el registro en DynamoDB usando id:
-    const record = await this.ctx.reportRequestRepository.getReportRequestById(
-      payload.id
+    const record: ReportRequest | null =
+      await this.ctx.reportRequestRepository.getReportRequestById(payload.id);
+
+    if (!record || !record.request) {
+      throw new Error(`Record with id ${payload.id} not found.`);
+    }
+
+    // 2. Obtener el archivo s3 utilizando el record.request que es el path del archivo en s3:
+    const csvBuffer: Buffer = await this.ctx.s3Repository.getFile(
+      record.request
     );
-    // 2. Obtener el s3Key del registro
+
+    // 3. Parsear el archivo CSV a JSON
+    const jsonData = await this.ctx.CSVService.parseCSVToJson(csvBuffer);
+
     // 3. Procesar el archivo CSV desde S3
     // 4. Generar el reporte de liquidación
     // 5. Actualizar el estado en DynamoDB

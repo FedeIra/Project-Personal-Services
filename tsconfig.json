@@ -22,6 +22,7 @@
     "authorization-services/**/*",
     "account-services/**/*",
     "report-services/**/*",
+    "report-processor/**/*",
     "common/**/*"
   ],
   "exclude": ["node_modules", "dist"]

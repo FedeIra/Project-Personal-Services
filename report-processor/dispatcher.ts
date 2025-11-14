@@ -3,6 +3,7 @@ import { GenerateLiquidationHandler } from './handlers/generateLiquidation';
 import { ReportRequestRepository } from './infrastructure/repositories/DynamoRequestReportRepository';
 import { S3Repository } from './infrastructure/repositories/S3Repository';
 import { S3 } from 'aws-sdk';
+import { CSVServices } from './infrastructure/services/CSVServices';
 
 // Tipos para handlers
 export interface HandlerContext {
@@ -10,6 +11,7 @@ export interface HandlerContext {
   table: string;
   reportRequestRepository: ReportRequestRepository;
   s3Repository: S3Repository;
+  CSVService: CSVServices;
   // liquidacionService: LiquidationService;
 }
 
@@ -29,13 +31,15 @@ export function buildRegistry() {
   const { AWS_REPORTS_BUCKET } = process.env;
   if (!AWS_REPORTS_BUCKET) throw new Error('AWS_REPORTS_BUCKET requerido');
 
-  const reportRepo = new ReportRequestRepository();
+  const reportRequestRepository = new ReportRequestRepository();
   const s3 = new S3();
-  const s3Repo = new S3Repository(s3, AWS_REPORTS_BUCKET);
+  const s3Repository = new S3Repository(s3, AWS_REPORTS_BUCKET);
+  const csvService = new CSVServices();
 
   const context = {
-    reportRequestRepository: reportRepo,
-    s3Repository: s3Repo,
+    reportRequestRepository: reportRequestRepository,
+    s3Repository: s3Repository,
+    CSVService: csvService,
     // liquidacionService,
   };
 

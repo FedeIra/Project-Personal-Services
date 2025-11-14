@@ -2,7 +2,7 @@
 import { DynamoDB } from 'aws-sdk';
 
 // Internal Dependencies:
-import { IReportRequestRepository } from '../../application/interfaces/IReportRequestRepository';
+import { IReportRequestRepository } from '../../application/interfaces/IDynamoRequestReportRepository';
 import { ReportRequest } from '../../application/domain/ReportRequestResponseDB';
 
 // Handle local/production environment:

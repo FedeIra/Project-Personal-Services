@@ -7,6 +7,28 @@ export class S3Repository {
     private readonly bucketName: string
   ) {}
 
+  // Nuevo método para obtener el contenido del archivo
+  async getFile(key: string): Promise<Buffer> {
+    try {
+      const result = await this.s3
+        .getObject({
+          Bucket: this.bucketName,
+          Key: key,
+        })
+        .promise();
+
+      if (!result.Body) {
+        throw new Error(`File not found or empty: ${key}`);
+      }
+
+      return result.Body as Buffer;
+    } catch (err) {
+      throw new Error(
+        `Error getting file from S3 (key: ${key}): ${(err as Error).message}`
+      );
+    }
+  }
+
   async uploadCSVFile(key: string, file: MultipartFile): Promise<void> {
     const buffer = await file.toBuffer();
 
@@ -25,21 +47,6 @@ export class S3Repository {
         .promise();
     } catch (err) {
       throw new Error('Error uploading file to S3: ' + (err as Error).message);
-    }
-  }
-
-  async getFileUrl(key: string): Promise<string> {
-    try {
-      const url = this.s3.getSignedUrl('getObject', {
-        Bucket: this.bucketName,
-        Key: key,
-        Expires: 60 * 60,
-      });
-      return url;
-    } catch (err) {
-      throw new Error(
-        'Error generating file URL from S3: ' + (err as Error).message
-      );
     }
   }
 }

@@ -38,9 +38,10 @@
       ],
       "cwd": "${workspaceFolder}",
       "env": {
+        "AWS_REGION": "us-east-2",
         "AWS_REPORTS_BUCKET": "dev-fedeira-personal-services-bucket",
         "REPORT_REQUESTS_TABLE": "ReportRequests",
-        "IS_OFFLINE": "true"
+        "IS_OFFLINE": "false"
       },
       "skipFiles": ["<node_internals>/**"],
       "outFiles": ["${workspaceFolder}/**/*.js"],

@@ -9,7 +9,7 @@ async function executeHandler() {
 
   // Crea un mensaje SQS de ejemplo
   const messageBody = {
-    id: '17374dd9-38e1-4e50-bb96-5189bd90f3f0',
+    id: '4378b7ac-cb27-42ca-8660-993db3328022',
     reportType: 'termination_liquidation',
   };
 

@@ -1,25 +1,28 @@
-import ExcelJS from 'exceljs';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import Papa from 'papaparse';
+import { ICSVServices } from '../../application/interfaces/ICSVService';
 
-export class CSVServices {
+export class CSVServices implements ICSVServices {
   // Parsea un archivo CSV y lo convierte en un array de objetos JSON
   async parseCSVToJson(buffer: Buffer): Promise<any[]> {
-    const workbook = new ExcelJS.Workbook();
-    await workbook.csv.read(buffer);
-    const worksheet = workbook.worksheets[0];
-    const rows: any[] = [];
+    const csvString = buffer.toString('utf8');
 
-    // Asume que la primera fila es el header
-    const headers = worksheet.getRow(1).values as string[];
-
-    worksheet.eachRow((row, rowNumber) => {
-      if (rowNumber === 1) return; // skip header
-      const obj: any = {};
-      row.values.forEach((value, idx) => {
-        if (headers[idx]) obj[headers[idx]] = value;
+    return new Promise((resolve, reject) => {
+      (Papa.parse as any)(csvString, {
+        header: true,
+        skipEmptyLines: true,
+        trimHeaders: true,
+        dynamicTyping: true,
+        complete: (results: Papa.ParseResult<any>) => {
+          if (results.errors && results.errors.length > 0) {
+            console.warn('[CSVServices] Parse warnings:', results.errors);
+          }
+          resolve(results.data);
+        },
+        error: (error: Papa.ParseError) => {
+          reject(new Error(`CSV parsing error: ${error.message || error}`));
+        },
       });
-      rows.push(obj);
     });
-
-    return rows;
   }
 }
