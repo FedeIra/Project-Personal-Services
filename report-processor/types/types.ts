@@ -17,3 +17,10 @@ export interface HandlerContext {
   s3Repository: IS3Repository;
   CSVService: ICSVServices;
 }
+
+export interface ProcessedCSVData {
+  grossSalary: number;
+  bestMonthlySalary: number;
+  startDate: string;
+  endDate: string;
+}

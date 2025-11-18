@@ -26,7 +26,7 @@ export class GenerateLiquidationHandler {
     );
 
     // 3. Parsear el archivo CSV a JSON
-    const jsonData = await this.ctx.CSVService.parseCSVToJson(csvBuffer);
+    const employeeData = await this.ctx.CSVService.parseCSVToJson(csvBuffer);
 
     // 3. Procesar el archivo CSV desde S3
     // 4. Generar el reporte de liquidación
