@@ -1,6 +1,7 @@
 import { IReportRequestRepository } from '../application/interfaces/IDynamoRequestReportRepository';
 import { IS3Repository } from '../application/interfaces/IS3Repository';
 import { ICSVServices } from '../application/interfaces/ICSVService';
+import { ILiquidationServices } from '../application/interfaces/ILiquidationService';
 
 export type Envelope<T = unknown> = {
   version?: string;
@@ -16,6 +17,7 @@ export interface HandlerContext {
   reportRequestRepository: IReportRequestRepository;
   s3Repository: IS3Repository;
   CSVService: ICSVServices;
+  LiquidationService: ILiquidationServices;
 }
 
 export interface EmploymentData {
@@ -23,4 +25,5 @@ export interface EmploymentData {
   bestMonthlySalary: number;
   startDate: string;
   endDate: string;
+  priorNotice: boolean;
 }

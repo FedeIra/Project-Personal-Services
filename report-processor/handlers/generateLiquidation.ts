@@ -29,6 +29,11 @@ export class GenerateLiquidationHandler {
       await this.ctx.CSVService.parseEmploymentCSVToJson(csvBuffer);
 
     // 4) Generate liquidation report
+    const terminationLiquidation =
+      await this.ctx.LiquidationService.buildTerminationLiquidation(
+        employmentData
+      );
+
     // 5) Update status in DynamoDB
     // 6) Save generated liquidation in S3
     // 7) Send report via email

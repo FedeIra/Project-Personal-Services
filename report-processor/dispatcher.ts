@@ -13,6 +13,7 @@ import { S3Repository } from './infrastructure/repositories/S3Repository';
 import { CSVServices } from './infrastructure/services/CSVServices';
 import { IMessageHandler } from './application/interfaces/IMessageHandler';
 import { CONFIG } from './config/constants';
+import { LiquidationServices } from './infrastructure/services/LiquidationServices';
 
 // Dispatcher Function to route messages to appropriate handlers:
 export async function dispatch(
@@ -51,13 +52,14 @@ export function buildHandlersRegistry(): Map<string, IMessageHandler<unknown>> {
   const s3 = new S3();
   const s3Repository = new S3Repository(s3, CONFIG.AWS_REPORTS_BUCKET);
   const csvService = new CSVServices();
+  const liquidationService = new LiquidationServices();
 
   // Create handler context with dependencies:
   const handlerContext: HandlerContext = {
     reportRequestRepository: reportRequestRepository,
     s3Repository: s3Repository,
     CSVService: csvService,
-    // liquidacionService,
+    LiquidationService: liquidationService,
   };
 
   // Instantiate handlers:

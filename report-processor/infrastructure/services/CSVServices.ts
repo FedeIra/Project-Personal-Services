@@ -13,6 +13,7 @@ export class CSVServices implements ICSVServices {
     'Mejor remuneración mensual, normal y habitual Bruta': 'bestMonthlySalary',
     'Fecha de ingreso': 'startDate',
     'Fecha de egreso': 'endDate',
+    'Preaviso?': 'priorNotice',
   };
 
   // Parse CSV buffer to EmploymentData JSON:
@@ -53,7 +54,8 @@ export class CSVServices implements ICSVServices {
         const mappedKey: string = this.conceptMapping[concept];
 
         if (mappedKey) {
-          (result as Record<string, number | string>)[mappedKey] = value;
+          (result as Record<string, number | string | boolean>)[mappedKey] =
+            value;
         }
       }
     }
@@ -61,8 +63,15 @@ export class CSVServices implements ICSVServices {
   }
 
   // Parse individual CSV value:
-  private parseValue(value: string): number | string {
-    const trimmedValue = value.trim();
+  private parseValue(value: string): number | string | boolean {
+    const trimmedValue = value.trim().toLowerCase();
+
+    if (trimmedValue === 'si' || trimmedValue === 'sí') {
+      return true;
+    }
+    if (trimmedValue === 'no') {
+      return false;
+    }
 
     const stringValue: string = trimmedValue
       .replace(/[$\s]/g, '')
