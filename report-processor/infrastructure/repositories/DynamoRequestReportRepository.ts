@@ -4,9 +4,10 @@ import { DynamoDB } from 'aws-sdk';
 // Internal Dependencies:
 import { IReportRequestRepository } from '../../application/interfaces/IDynamoRequestReportRepository';
 import { ReportRequest } from '../../application/domain/ReportRequestResponseDB';
+import { CONFIG } from '../../config/constants';
 
 // Handle local/production environment:
-const isOffline: boolean = process.env.IS_OFFLINE === 'true';
+const isOffline: boolean = CONFIG.IS_OFFLINE;
 
 let dynamoDb: DynamoDB.DocumentClient;
 
@@ -26,7 +27,7 @@ export class ReportRequestRepository implements IReportRequestRepository {
   // Method to get a report request by ID:
   async getReportRequestById(id: string): Promise<ReportRequest | null> {
     const params: DynamoDB.DocumentClient.GetItemInput = {
-      TableName: process.env.REPORT_REQUESTS_TABLE || '',
+      TableName: CONFIG.REPORT_REQUESTS_TABLE,
       Key: { id },
     };
     const result = await dynamoDb.get(params).promise();

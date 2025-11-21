@@ -1,16 +1,22 @@
+// External Dependencies:
 import Papa, { ParseResult, ParseConfig } from 'papaparse';
-import { ICSVServices } from '../../application/interfaces/ICSVService';
-import { ProcessedCSVData } from '../../types/types';
 
+// Internal Dependencies:
+import { ICSVServices } from '../../application/interfaces/ICSVService';
+import { EmploymentData } from '../../types/types';
+
+// Service to handle CSV operations:
 export class CSVServices implements ICSVServices {
-  private readonly conceptMapping: Record<string, keyof ProcessedCSVData> = {
+  // Mapping of CSV concepts to Employment Data keys:
+  private readonly conceptMapping: Record<string, keyof EmploymentData> = {
     'Remuneración Bruta': 'grossSalary',
     'Mejor remuneración mensual, normal y habitual Bruta': 'bestMonthlySalary',
     'Fecha de ingreso': 'startDate',
     'Fecha de egreso': 'endDate',
   };
 
-  async parseCSVToJson(buffer: Buffer): Promise<ProcessedCSVData> {
+  // Parse CSV buffer to EmploymentData JSON:
+  async parseEmploymentCSVToJson(buffer: Buffer): Promise<EmploymentData> {
     const csvString: string = buffer.toString('latin1');
 
     return new Promise((resolve, reject) => {
@@ -23,7 +29,8 @@ export class CSVServices implements ICSVServices {
             if (results.errors && results.errors.length > 0) {
               console.warn('[CSVServices] Parse warnings:', results.errors);
             }
-            const processedData = this.processTransposedCSV(results.data);
+            const processedData: EmploymentData =
+              this.transformRowsToEmploymentData(results.data);
             resolve(processedData);
           } catch (error) {
             reject(error as Error);
@@ -34,8 +41,9 @@ export class CSVServices implements ICSVServices {
     });
   }
 
-  private processTransposedCSV(rawData: string[][]): ProcessedCSVData {
-    const result: Partial<ProcessedCSVData> = {};
+  // Transform CSV rows to Employment Data object:
+  private transformRowsToEmploymentData(rawData: string[][]): EmploymentData {
+    const result: Partial<EmploymentData> = {};
 
     for (const row of rawData) {
       if (row.length >= 2 && row[0] && row[1]) {
@@ -49,9 +57,10 @@ export class CSVServices implements ICSVServices {
         }
       }
     }
-    return result as ProcessedCSVData;
+    return result as EmploymentData;
   }
 
+  // Parse individual CSV value:
   private parseValue(value: string): number | string {
     const trimmedValue = value.trim();
 

@@ -7,7 +7,7 @@ export type Envelope<T = unknown> = {
   payload: T;
 };
 
-export type GenerateReport = {
+export type ReportGenerationRequest = {
   id: string;
   reportType: string;
 };
@@ -18,7 +18,7 @@ export interface HandlerContext {
   CSVService: ICSVServices;
 }
 
-export interface ProcessedCSVData {
+export interface EmploymentData {
   grossSalary: number;
   bestMonthlySalary: number;
   startDate: string;

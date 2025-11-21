@@ -1,13 +1,14 @@
 import { S3 } from 'aws-sdk';
 import { MultipartFile } from '@fastify/multipart';
 
+// S3 Repository for file operations:
 export class S3Repository {
   constructor(
     private readonly s3: S3,
     private readonly bucketName: string
   ) {}
 
-  // Nuevo método para obtener el contenido del archivo
+  // Get file from S3 as Buffer:
   async getFile(key: string): Promise<Buffer> {
     try {
       const result = await this.s3
@@ -29,6 +30,7 @@ export class S3Repository {
     }
   }
 
+  // Upload CSV file to S3:
   async uploadCSVFile(key: string, file: MultipartFile): Promise<void> {
     const buffer = await file.toBuffer();
 

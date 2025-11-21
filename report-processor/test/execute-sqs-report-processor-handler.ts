@@ -1,19 +1,24 @@
-import { handler } from '../handler';
-import type { SQSEvent, SQSRecord, Context } from 'aws-lambda';
+// External Dependencies:
+import type {
+  SQSEvent,
+  SQSRecord,
+  Context,
+  SQSBatchResponse,
+} from 'aws-lambda';
 import { v4 as uuidv4 } from 'uuid';
 
-async function executeHandler() {
-  // Configura variables de entorno necesarias
-  process.env.AWS_REPORTS_BUCKET = 'dev-fedeira-personal-services-bucket';
-  process.env.REPORT_REQUESTS_TABLE = 'ReportRequests';
+// Internal Dependencies:
+import { handler } from '../handler';
+import { ReportGenerationRequest } from '../types/types';
 
-  // Crea un mensaje SQS de ejemplo
-  const messageBody = {
+async function executeHandler(): Promise<void> {
+  // Example SQS message:
+  const messageBody: ReportGenerationRequest = {
     id: '4378b7ac-cb27-42ca-8660-993db3328022',
     reportType: 'termination_liquidation',
   };
 
-  // Crea un registro SQS simulado
+  // SQS record simulation:
   const sqsRecord: SQSRecord = {
     messageId: uuidv4(),
     receiptHandle: 'dummy-receipt-handle',
@@ -32,12 +37,12 @@ async function executeHandler() {
     awsRegion: 'us-east-2',
   };
 
-  // Crea el evento SQS completo
+  // SQS event
   const sqsEvent: SQSEvent = {
     Records: [sqsRecord],
   };
 
-  // Contexto simulado de Lambda
+  // Test context simulation:
   const context: Context = {
     callbackWaitsForEmptyEventLoop: true,
     functionName: 'report-processor-local',
@@ -54,14 +59,14 @@ async function executeHandler() {
   };
 
   try {
-    console.log(
-      'Ejecutando handler con mensaje:',
-      JSON.stringify(messageBody, null, 2)
+    const result: void | SQSBatchResponse = await handler(
+      sqsEvent,
+      context,
+      () => {}
     );
-    const result = await handler(sqsEvent, context, () => {});
-    console.log('Resultado:', result);
+    console.log('Finished executing handler. Result:', result);
   } catch (error) {
-    console.error('Error ejecutando handler:', error);
+    console.error('Error executing handler:', error);
     process.exit(1);
   }
 }

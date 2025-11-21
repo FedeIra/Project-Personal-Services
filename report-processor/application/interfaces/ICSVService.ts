@@ -1,6 +1,6 @@
-import { ProcessedCSVData } from '../../types/types';
+import { EmploymentData } from '../../types/types';
 
 // Interface for CSV service operations:
 export interface ICSVServices {
-  parseCSVToJson(buffer: Buffer): Promise<ProcessedCSVData>;
+  parseEmploymentCSVToJson(buffer: Buffer): Promise<EmploymentData>;
 }
