@@ -9,11 +9,14 @@ import { EmploymentData } from '../../types/types';
 export class CSVServices implements ICSVServices {
   // Mapping of CSV concepts to Employment Data keys:
   private readonly conceptMapping: Record<string, keyof EmploymentData> = {
-    'Remuneración Bruta': 'grossSalary',
-    'Mejor remuneración mensual, normal y habitual Bruta': 'bestMonthlySalary',
-    'Fecha de ingreso': 'startDate',
+    'Sueldo bruto mensual y habitual': 'grossSalary',
+    'Mejor sueldo bruto, mensual, normal y habitual': 'bestMonthlySalary',
+    'Fecha de ingreso registrada': 'recordedStartDate',
+    'Fecha de ingreso real': 'realStartDate',
     'Fecha de egreso': 'endDate',
     'Preaviso?': 'priorNotice',
+    'Días de vacaciones adeudadas': 'previousVacationBalance',
+    'Provincia de Buenos Aires': 'buenosAires',
   };
 
   // Parse CSV buffer to EmploymentData JSON:

@@ -10,15 +10,20 @@ export class LiquidationServices implements ILiquidationServices {
     // Calculate seniority using stardDate and endDate. Need to know amount of years and months:
     // in private method:
     const { years, months, days } = this.calculateSeniority(
-      employmentData.startDate, // '2024-08-01T03:00:00.000Z'
+      employmentData.realStartDate ?? employmentData.recordedStartDate, // '2024-08-01T03:00:00.000Z'
       employmentData.endDate // '2025-05-21T03:00:00.000Z'
     );
 
     const seniorityCompensation = this.calculateSeniorityCompensation(
-      employmentData.bestMonthlySalary,
+      employmentData.bestMonthlySalary ?? employmentData.grossSalary,
       years,
       months
     );
+
+    const priorNoticeCompensation = employmentData.priorNotice
+      ? employmentData.grossSalary
+      : 0;
+
     return employmentData;
   }
 
