@@ -22,11 +22,12 @@ export interface HandlerContext {
 
 export interface EmploymentData {
   grossSalary: number;
-  bestMonthlySalary?: number;
+  bestMonthlySalary: number;
   recordedStartDate: string;
-  realStartDate?: string;
+  realStartDate: string;
   endDate: string;
   priorNotice: boolean;
-  previousVacationBalance?: number;
-  buenosAires?: boolean;
+  previousVacationBalance: number;
+  buenosAires: boolean;
+  registered: boolean;
 }

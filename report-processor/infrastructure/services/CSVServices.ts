@@ -17,6 +17,7 @@ export class CSVServices implements ICSVServices {
     'Preaviso?': 'priorNotice',
     'Días de vacaciones adeudadas': 'previousVacationBalance',
     'Provincia de Buenos Aires': 'buenosAires',
+    'Trabajas en negro o no estás registrado?': 'registered',
   };
 
   // Parse CSV buffer to EmploymentData JSON:
