@@ -149,4 +149,37 @@ export class LiquidationServices implements ILiquidationServices {
       (grossSalary ?? bestMonthlySalary) / daysInMonth;
     return dailySalary * new Date(endDate).getDate();
   }
+
+  // Calculate proportional SAC:
+  private calculateProportionalSAC(
+    endDate: string,
+    bestMonthlySalary: number,
+    grossSalary: number
+  ): number {
+    // to calculate count days from Jan 1 to June 30 or from Aug 1 to Dec 31
+    // if end month is between Jan and June
+    // for example if termination is in 22 july then to count days will be from Aug 1 to July 22, therefore 22 days.
+    // then divide by 182,5 and multiply by days of previous calculation
+    const end = new Date(endDate);
+    let periodStart: Date;
+    let periodEnd: Date;
+    if (end.getMonth() < 6) {
+      periodStart = new Date(end.getFullYear(), 0, 1);
+      periodEnd = new Date(end.getFullYear(), 5, 30);
+    } else {
+      periodStart = new Date(end.getFullYear(), 7, 1);
+      periodEnd = new Date(end.getFullYear(), 11, 31);
+    }
+    const daysWorked =
+      Math.ceil(
+        (end.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24)
+      ) + 1;
+    const totalPeriodDays =
+      Math.ceil(
+        (periodEnd.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24)
+      ) + 1;
+    const proportionalSAC =
+      ((bestMonthlySalary ?? grossSalary) * daysWorked) / totalPeriodDays;
+    return proportionalSAC;
+  }
 }
