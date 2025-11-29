@@ -1,74 +1,113 @@
 import { ILiquidationServices } from '../../application/interfaces/ILiquidationService';
-import { EmploymentData } from '../../types/types';
+import { EmploymentData, SeniorityAndTerminationData } from '../../types/types';
 
 // Service to handle liquidation operations:
 export class LiquidationServices implements ILiquidationServices {
   async buildTerminationLiquidation(
     employmentData: EmploymentData
   ): Promise<any> {
-    // Calculate seniority:
-    const { years, months, days } = this.calculateSeniority(
-      employmentData.realStartDate ?? employmentData.recordedStartDate, // '2024-08-01T03:00:00.000Z'
-      employmentData.endDate // '2025-05-21T03:00:00.000Z'
+    // TODO: mock up employment data:
+    employmentData = {
+      grossSalary: 37079.34,
+      bestMonthlySalary: 37079.34,
+      recordedStartDate: '2016-02-14T03:00:00.000Z',
+      realStartDate: '2016-02-14T03:00:00.000Z',
+      endDate: '2020-07-22T03:00:00.000Z',
+      includePriorNotice: true,
+      previousVacationBalance: 0,
+      buenosAires: true,
+      registered: true,
+    };
+
+    // Seniority, worked and pending days of month:
+    const seniorityAndTerminationData: SeniorityAndTerminationData =
+      this.calculateSeniorityAndTerminationMonth(
+        employmentData.realStartDate ?? employmentData.recordedStartDate,
+        employmentData.endDate
+      );
+
+    // Salary base calculations:
+    const { baseSalary, bestSalary, dailySalary } = this.calculateBaseSalaries(
+      employmentData.grossSalary,
+      employmentData.bestMonthlySalary,
+      seniorityAndTerminationData.terminationMonth.daysInMonth
     );
 
-    // Calculate worked days of termination month:
-    const workedDaysTerminationMonth = this.calculateDaysInTerminationMonth(
-      employmentData.endDate
+    // Worked days of termination month compensation:
+    const workedDaysCompensation: number = this.calculateWorkedDaysCompensation(
+      dailySalary,
+      seniorityAndTerminationData.terminationMonth.workedDays
     );
 
-    const seniorityCompensation = this.calculateSeniorityCompensation(
-      employmentData.bestMonthlySalary ?? employmentData.grossSalary,
-      years,
-      months
+    // Proportional SAC compensation:
+    const proportionalSACCompensation: number = this.calculateProportionalSAC(
+      employmentData.endDate,
+      bestSalary
     );
 
-    const SACseniorityCompensation = this.calculateSAC(
+    // Proportional Vacaciones compensation:
+    const proportionalVacationCompensation: number =
+      this.calculateProportionalVacationCompensation(
+        employmentData.endDate,
+        seniorityAndTerminationData.years,
+        bestSalary
+      );
+
+    // SAC over proportional vacaciones compensation:
+    const SACproportionalVacationCompensation: number = this.calculateSAC(
+      proportionalVacationCompensation,
+      true
+    );
+
+    // Seniority compensation:
+    const seniorityCompensation: number = this.calculateSeniorityCompensation(
+      bestSalary,
+      seniorityAndTerminationData.years,
+      seniorityAndTerminationData.months
+    );
+
+    // SAC over seniority compensation:
+    const SACseniorityCompensation: number = this.calculateSAC(
       seniorityCompensation,
       employmentData.buenosAires
     );
 
-    const priorNoticeCompensation = this.calculatePriorNoticeCompensation(
-      employmentData.grossSalary,
-      employmentData.bestMonthlySalary,
-      employmentData.priorNotice
-    );
+    // Prior notice compensation:
+    const priorNoticeCompensation: number =
+      this.calculatePriorNoticeCompensation(
+        baseSalary,
+        employmentData.includePriorNotice
+      );
 
-    const SACpriorNoticeCompensation = this.calculateSAC(
+    // SAC over prior notice compensation:
+    const SACpriorNoticeCompensation: number = this.calculateSAC(
       priorNoticeCompensation,
-      employmentData.priorNotice
+      employmentData.includePriorNotice
     );
 
-    const integrationCompensation = this.calculateIntegrationCompensation(
-      employmentData.endDate,
-      employmentData.grossSalary,
-      employmentData.bestMonthlySalary,
-      workedDaysTerminationMonth
-    );
+    // Integration compensation:
+    const integrationCompensation: number =
+      this.calculateIntegrationCompensation(
+        dailySalary,
+        seniorityAndTerminationData.terminationMonth.pendingDays
+      );
 
-    const SACintegrationCompensation = this.calculateSAC(
+    // SAC over integration compensation:
+    const SACintegrationCompensation: number = this.calculateSAC(
       integrationCompensation,
-      employmentData.priorNotice
+      true
     );
 
-    const workedDaysCompensation = this.calculateWorkedDayCompensation(
-      employmentData.endDate,
-      employmentData.grossSalary,
-      employmentData.bestMonthlySalary,
-      workedDaysTerminationMonth
-    );
-
-    // TODO: Falta: SAC proporcional, vacaciones proporcionales, SAC sobre vacaciones proporcionales.
     // TODO: multas por omisión de registro o registro deficiente.
 
     return employmentData;
   }
 
   // Calculate employment seniority in years and months:
-  private calculateSeniority(
+  private calculateSeniorityAndTerminationMonth(
     startDate: string,
     endDate: string
-  ): { years: number; months: number; days: number } {
+  ): SeniorityAndTerminationData {
     const start = new Date(startDate);
     const end = new Date(endDate);
 
@@ -87,79 +126,54 @@ export class LiquidationServices implements ILiquidationServices {
       months += 12;
     }
 
-    return { years, months, days };
+    const daysInMonth: number = new Date(
+      Date.UTC(end.getUTCFullYear(), end.getUTCMonth() + 1, 0)
+    ).getUTCDate();
+    const workedDays = end.getUTCDate();
+    const pendingDays = daysInMonth - workedDays;
+
+    return {
+      years,
+      months,
+      days,
+      terminationMonth: {
+        daysInMonth,
+        workedDays,
+        pendingDays,
+      },
+    };
   }
 
-  // Calculate SAC over seniority compensation:
-  private calculateSAC(compensation: number, condition: boolean): number {
-    return condition ? compensation / 12 : 0;
+  // Calculate base salaries for liquidation calculations
+  private calculateBaseSalaries(
+    grossSalary: number,
+    bestMonthlySalary: number,
+    daysInMonth: number
+  ): { baseSalary: number; bestSalary: number; dailySalary: number } {
+    const baseSalary = grossSalary ?? bestMonthlySalary;
+    const bestSalary = bestMonthlySalary ?? grossSalary;
+    const dailySalary = baseSalary / daysInMonth;
+
+    return {
+      baseSalary,
+      bestSalary,
+      dailySalary,
+    };
   }
 
   // Calculate days in termination month:
-  private calculateDaysInTerminationMonth(endDate: string): number {
-    const end = new Date(endDate);
-    return new Date(end.getFullYear(), end.getMonth() + 1, 0).getDate();
-  }
-
-  // Calculate seniority compensation:
-  private calculateSeniorityCompensation(
-    bestMonthlySalary: number,
-    years: number,
-    months: number
+  private calculateWorkedDaysCompensation(
+    dailySalary: number,
+    workedDays: number
   ): number {
-    // one salary per year and if there are still more than 3 months an additional salary
-    let seniorityCompensation = years * bestMonthlySalary;
-    if (months >= 3) {
-      seniorityCompensation += bestMonthlySalary;
-    }
-    return seniorityCompensation;
-  }
-
-  // Calculate prior notice compensation:
-  private calculatePriorNoticeCompensation(
-    grossSalary: number,
-    bestMonthlySalary: number,
-    priorNotice: boolean
-  ): number {
-    return priorNotice ? (grossSalary ?? bestMonthlySalary) : 0;
-  }
-
-  // Calculate integration compensation:
-  private calculateIntegrationCompensation(
-    endDate: string,
-    grossSalary: number,
-    bestMonthlySalary: number,
-    daysInMonth: number
-  ): number {
-    const monthPendingDays: number =
-      daysInMonth - new Date(endDate).getDate() + 1;
-    const dailySalary: number =
-      (grossSalary ?? bestMonthlySalary) / daysInMonth;
-    return dailySalary * monthPendingDays;
-  }
-
-  // Calculate worked days of month:
-  private calculateWorkedDayCompensation(
-    endDate: string,
-    grossSalary: number,
-    bestMonthlySalary: number,
-    daysInMonth: number
-  ): number {
-    const dailySalary: number =
-      (grossSalary ?? bestMonthlySalary) / daysInMonth;
-    return dailySalary * new Date(endDate).getDate();
+    return dailySalary * workedDays;
   }
 
   // Calculate proportional SAC:
   private calculateProportionalSAC(
     endDate: string,
-    bestMonthlySalary: number,
-    grossSalary: number
+    bestSalary: number
   ): number {
-    // to calculate count days from Jan 1 to June 30 or from Aug 1 to Dec 31
-    // if end month is between Jan and June
-    // for example if termination is in 22 july then to count days will be from Aug 1 to July 22, therefore 22 days.
-    // then divide by 182,5 and multiply by days of previous calculation
     const end = new Date(endDate);
     let periodStart: Date;
     let periodEnd: Date;
@@ -178,8 +192,88 @@ export class LiquidationServices implements ILiquidationServices {
       Math.ceil(
         (periodEnd.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24)
       ) + 1;
-    const proportionalSAC =
-      ((bestMonthlySalary ?? grossSalary) * daysWorked) / totalPeriodDays;
+    const proportionalSAC = (bestSalary * daysWorked) / totalPeriodDays;
     return proportionalSAC;
+  }
+
+  // Calculate SAC over compensation:
+  private calculateSAC(compensation: number, condition: boolean): number {
+    return condition ? compensation / 12 : 0;
+  }
+
+  // Calculate seniority compensation:
+  private calculateSeniorityCompensation(
+    bestMonthlySalary: number,
+    years: number,
+    months: number
+  ): number {
+    // one salary per year and if there are still more than 3 months an additional salary:
+    let seniorityCompensation = years * bestMonthlySalary;
+    if (months >= 3) {
+      seniorityCompensation += bestMonthlySalary;
+    }
+    return seniorityCompensation;
+  }
+
+  // Calculate prior notice compensation:
+  private calculatePriorNoticeCompensation(
+    baseSalary: number,
+    includePriorNotice: boolean
+  ): number {
+    return includePriorNotice ? baseSalary : 0;
+  }
+
+  // Calculate integration compensation:
+  private calculateIntegrationCompensation(
+    dailySalary: number,
+    pendingDays: number
+  ): number {
+    return dailySalary * pendingDays;
+  }
+
+  private calculateProportionalVacationCompensation(
+    endDate: string,
+    seniorityYears: number,
+    bestSalary: number
+  ): number {
+    const end = new Date(endDate);
+    const endYear: number = end.getFullYear();
+
+    // Determine vacation days based on seniority:
+    const vacationDaysPerYear: number =
+      this.getVacationDaysBySeniority(seniorityYears);
+
+    // Calculate worked days in the termination year:
+    const yearStart = new Date(endYear, 0, 1);
+    const workedDaysInYear: number =
+      Math.ceil((end.getTime() - yearStart.getTime()) / (1000 * 60 * 60 * 24)) +
+      1;
+
+    // Calculate proportional vacation days:
+    const proportionalVacationDays: number = Math.floor(
+      (vacationDaysPerYear * workedDaysInYear) / 365
+    );
+
+    // Calculate daily vacation value:
+    const dailyVacationValue: number = bestSalary / 25;
+
+    // Calculate proportional vacations compensation:
+    const proportionalVacationsCompensation: number =
+      dailyVacationValue * proportionalVacationDays;
+
+    return proportionalVacationsCompensation;
+  }
+
+  // Determine vacation days based on seniority:
+  private getVacationDaysBySeniority(years: number): number {
+    if (years <= 5) {
+      return 14;
+    } else if (years <= 10) {
+      return 21;
+    } else if (years <= 20) {
+      return 28;
+    } else {
+      return 35;
+    }
   }
 }

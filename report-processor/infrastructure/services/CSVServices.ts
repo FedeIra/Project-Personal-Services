@@ -14,7 +14,7 @@ export class CSVServices implements ICSVServices {
     'Fecha de ingreso registrada': 'recordedStartDate',
     'Fecha de ingreso real': 'realStartDate',
     'Fecha de egreso': 'endDate',
-    'Preaviso?': 'priorNotice',
+    'Preaviso?': 'includePriorNotice',
     'Días de vacaciones adeudadas': 'previousVacationBalance',
     'Provincia de Buenos Aires': 'buenosAires',
     'Trabajas en negro o no estás registrado?': 'registered',

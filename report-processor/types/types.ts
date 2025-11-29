@@ -26,8 +26,19 @@ export interface EmploymentData {
   recordedStartDate: string;
   realStartDate: string;
   endDate: string;
-  priorNotice: boolean;
+  includePriorNotice: boolean;
   previousVacationBalance: number;
   buenosAires: boolean;
   registered: boolean;
+}
+
+export interface SeniorityAndTerminationData {
+  years: number;
+  months: number;
+  days: number;
+  terminationMonth: {
+    daysInMonth: number;
+    workedDays: number;
+    pendingDays: number;
+  };
 }
