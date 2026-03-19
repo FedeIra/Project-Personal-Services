@@ -45,7 +45,18 @@ Lambda disparado por SQS. Procesa liquidaciones laborales de forma asíncrona.
 - **LiquidationServices:** calcula indemnizaciones laborales (ver detalle abajo)
 - **SQS:** batch size 1, max concurrency 10, visibility timeout 300s, max receive count 5 (luego DLQ)
 
-### 6. common
+### 6. portfolio-services
+Lambda functions para el backend del portfolio personal. El front (Project-Portfolio) consume estos endpoints.
+- **Comments:** `GET /portfolio/comments` (público) · `POST /portfolio/comments` (auth)
+- **Email:** `POST /portfolio/send-email` (público) — envía email de contacto vía SES
+- **Files (S3):** `POST /portfolio/files/upload` (público) · `GET /portfolio/files` (auth) · `GET /portfolio/files/{fileName}` (auth) · `GET /portfolio/files/{fileName}/url` (auth) · `GET /portfolio/files/{fileName}/download` (auth) · `DELETE /portfolio/files/{fileName}` (auth)
+- **DynamoDB:** `PortfolioComments` (commentId HASH)
+- **S3:** bucket `dev-fedeira-personal-services-bucket`, prefijo `portfolio/`
+- **SES:** env vars `PORTFOLIO_FROM_EMAIL` y `PORTFOLIO_TO_EMAIL` (SSM en prod)
+- **Nota:** el endpoint `/download` devuelve presigned URL con `Content-Disposition: attachment` (Lambda no soporta streaming)
+- **Deps extra:** `busboy` para parsear multipart/form-data en Lambda
+
+### 7. common
 Utilidades compartidas: `ResponseBuilder`, `ErrorHandler`, `axiosConfiguration` con retries.
 
 ---
@@ -99,9 +110,9 @@ Usuario
 
 | Servicio | Uso |
 |----------|-----|
-| Lambda | 6 funciones (auth, login, accounts, investment, report-upload, report-processor) |
+| Lambda | 15 funciones (auth, login, accounts, investment, report-upload, report-processor, 9× portfolio) |
 | API Gateway | REST API unificada con Lambda authorizer, CORS habilitado |
-| DynamoDB | 3 tablas: UserCredentials, Accounts, ReportRequests |
+| DynamoDB | 4 tablas: UserCredentials, Accounts, ReportRequests, PortfolioComments |
 | S3 | `dev-fedeira-personal-services-bucket` — CSVs entrada + reportes generados |
 | SQS FIFO | Cola + DLQ (`ReportRequestsDeadLetterQueue.fifo`), retención 14 días |
 | SES | Envío del reporte generado por email |
@@ -114,15 +125,78 @@ Usuario
 
 **Rama activa:** `Task/liquidation-report-process`
 
-### Completado ✅
+### Completado
 - Parser CSV (papaparse, latin1, separador `;`)
 - Cálculos de liquidación: días trabajados, SAC proporcional, vacaciones, antigüedad, preaviso, integración
 - Message Dispatcher con handler registry extensible
 - Scaffolding completo del pipeline
 
-### Pendiente 🔲
+### Pendiente
 - Persistir resultado de liquidación en DynamoDB (actualizar status)
 - Guardar reporte generado en S3 (`reports/response/{date}/{email}/{id}.json`)
 - Envío del reporte por SES
 - Remover mock data y conectar con CSV real
 - Tests de los cálculos de liquidación
+
+---
+
+## Desarrollo Local
+
+Para correr el proyecto localmente seguir los pasos del README completo en `common/docs/README.md`.
+
+### Prerequisitos
+- Node.js 20.x (`nvm use 20`)
+- Docker (para DynamoDB local)
+- AWS CLI configurado
+- Serverless Framework (`npm install -g serverless`)
+
+### Pasos
+
+```bash
+# 1. Instalar dependencias
+npm install
+
+# 2. Crear .env en la raíz (usar env.example como guía)
+
+# 3. Iniciar DynamoDB local (requiere Docker)
+npm run offline-db-init
+
+# 4. Verificar que DynamoDB está corriendo
+npm run offline-db-verify
+
+# 5. Correr migraciones (crear tablas)
+npm run offline-db-migrate
+
+# 6. Insertar datos de prueba
+npm run insert-user
+npm run insert-accounts
+
+# 7. Levantar la API localmente (http://localhost:3000)
+npm run offline
+```
+
+### Variables de entorno requeridas para modo offline
+Además de las variables de credenciales, asegurarse de tener:
+- `IS_OFFLINE=true`
+- `AWS_REPORTS_BUCKET=<nombre del bucket>`
+- `AWS_REPORT_REQUESTS_QUEUE_URL=<url de la cola SQS>`
+- `REPORT_REQUESTS_TABLE=ReportRequests`
+
+### Ejecutar report-processor localmente (sin levantar todo el stack)
+Usar el script de prueba que simula un evento SQS:
+```bash
+dotenv -e .env -- ts-node report-processor/test/execute-sqs-report-processor-handler.ts
+```
+
+---
+
+## Documentación del Proyecto
+
+Los siguientes archivos de referencia se encuentran en `common/docs/`:
+
+| Archivo | Descripción |
+|---------|-------------|
+| `README.md` | Guía completa de instalación, ejecución local y despliegue |
+| `architecture.png` | Diagrama visual de la arquitectura del sistema |
+| `architecture.drawio` | Diagrama editable de la arquitectura (draw.io) |
+| `Project Personal Services API.postman_collection.json` | Colección Postman con todos los endpoints del sistema |

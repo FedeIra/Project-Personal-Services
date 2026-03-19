@@ -54,6 +54,10 @@ provider:
     AWS_REPORTS_BUCKET: ${env:AWS_REPORTS_BUCKET}
     AWS_REPORT_REQUESTS_QUEUE_URL: !Ref ReportRequestsQueue
     REPORT_REQUESTS_TABLE: ReportRequests
+    PORTFOLIO_COMMENTS_TABLE: PortfolioComments
+    PORTFOLIO_S3_BUCKET: dev-fedeira-personal-services-bucket
+    PORTFOLIO_FROM_EMAIL: ${env:PORTFOLIO_FROM_EMAIL, ssm:/fedeira-personal-services/portfolio/fromEmail}
+    PORTFOLIO_TO_EMAIL: ${env:PORTFOLIO_TO_EMAIL, ssm:/fedeira-personal-services/portfolio/toEmail}
 
   # Monitoring & Logging:
   tracing:
@@ -88,6 +92,7 @@ provider:
             - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/UserCredentials'
             - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Accounts'
             - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ReportRequests'
+            - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/PortfolioComments'
         # Permit for logs operations in cloudwatch
         - Effect: 'Allow'
           Action:
@@ -108,9 +113,12 @@ provider:
             - 's3:GetBucketLocation'
             - 's3:GetObject'
             - 's3:PutObject'
+            - 's3:DeleteObject'
           Resource:
             - 'arn:aws:s3:::dev-fedeira-personal-services-bucket'
             - 'arn:aws:s3:::dev-fedeira-personal-services-bucket/*'
+            - 'arn:aws:s3:::dev-fedeira-personal-services-reports'
+            - 'arn:aws:s3:::dev-fedeira-personal-services-reports/*'
             # Permit for SQS operations:
         - Effect: 'Allow'
           Action:
@@ -203,6 +211,68 @@ functions:
           functionResponseType: ReportBatchItemFailures
           maximumConcurrency: 10
 
+  # Portfolio domain Lambda (single function, Fastify handles internal routing):
+  portfolio-service:
+    handler: portfolio-services/lambda.handler
+    name: 'dev-fedeira-portfolio-services'
+    timeout: 29
+    memorySize: 1024
+    events:
+      - http:
+          path: portfolio/comments
+          method: get
+          cors: true
+      - http:
+          path: portfolio/comments
+          method: post
+          cors: true
+          authorizer:
+            name: auth-service-authorizer
+            type: TOKEN
+      - http:
+          path: portfolio/send-email
+          method: post
+          cors: true
+      - http:
+          path: portfolio/files/upload
+          method: post
+          cors: true
+      - http:
+          path: portfolio/files
+          method: get
+          cors: true
+          authorizer:
+            name: auth-service-authorizer
+            type: TOKEN
+      - http:
+          path: portfolio/files/{fileName}/url
+          method: get
+          cors: true
+          authorizer:
+            name: auth-service-authorizer
+            type: TOKEN
+      - http:
+          path: portfolio/files/{fileName}/download
+          method: get
+          cors: true
+          authorizer:
+            name: auth-service-authorizer
+            type: TOKEN
+      - http:
+          path: portfolio/files/{fileName}
+          method: get
+          cors: true
+          authorizer:
+            name: auth-service-authorizer
+            type: TOKEN
+      - http:
+          path: portfolio/files/{fileName}
+          method: delete
+          cors: true
+          authorizer:
+            name: auth-service-authorizer
+            type: TOKEN
+
 # AWS Resources: DynamoDB Tables, S3 Bucket and SQS Queue:
 resources:
   Resources:
@@ -270,6 +340,17 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
+    PortfolioCommentsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: PortfolioComments
+        AttributeDefinitions:
+          - AttributeName: commentId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: commentId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
     # S3Bucket:
     # Type: AWS::S3::Bucket
     # Properties:
@@ -287,6 +368,23 @@ resources:
     #         AllowedOrigins:
     #           - '*'
     #         MaxAge: 3000
+    ReportsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: dev-fedeira-personal-services-reports
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              AllowedOrigins:
+                - '*'
+              MaxAge: 3000
     ReportRequestsQueue:
       Type: AWS::SQS::Queue
       Properties:

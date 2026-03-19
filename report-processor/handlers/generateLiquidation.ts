@@ -34,6 +34,11 @@ export class GenerateLiquidationHandler {
         employmentData
       );
 
+    console.log(
+      '🚀 ~ GenerateLiquidationHandler ~ handle ~ terminationLiquidation:',
+      terminationLiquidation
+    );
+
     // 5) Update status in DynamoDB
     // 6) Save generated liquidation in S3
     // 7) Send report via email
