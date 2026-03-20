@@ -49,6 +49,12 @@ provider:
     AWS_REPORT_REQUESTS_QUEUE_URL: ${env:AWS_REPORT_REQUESTS_QUEUE_URL}
     REPORT_REQUESTS_TABLE: ReportRequests
 
+    # [Faros AI Assignment] - Word Cloud service environment variables:
+    FAROS_PROCESSED_URLS_TABLE: FarosProcessedUrls
+    FAROS_WORD_COUNTS_TABLE: FarosWordCounts
+    FAROS_WORDCLOUD_QUEUE_URL: ${env:FAROS_WORDCLOUD_QUEUE_URL}
+    FAROS_WORDCLOUD_CACHE_BUCKET: dev-fedeira-personal-services-bucket
+
 # Lambda functions:
 functions:
   auth-service-authorizer:
@@ -94,6 +100,40 @@ functions:
           authorizer:
             name: auth-service-authorizer
             type: TOKEN
+  # [Faros AI Assignment] - Word Cloud HTTP Lambda (GET + POST /wordcloud):
+  faros-ai-service:
+    handler: faros-ai-services/lambda.handler
+    events:
+      - http:
+          path: wordcloud
+          method: get
+          cors: true
+          authorizer:
+            name: auth-service-authorizer
+      - http:
+          path: wordcloud
+          method: post
+          cors: true
+          authorizer:
+            name: auth-service-authorizer
+
+  # [Faros AI Assignment] - Word Cloud SQS Processor Lambda:
+  faros-ai-processor:
+    handler: faros-ai-services/processor-handler.handler
+    name: 'dev-fedeira-faros-ai-processor'
+    memorySize: 1024
+    timeout: 300
+    environment:
+      FAROS_PROCESSED_URLS_TABLE: FarosProcessedUrls
+      FAROS_WORD_COUNTS_TABLE: FarosWordCounts
+      FAROS_WORDCLOUD_CACHE_BUCKET: dev-fedeira-personal-services-bucket
+    events:
+      - sqs:
+          arn: arn:aws:sqs:us-east-2:000000000000:FarosWordCloudQueue
+          batchSize: 1
+          maximumBatchingWindow: 0
+          functionResponseType: ReportBatchItemFailures
+
   report-request-processor:
     handler: report-services/handler.handler
     name: 'dev-fedeira-report-request-processor'
@@ -178,6 +218,39 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
+
+    # [Faros AI Assignment] - DynamoDB table for URL deduplication:
+    FarosProcessedUrlsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: FarosProcessedUrls
+        AttributeDefinitions:
+          - AttributeName: url
+            AttributeType: S
+        KeySchema:
+          - AttributeName: url
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    # [Faros AI Assignment] - DynamoDB table for word frequency counts:
+    FarosWordCountsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: FarosWordCounts
+        AttributeDefinitions:
+          - AttributeName: word
+            AttributeType: S
+        KeySchema:
+          - AttributeName: word
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    # [Faros AI Assignment] - SQS Standard Queue for async URL processing:
+    FarosWordCloudQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: FarosWordCloudQueue
+        VisibilityTimeout: 300
 
     ReportRequestsQueue:
       Type: AWS::SQS::Queue

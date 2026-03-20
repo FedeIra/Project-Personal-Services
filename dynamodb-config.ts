@@ -17,6 +17,26 @@ const dynamoDb = new AWS.DynamoDB({
 });
 
 const tables: TableDefinition[] = [
+  // [Faros AI Assignment] - URL deduplication table:
+  {
+    TableName: 'FarosProcessedUrls',
+    KeySchema: [{ AttributeName: 'url', KeyType: 'HASH' }],
+    AttributeDefinitions: [{ AttributeName: 'url', AttributeType: 'S' }],
+    ProvisionedThroughput: {
+      ReadCapacityUnits: 5,
+      WriteCapacityUnits: 5,
+    },
+  },
+  // [Faros AI Assignment] - Word frequency counts table:
+  {
+    TableName: 'FarosWordCounts',
+    KeySchema: [{ AttributeName: 'word', KeyType: 'HASH' }],
+    AttributeDefinitions: [{ AttributeName: 'word', AttributeType: 'S' }],
+    ProvisionedThroughput: {
+      ReadCapacityUnits: 5,
+      WriteCapacityUnits: 5,
+    },
+  },
   {
     TableName: 'UserCredentials',
     KeySchema: [{ AttributeName: 'email', KeyType: 'HASH' }],

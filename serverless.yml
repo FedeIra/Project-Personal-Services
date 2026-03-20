@@ -59,6 +59,12 @@ provider:
     PORTFOLIO_FROM_EMAIL: ${env:PORTFOLIO_FROM_EMAIL, ssm:/fedeira-personal-services/portfolio/fromEmail}
     PORTFOLIO_TO_EMAIL: ${env:PORTFOLIO_TO_EMAIL, ssm:/fedeira-personal-services/portfolio/toEmail}
 
+    # [Faros AI Assignment] - Word Cloud service environment variables:
+    FAROS_PROCESSED_URLS_TABLE: FarosProcessedUrls
+    FAROS_WORD_COUNTS_TABLE: FarosWordCounts
+    FAROS_WORDCLOUD_QUEUE_URL: !Ref FarosWordCloudQueue
+    FAROS_WORDCLOUD_CACHE_BUCKET: dev-fedeira-personal-services-bucket
+
   # Monitoring & Logging:
   tracing:
     apiGateway: true
@@ -93,6 +99,9 @@ provider:
             - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/Accounts'
             - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/ReportRequests'
             - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/PortfolioComments'
+            # [Faros AI Assignment] - DynamoDB tables for Word Cloud:
+            - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/FarosProcessedUrls'
+            - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/FarosWordCounts'
         # Permit for logs operations in cloudwatch
         - Effect: 'Allow'
           Action:
@@ -131,6 +140,8 @@ provider:
             ]
           Resource:
             - !GetAtt ReportRequestsQueue.Arn
+            # [Faros AI Assignment] - SQS permissions for Word Cloud queue:
+            - !GetAtt FarosWordCloudQueue.Arn
 # Lambda functions definitions:
 functions:
   # Custom authorizer Lambda for API Gateway (verifies JWT tokens)
@@ -206,6 +217,46 @@ functions:
     events:
       - sqs:
           arn: !GetAtt ReportRequestsQueue.Arn
+          batchSize: 1
+          maximumBatchingWindow: 0
+          functionResponseType: ReportBatchItemFailures
+          maximumConcurrency: 10
+
+  # [Faros AI Assignment] - Word Cloud HTTP Lambda (Fastify handles GET + POST /wordcloud):
+  faros-ai-service:
+    handler: faros-ai-services/lambda.handler
+    name: 'dev-fedeira-faros-ai-services'
+    timeout: 29
+    memorySize: 1024
+    events:
+      - http:
+          path: wordcloud
+          method: get
+          cors: true
+          authorizer:
+            name: auth-service-authorizer
+            type: TOKEN
+      - http:
+          path: wordcloud
+          method: post
+          cors: true
+          authorizer:
+            name: auth-service-authorizer
+            type: TOKEN
+
+  # [Faros AI Assignment] - Word Cloud SQS Processor Lambda (async URL crawling):
+  faros-ai-processor:
+    handler: faros-ai-services/processor-handler.handler
+    name: 'dev-fedeira-faros-ai-processor'
+    timeout: 300
+    memorySize: 1024
+    environment:
+      FAROS_PROCESSED_URLS_TABLE: FarosProcessedUrls
+      FAROS_WORD_COUNTS_TABLE: FarosWordCounts
+      FAROS_WORDCLOUD_CACHE_BUCKET: dev-fedeira-personal-services-bucket
+    events:
+      - sqs:
+          arn: !GetAtt FarosWordCloudQueue.Arn
           batchSize: 1
           maximumBatchingWindow: 0
           functionResponseType: ReportBatchItemFailures
@@ -368,6 +419,50 @@ resources:
     #         AllowedOrigins:
     #           - '*'
     #         MaxAge: 3000
+    # [Faros AI Assignment] - DynamoDB table for URL deduplication:
+    FarosProcessedUrlsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: FarosProcessedUrls
+        AttributeDefinitions:
+          - AttributeName: url
+            AttributeType: S
+        KeySchema:
+          - AttributeName: url
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    # [Faros AI Assignment] - DynamoDB table for word frequency counts:
+    FarosWordCountsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: FarosWordCounts
+        AttributeDefinitions:
+          - AttributeName: word
+            AttributeType: S
+        KeySchema:
+          - AttributeName: word
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    # [Faros AI Assignment] - SQS Standard Queue for async URL processing:
+    FarosWordCloudQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: FarosWordCloudQueue
+        VisibilityTimeout: 300
+        MessageRetentionPeriod: 1209600
+        RedrivePolicy:
+          deadLetterTargetArn: !GetAtt FarosWordCloudDeadLetterQueue.Arn
+          maxReceiveCount: 5
+
+    # [Faros AI Assignment] - Dead Letter Queue for failed word cloud processing:
+    FarosWordCloudDeadLetterQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: FarosWordCloudDeadLetterQueue
+        MessageRetentionPeriod: 1209600
+
     ReportsBucket:
       Type: AWS::S3::Bucket
       Properties:

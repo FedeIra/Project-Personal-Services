@@ -21,6 +21,9 @@ Services are the following:
 - **Authorization Service**: Handles user authentication and authorization.
 - **Investment Service**: Manages investment-related operations against PPI.
 - **Account Service**: Manages user accounts.
+- **Report Service**: Handles CSV upload and async report generation (liquidation reports).
+- **Portfolio Service**: Portfolio comments, email, and file management (S3).
+- **Faros AI Service** (Assignment): Amazon Product Descriptions Word Cloud — crawls Amazon product pages and builds a word cloud of the most significant terms.
 
 ## 🚀 Getting Started
 
@@ -148,6 +151,82 @@ Command Description:
 - npm run deploy → Deploys the service to AWS.
 - npm run insert-user → Runs a script to insert a test user into DynamoDB.
 - npm run insert-accounts → Runs a script to insert test accounts into DynamoDB.
+
+## Faros AI Word Cloud Service (Assignment)
+
+### Overview
+
+A web crawler service that generates a word cloud from Amazon product descriptions. The system receives Amazon product URLs, crawls the pages asynchronously, extracts product descriptions, and maintains a real-time word cloud of the most significant terms.
+
+### Architecture
+
+```
+POST /wordcloud?url=X                          GET /wordcloud?top=X
+        |                                              |
+   [Fastify Lambda]                              [Fastify Lambda]
+        |                                              |
+   DynamoDB conditional write                   S3 cache (pre-computed)
+   (URL deduplication)                          + Lambda in-memory cache
+        |                                         (TTL 60s → O(1) response)
+   SQS Standard Queue
+        |
+   [Processor Lambda]
+        |
+   1. Crawl Amazon (axios + retry + cheerio)
+   2. Tokenize + filter stop words
+   3. DynamoDB atomic ADD (word counts)
+   4. Rebuild S3 cache (top 1000 sorted)
+   5. Mark URL as PROCESSED
+```
+
+### Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/wordcloud?top=X` | Returns the top X significant terms. Fast (reads from cache). Default: 10, Max: 1000 |
+| `POST` | `/wordcloud?url=X` | Submits an Amazon product URL for async processing. Returns 202 if new, 200 if duplicate |
+
+### Key Design Decisions
+
+1. **SQS for async processing**: POST returns 202 immediately; crawling is inherently slow (external network) and must not block HTTP responses.
+2. **DynamoDB atomic increments (ADD)**: Concurrent processors safely update word counts without locks.
+3. **S3 pre-computed cache**: The word corpus can be very large; GET cannot scan/sort at runtime.
+4. **Lambda in-memory cache**: Avoids S3 latency on the critical GET path (warm Lambda reuse).
+5. **Conditional writes for deduplication**: `attribute_not_exists(url)` prevents race conditions when duplicate URLs arrive simultaneously.
+6. **Standard SQS queue (not FIFO)**: Better throughput for scaling to thousands of requests/second.
+
+### AWS Resources (Assignment-specific)
+
+| Resource | Name | Purpose |
+|----------|------|---------|
+| DynamoDB | `FarosProcessedUrls` | URL deduplication (`url` HASH key) |
+| DynamoDB | `FarosWordCounts` | Word frequency (`word` HASH key, `wordCount` number) |
+| SQS | `FarosWordCloudQueue` | Decouples POST from crawling |
+| SQS | `FarosWordCloudDeadLetterQueue` | Failed messages after 5 retries |
+| S3 | `wordcloud/cache/top-words.json` | Pre-computed sorted word cloud |
+
+### Testing Locally
+
+```bash
+# 1. Start DynamoDB local + migrate tables
+npm run offline-db-init
+npm run offline-db-migrate
+
+# 2. Start the API
+npm run offline
+
+# 3. Submit a URL
+curl -X POST "http://localhost:3000/wordcloud?url=http://www.amazon.com/gp/product/B00VVOCSOU"
+
+# 4. Get word cloud
+curl "http://localhost:3000/wordcloud?top=10"
+
+# 5. Run the simulate script
+bash faros-ai-services/test/simulateRequests.sh localhost 3000 1
+
+# 6. Test processor directly (bypass SQS)
+dotenv -e .env -- ts-node faros-ai-services/test/execute-sqs-wordcloud-handler.ts
+```
 
 ## 📚 Technologies Used
 

@@ -23,6 +23,7 @@
     "account-services/**/*",
     "report-services/**/*",
     "report-processor/**/*",
+    "faros-ai-services/**/*",
     "common/**/*"
   ],
   "exclude": ["node_modules", "dist"]

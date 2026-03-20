@@ -6,3 +6,5 @@ node_modules/
 dist/
 .serverless/
 .eslintcache
+# [Faros AI Assignment] - Exclude markdown documentation from auto-formatting:
+faros-ai-services/documentation/*.md

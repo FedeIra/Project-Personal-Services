@@ -5,7 +5,9 @@
       "Bash(npm run:*)",
       "Bash(aws dynamodb:*)",
       "Bash(docker --version)",
-      "mcp__github__get_file_contents"
+      "mcp__github__get_file_contents",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }
