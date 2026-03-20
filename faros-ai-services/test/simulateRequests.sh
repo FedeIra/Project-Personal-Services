@@ -1,49 +1,279 @@
-#!/bin/bash
-# Faros AI Word Cloud - Request Simulator
-# Usage: ./simulateRequests.sh [host] [port] [delay_seconds]
+#!/bin/sh
+# Faros AI Word Cloud - Request Simulator (assignment script)
 #
-# Example: ./simulateRequests.sh localhost 3000 1
+# Usage: ./simulateRequests.sh <SERVER> <PORT> <PARAM> <SLEEP_TIME> <EMAIL> <PASSWORD>
+#
+# Local example:
+#   ./simulateRequests.sh http://localhost 3000/dev/wordcloud url 1 fedeirar@gmail.com mypassword
+#
+# AWS example:
+#   ./simulateRequests.sh https://bk7xpquf2k.execute-api.us-east-2.amazonaws.com dev/wordcloud url 1 fedeirar@gmail.com mypassword
 
-HOST=${1:-localhost}
-PORT=${2:-3000}
-DELAY=${3:-1}
+SERVER=$1
+PORT=$2
+PARAM=$3
+SLEEP_TIME=$4
+EMAIL=$5
+PASSWORD=$6
 
-BASE_URL="http://${HOST}:${PORT}"
+# Extract base URL (only SERVER:PORT number, without path) for the login endpoint
+BASE_PORT=$(echo "$PORT" | cut -d'/' -f1)
+BASE_URL="$SERVER:$BASE_PORT"
 
-# Sample Amazon product URLs for testing:
-URLS=(
-  "http://www.amazon.com/gp/product/B00VVOCSOU"
-  "http://www.amazon.com/gp/product/B00YD545CC"
-  "http://www.amazon.com/gp/product/B01LZKNRR3"
-  "http://www.amazon.com/gp/product/B00ZV9RDKK"
-  "http://www.amazon.com/gp/product/B00BGGDVOO"
-)
+if [ -z "$TOKEN" ]; then
+  echo "Authenticating..."
+  LOGIN_RESPONSE=$(curl -s -X POST "$BASE_URL/dev/login" \
+    -H "Content-Type: application/json" \
+    -d "{\"email\":\"$EMAIL\",\"password\":\"$PASSWORD\"}")
 
-echo "=== Faros AI Word Cloud - Simulating Requests ==="
-echo "Target: ${BASE_URL}"
-echo "Delay between requests: ${DELAY}s"
-echo ""
+  TOKEN=$(echo "$LOGIN_RESPONSE" | sed 's/.*"token":"\([^"]*\)".*/\1/')
 
-# Submit URLs
-for url in "${URLS[@]}"; do
-  echo ">>> POST /wordcloud?url=${url}"
-  curl -s -X POST "${BASE_URL}/wordcloud?url=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${url}', safe=''))")" | python3 -m json.tool 2>/dev/null || echo "(raw response above)"
-  echo ""
-  sleep "$DELAY"
-done
+  if [ -z "$TOKEN" ] || [ "$TOKEN" = "$LOGIN_RESPONSE" ]; then
+    echo "Login failed: $LOGIN_RESPONSE"
+    exit 1
+  fi
+  echo "Token obtained. Starting simulation..."
+else
+  echo "Using pre-set TOKEN. Starting simulation..."
+fi
 
-# Test duplicate URL (should be deduplicated)
-echo ">>> POST /wordcloud (duplicate URL - should be deduplicated):"
-curl -s -X POST "${BASE_URL}/wordcloud?url=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${URLS[0]}', safe=''))")" | python3 -m json.tool 2>/dev/null || echo "(raw response above)"
-echo ""
-
-# Wait for processing
-echo ">>> Waiting ${DELAY}s for processor to finish..."
-sleep "$DELAY"
-
-# Get word cloud
-echo ">>> GET /wordcloud?top=10:"
-curl -s "${BASE_URL}/wordcloud?top=10" | python3 -m json.tool 2>/dev/null || echo "(raw response above)"
-echo ""
-
-echo "=== Done ==="
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBFZNG" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBFZNG" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00HUGXOAU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00CBNIXHQ" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TRQPVKM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCSOU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCSOU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCQHE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00KRMMCFM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBFZNG" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TRQPVKM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCQHE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00HUGXOAU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00CBNIXHQ" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00HUGXOAU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TRQPVKM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00HUGXOAU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00HUGXOAU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00KRMMCFM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00HUGXOAU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00CBNIXHQ" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00KRMMCFM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00CBNIXHQ" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TRQPVKM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBFZNG" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCSOU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBFZNG" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCSOU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00HUGXOAU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TRQPVKM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBFZNG" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCSOU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00KRMMCFM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00KRMMCFM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00KRMMCFM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TRQPVKM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBFZNG" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00HUGXOAU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00KRMMCFM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00KRMMCFM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCQHE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCQHE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TRQPVKM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCSOU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBFZNG" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00KRMMCFM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCQHE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TRQPVKM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCQHE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00CBNIXHQ" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00CBNIXHQ" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCSOU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCSOU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBFZNG" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00CBNIXHQ" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCSOU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00HUGXOAU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCQHE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCSOU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00HUGXOAU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00KRMMCFM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00KRMMCFM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCQHE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCQHE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCQHE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00CBNIXHQ" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCSOU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCSOU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBFZNG" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCQHE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00HUGXOAU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00HUGXOAU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00HUGXOAU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBFZNG" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBFZNG" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCSOU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00KRMMCFM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBFZNG" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCSOU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00KRMMCFM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBFZNG" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00CBNIXHQ" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCQHE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00HUGXOAU" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00KRMMCFM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TSUGXKE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00VVOCQHE" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00TRQPVKM" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
+curl -X POST "$SERVER:$PORT?$PARAM=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" -H "Authorization: Bearer $TOKEN"
+sleep $SLEEP_TIME
