@@ -1,233 +1,368 @@
 # Faros AI Assignment — Amazon Product Descriptions Word Cloud
 
-## Objetivo
+## Objective
 
-Servicio web que genera un word cloud a partir de descripciones de productos de Amazon. Recibe URLs de productos vía REST endpoint, crawlea las páginas, extrae las descripciones y mantiene un word cloud con las palabras más significativas.
+Web service that generates a word cloud from Amazon product descriptions. Receives product URLs via REST endpoint, crawls the pages, extracts descriptions, and maintains a word cloud with the most significant words.
 
 ---
 
 ## Endpoints
 
-| Método | Path | Descripción |
+| Method | Path | Description |
 |--------|------|-------------|
-| `GET`  | `/wordcloud?top=X` | Retorna los top X términos significativos. Rápido (lee cache pre-computado). Default: 10, Max: 1000 |
-| `POST` | `/wordcloud?url=X` | Envía una URL de Amazon para procesamiento async. Retorna 202 si es nueva, 200 si está duplicada |
+| `GET`  | `/wordcloud?top=X` | Returns the top X significant terms. Fast (reads pre-computed cache). Default: 10, Max: 1000 |
+| `POST` | `/wordcloud?url=X` | Submits an Amazon URL for async processing. Returns 202 if new, 200 if duplicate |
 
 ---
 
-## Arquitectura
+## Architecture
 
 ```
 POST /wordcloud?url=X                            GET /wordcloud?top=X
         │                                                │
    [Fastify Lambda]                                [Fastify Lambda]
         │                                                │
-   DynamoDB conditional write                     S3 cache (pre-computado)
-   (deduplicación de URLs)                        + Lambda in-memory cache
-        │                                           (TTL 60s → respuesta O(1))
+   DynamoDB conditional write                     S3 cache (pre-computed)
+   (URL deduplication)                            + Lambda in-memory cache
+        │                                           (TTL 60s → O(1) response)
    SQS Standard Queue
         │
    [Processor Lambda]
         │
    1. Crawl Amazon (axios + retry + cheerio)
-   2. Tokenizar + filtrar stop words
-   3. DynamoDB atomic ADD (conteo de palabras)
-   4. Reconstruir S3 cache (top 1000 ordenados)
-   5. Marcar URL como PROCESSED
+   2. Tokenize + filter stop words
+   3. DynamoDB atomic ADD (word count)
+   4. Rebuild S3 cache (top 1000 sorted)
+   5. Mark URL as PROCESSED
 ```
 
-### Flujo detallado del POST
+### Detailed POST Flow
 
-1. Controller valida que la URL sea de Amazon
-2. SubmitUrlUseCase ejecuta un **conditional write atómico** en DynamoDB (`attribute_not_exists(url)`)
-   - Si la URL ya existe → retorna 200 "URL already submitted" (deduplicación)
-   - Si es nueva → la inserta con status `IN_PROGRESS`
-3. Encola mensaje en SQS con `{ url, messageType: "word_cloud_url" }`
-4. Retorna 202 Accepted inmediatamente (no espera el crawling)
+1. Controller validates that the URL belongs to Amazon
+2. SubmitUrlUseCase executes an **atomic conditional write** in DynamoDB (`attribute_not_exists(url)`)
+   - If the URL already exists → returns 200 "URL already submitted" (deduplication)
+   - If new → inserts it with status `IN_PROGRESS`
+3. Enqueues a message in SQS with `{ url, messageType: "word_cloud_url" }`
+4. Returns 202 Accepted immediately (does not wait for crawling)
 
-### Flujo detallado del Processor (SQS Lambda)
+### Detailed Processor Flow (SQS Lambda)
 
-1. Recibe mensaje de SQS con la URL
-2. Verifica si la URL ya fue procesada (guard para at-least-once delivery de SQS)
-3. Crawlea la página de Amazon con axios (retry exponencial, 3 intentos, 15s timeout)
-4. Parsea HTML con cheerio, extrayendo el `#productDescription` y selectores alternativos
-5. Tokeniza el texto: lowercase → remove punctuation → split → filter stop words → filter < 3 chars
-6. Incrementa atómicamente los conteos en DynamoDB con `ADD` expression (sin locks, sin race conditions)
-7. Escanea DynamoDB, ordena por count DESC, toma top 1000 → actualiza S3 cache
-8. Marca URL como `PROCESSED` en DynamoDB
+1. Receives SQS message with the URL
+2. Checks if the URL was already processed (guard for at-least-once SQS delivery)
+3. Crawls the Amazon page with axios (exponential retry, 3 attempts, 15s timeout)
+4. Parses HTML with cheerio, extracting `#productDescription` and alternative selectors
+5. Tokenizes the text: lowercase → remove punctuation → split → filter stop words → filter < 3 chars
+6. Atomically increments word counts in DynamoDB using `ADD` expression (lock-free, no race conditions)
+7. Scans DynamoDB, sorts by count DESC, takes top 1000 → updates S3 cache
+8. Marks URL as `PROCESSED` in DynamoDB
 
-### Flujo detallado del GET
+### Detailed GET Flow
 
-1. Lee el word cloud pre-computado desde Lambda in-memory cache (TTL 60s)
-2. Si cache expiró → lee de S3 y re-cachea en memoria
-3. Retorna los primeros X elementos del array pre-ordenado → respuesta O(1)
+1. Reads the pre-computed word cloud from Lambda in-memory cache (TTL 60s)
+2. If cache expired → reads from S3 and re-caches in memory
+3. Returns the first X elements from the pre-sorted array → O(1) response
 
 ---
 
-## Decisiones de Diseño
+## Design Decisions
 
-### 1. SQS para procesamiento async
+### 1. SQS for async processing
 
-**Por qué:** El crawling es inherentemente lento (red externa, 5-15s) y no debe bloquear la respuesta HTTP. API Gateway tiene un timeout de 29s. Con SQS, el POST retorna 202 inmediatamente.
+**Why:** Crawling is inherently slow (external network, 5–15s) and should not block the HTTP response. API Gateway has a 29s timeout. With SQS, the POST returns 202 immediately.
 
-### 2. Standard Queue (no FIFO)
+### 2. Standard Queue (not FIFO)
 
-**Por qué:** El assignment requiere soportar "several orders of magnitudes" más carga. Standard Queues tienen throughput casi ilimitado vs FIFO (300/s). La deduplicación de URLs se maneja en DynamoDB, no en SQS.
+**Why:** The assignment requires supporting "several orders of magnitude" more load. Standard Queues have near-unlimited throughput vs FIFO (300/s). URL deduplication is handled in DynamoDB, not SQS.
 
 ### 3. DynamoDB atomic increments (ADD expression)
 
-**Por qué:** Múltiples processors concurrentes pueden actualizar los mismos conteos de palabras sin locks ni race conditions. Cada `UpdateItem` con `ADD` es atómico a nivel de ítem.
+**Why:** Multiple concurrent processors can update the same word counts without locks or race conditions. Each `UpdateItem` with `ADD` is atomic at the item level.
 
-### 4. Conditional write para deduplicación
+### 4. Conditional write for deduplication
 
-**Por qué:** Si 5 requests llegan simultáneamente con la misma URL, el `PutItem` con `attribute_not_exists(url)` garantiza que solo uno tenga éxito. DynamoDB rechaza los demás con `ConditionalCheckFailedException`. Elimina la race condition del patrón check-then-insert.
+**Why:** If 5 simultaneous requests arrive with the same URL, the `PutItem` with `attribute_not_exists(url)` guarantees only one succeeds. DynamoDB rejects the rest with `ConditionalCheckFailedException`. Eliminates the race condition from the check-then-insert pattern.
 
 ### 5. S3 pre-computed cache
 
-**Por qué:** El corpus de palabras puede ser muy grande. No es viable escanear y ordenar todas las palabras en cada GET request. El cache se recalcula una vez por URL procesada (en el processor, async).
+**Why:** The word corpus can be very large. Scanning and sorting all words on every GET request is not viable. The cache is recalculated once per processed URL (in the processor, async).
 
 ### 6. Lambda in-memory cache (TTL 60s)
 
-**Por qué:** Evita latencia de S3 en el path crítico del GET. Los Lambda containers "warm" reutilizan la variable en memoria entre invocaciones. Tradeoff: máximo 60s de stale data, aceptable para un word cloud.
+**Why:** Avoids S3 latency on the critical GET path. Warm Lambda containers reuse the in-memory variable across invocations. Trade-off: up to 60s of stale data — acceptable for a word cloud.
 
-### 7. Stop words hardcodeadas
+### 7. Hardcoded stop words
 
-**Por qué:** Simple y efectivo para inglés. Lista de ~120 palabras comunes (a, the, is, are, etc.) que no aportan al word cloud. Extensible a S3 si se necesita.
-
----
-
-## Infraestructura AWS (específica del assignment)
-
-| Recurso | Nombre | Propósito |
-|---------|--------|-----------|
-| Lambda HTTP | `dev-fedeira-faros-ai-services` | Endpoints GET/POST /wordcloud (Fastify) |
-| Lambda SQS | `dev-fedeira-faros-ai-processor` | Procesamiento async de URLs |
-| DynamoDB | `FarosProcessedUrls` | Deduplicación de URLs (`url` HASH key, `status`, timestamps) |
-| DynamoDB | `FarosWordCounts` | Conteo de frecuencia de palabras (`word` HASH key, `wordCount` number) |
-| SQS | `FarosWordCloudQueue` | Cola standard para desacoplar POST del crawling |
-| SQS | `FarosWordCloudDeadLetterQueue` | Mensajes fallidos después de 5 reintentos |
-| S3 | `wordcloud/cache/top-words.json` | Cache pre-computado del word cloud ordenado |
+**Why:** Simple and effective for English. List of ~120 common words (a, the, is, are, etc.) that don't contribute to the word cloud. Extensible to S3 if needed.
 
 ---
 
-## Estructura de Archivos
+## AWS Infrastructure (assignment-specific)
+
+| Resource | Name | Purpose |
+|----------|------|----------|
+| Lambda HTTP | `dev-fedeira-faros-ai-services` | GET/POST /wordcloud endpoints (Fastify) |
+| Lambda SQS | `dev-fedeira-faros-ai-processor` | Async URL processing |
+| DynamoDB | `FarosProcessedUrls` | URL deduplication (`url` HASH key, `status`, timestamps) |
+| DynamoDB | `FarosWordCounts` | Word frequency counts (`word` HASH key, `wordCount` number) |
+| SQS | `FarosWordCloudQueue` | Standard queue to decouple POST from crawling |
+| SQS | `FarosWordCloudDeadLetterQueue` | Failed messages after 5 retries |
+| S3 | `wordcloud/cache/top-words.json` | Pre-computed sorted word cloud cache |
+
+---
+
+## File Structure
 
 ```
 faros-ai-services/
-├── app.ts                                          ← Fastify + DI + rutas GET/POST
-├── lambda.ts                                       ← Lambda HTTP wrapper (cold start optimization)
-├── processor-handler.ts                            ← Lambda SQS wrapper (batch failure reporting)
+├── app.ts                                          ← Fastify + DI + GET/POST routes
+├── lambda.ts                                       ← HTTP Lambda wrapper (cold start optimization)
+├── processor-handler.ts                            ← SQS Lambda wrapper (batch failure reporting)
 ├── dispatcher.ts                                   ← Message router + handler registry builder
 ├── config/
-│   └── constants.ts                                ← Variables de entorno tipadas
+│   └── constants.ts                                ← Typed environment variables
 ├── domain/
 │   ├── WordCloud.ts                                ← WordEntry, ProcessedUrl, UrlStatus
-│   └── StopWords.ts                                ← Lista de stop words en inglés
+│   └── StopWords.ts                                ← English stop words list
 ├── types/
 │   └── types.ts                                    ← Envelope, ProcessorHandlerContext
 ├── application/
 │   ├── interfaces/
-│   │   ├── IProcessedUrlRepository.ts              ← Contrato deduplicación URLs
-│   │   ├── IWordCountRepository.ts                 ← Contrato incrementos atómicos
-│   │   ├── IWordCloudCacheRepository.ts            ← Contrato cache S3 + in-memory
-│   │   ├── ISQSRepository.ts                       ← Contrato envío a SQS
-│   │   ├── IScraperService.ts                      ← Contrato crawling + parsing
-│   │   ├── IWordTokenizerService.ts                ← Contrato tokenización
-│   │   └── IMessageHandler.ts                      ← Contrato handler de mensajes
+│   │   ├── IProcessedUrlRepository.ts              ← URL deduplication contract
+│   │   ├── IWordCountRepository.ts                 ← Atomic increment contract
+│   │   ├── IWordCloudCacheRepository.ts            ← S3 + in-memory cache contract
+│   │   ├── ISQSRepository.ts                       ← SQS enqueue contract
+│   │   ├── IScraperService.ts                      ← Crawling + parsing contract
+│   │   ├── IWordTokenizerService.ts                ← Tokenization contract
+│   │   └── IMessageHandler.ts                      ← Message handler contract
 │   └── usecases/
 │       ├── SubmitUrlUseCase.ts                     ← Conditional write + SQS enqueue
-│       └── GetWordCloudUseCase.ts                  ← Lee cache pre-computado
+│       └── GetWordCloudUseCase.ts                  ← Reads pre-computed cache
 ├── handlers/
 │   └── processWordCloudUrl.ts                      ← Handler: crawl → tokenize → increment → cache
 ├── infrastructure/
 │   ├── controllers/
-│   │   ├── SubmitUrlController.ts                  ← Validación URL Amazon + POST handler
-│   │   └── GetWordCloudController.ts               ← GET handler con validación de params
+│   │   ├── SubmitUrlController.ts                  ← Amazon URL validation + POST handler
+│   │   └── GetWordCloudController.ts               ← GET handler with param validation
 │   ├── repositories/
 │   │   ├── DynamoProcessedUrlRepository.ts         ← Conditional write deduplication
 │   │   ├── DynamoWordCountRepository.ts            ← Atomic ADD + scan/sort
 │   │   ├── S3WordCloudCacheRepository.ts           ← S3 cache + Lambda in-memory TTL
 │   │   └── SQSRepository.ts                        ← Standard queue message sender
 │   └── services/
-│       ├── AmazonScraperService.ts                 ← axios (retry exponencial) + cheerio
+│       ├── AmazonScraperService.ts                 ← axios (exponential retry) + cheerio
 │       └── WordTokenizerService.ts                 ← Tokenizer + stop word filter
 ├── utils/
-│   └── sqs.ts                                      ← parseEnvelope helper con validación
+│   └── sqs.ts                                      ← parseEnvelope helper with validation
 ├── test/
-│   ├── execute-sqs-wordcloud-handler.ts            ← Script para probar processor localmente
-│   └── simulateRequests.sh                         ← Simulador de requests con curl
+│   ├── execute-sqs-wordcloud-handler.ts            ← Script to test processor locally
+│   └── simulateRequests.sh                         ← Request simulator using curl
 └── documentation/
-    ├── README.md                                   ← Este archivo
-    ├── assignment.md                               ← Enunciado del assignment
-    └── Amazon_Product_Descriptions_Word_Cloud.pdf  ← PDF del assignment
+    ├── README.md                                   ← This file
+    ├── assignment.md                               ← Assignment description
+    └── Amazon_Product_Descriptions_Word_Cloud.pdf  ← Assignment PDF
 ```
 
 ---
 
-## Archivos Modificados (fuera de faros-ai-services/)
+## Modified Files (outside faros-ai-services/)
 
-Todos los cambios están marcados con el comentario `[Faros AI Assignment]` para fácil identificación y eventual limpieza.
+All changes are marked with the `[Faros AI Assignment]` comment for easy identification and eventual cleanup.
 
-| Archivo | Cambios |
-|---------|---------|
+| File | Changes |
+|------|---------|
 | `serverless.yml` | +2 Lambda functions, +2 DynamoDB tables, +2 SQS queues, env vars, IAM permissions |
 | `serverless.offline.yml` | +2 Lambda functions, +2 DynamoDB tables, +1 SQS queue, env vars |
 | `dynamodb-config.ts` | +2 table definitions (FarosProcessedUrls, FarosWordCounts) |
-| `tsconfig.json` | +`faros-ai-services/**/*` en include array |
+| `tsconfig.json` | +`faros-ai-services/**/*` in include array |
 | `package.json` | +`cheerio` dependency (HTML parsing) |
 | `.env` | +4 variables: FAROS_PROCESSED_URLS_TABLE, FAROS_WORD_COUNTS_TABLE, FAROS_WORDCLOUD_QUEUE_URL, FAROS_WORDCLOUD_CACHE_BUCKET |
-| `.prettierignore` | +exclusión de `faros-ai-services/documentation/*.md` |
-| `common/docs/README.md` | +documentación del servicio Faros AI |
+| `.prettierignore` | +exclusion of `faros-ai-services/documentation/*.md` |
+| `common/docs/README.md` | +Faros AI service documentation |
 
 ---
 
-## Dependencias Nuevas
+## New Dependencies
 
-| Paquete | Versión | Uso |
-|---------|---------|-----|
-| `cheerio` | ^1.0.0 | Parsing HTML de páginas de Amazon (jQuery-like API para Node.js) |
+| Package | Version | Usage |
+|---------|---------|-------|
+| `cheerio` | ^1.0.0 | HTML parsing of Amazon pages (jQuery-like API for Node.js) |
 
-Dependencias reutilizadas del proyecto existente:
+Reused dependencies from the existing project:
 
-- `axios` + `axios-retry` — HTTP client con retry exponencial
+- `axios` + `axios-retry` — HTTP client with exponential retry
 - `aws-sdk` — DynamoDB, S3, SQS
 - `fastify` + `@fastify/aws-lambda` — HTTP framework + Lambda wrapper
 
 ---
 
-## Testing Local
+## Local Testing
+
+### Prerequisites
 
 ```bash
-# 1. Iniciar DynamoDB local + migrar tablas
-npm run offline-db-init
+# 1. Start local DynamoDB (Docker)
+docker run -d -p 8000:8000 --name dynamodb-local amazon/dynamodb-local \
+  -jar DynamoDBLocal.jar -inMemory -sharedDb
+
+# 2. Start ElasticMQ for local SQS (Docker)
+docker run -d -p 9324:9324 -p 9325:9325 --name elasticmq softwaremill/elasticmq-native
+
+# 3. Create local SQS queue
+aws sqs create-queue --queue-name FarosWordCloudQueue \
+  --endpoint-url http://localhost:9324 --region us-east-2
+
+# 4. Create local DynamoDB tables
 npm run offline-db-migrate
 
-# 2. Levantar API
+# 5. Insert test user
+npm run insert-user
+
+# 6. Start API
 npm run offline
-
-# 3. Enviar una URL
-curl -X POST "http://localhost:3000/wordcloud?url=http://www.amazon.com/gp/product/B00VVOCSOU"
-
-# 4. Consultar word cloud
-curl "http://localhost:3000/wordcloud?top=10"
-
-# 5. Ejecutar simulador de requests
-bash faros-ai-services/test/simulateRequests.sh localhost 3000 1
-
-# 6. Testear processor directamente (sin pasar por SQS)
-dotenv -e .env -- ts-node faros-ai-services/test/execute-sqs-wordcloud-handler.ts
 ```
 
 ---
 
-## Escalabilidad
+### Get JWT token
 
-| Componente | Capacidad | Justificación |
-|------------|-----------|---------------|
-| POST handler | O(1) por request | Solo DynamoDB conditional write + SQS enqueue |
-| SQS Standard Queue | Throughput casi ilimitado | Standard queue vs FIFO (300/s limit) |
-| Processor Lambda | Escala automáticamente | Lambda concurrency controlada por maximumConcurrency: 10 |
-| DynamoDB word counts | Sin límite práctico | Atomic ADD, PAY_PER_REQUEST billing |
-| GET handler | O(1) por request | Lambda in-memory cache → S3 fallback |
+```bash
+curl -s -X POST "http://localhost:3000/dev/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"fedeirar@gmail.com","password":"YOUR_PASSWORD"}'
+# Response: { "token": "eyJ..." }
+```
 
-Para escalar a 10,000+ req/seg: solo aumentar `maximumConcurrency` del processor y el Lambda reserved concurrency del HTTP handler.
+---
+
+### POST /wordcloud — Submit a URL for processing
+
+```bash
+# New URL → responds 202 Accepted
+curl -X POST "http://localhost:3000/dev/wordcloud?url=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Repeated URL → responds 200 (deduplication)
+curl -X POST "http://localhost:3000/dev/wordcloud?url=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+---
+
+### GET /wordcloud — Query the word cloud
+
+```bash
+# Top 10 words (default)
+curl "http://localhost:3000/dev/wordcloud" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Top 50 words
+curl "http://localhost:3000/dev/wordcloud?top=50" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Top 1000 words (maximum)
+curl "http://localhost:3000/dev/wordcloud?top=1000" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+---
+
+### Test the SQS Processor directly (without HTTP or SQS)
+
+The processor is not triggered automatically in local mode (serverless-offline-sqs does not auto-consume from ElasticMQ). To test it directly:
+
+```bash
+# Default URL (B00SMBFZNG)
+npx dotenv -e .env -- ts-node faros-ai-services/test/execute-sqs-wordcloud-handler.ts
+
+# Specific URL
+npx dotenv -e .env -- ts-node faros-ai-services/test/execute-sqs-wordcloud-handler.ts \
+  https://www.amazon.com/gp/product/B00SMBESTI
+```
+
+If the URL was already processed, delete it from DynamoDB first:
+
+```bash
+aws dynamodb delete-item \
+  --table-name FarosProcessedUrls \
+  --key '{"url": {"S": "https://www.amazon.com/gp/product/B00SMBESTI"}}' \
+  --endpoint-url http://localhost:8000 --region localhost
+```
+
+---
+
+### Run the assignment simulation script
+
+The script sends 120 POSTs with 9 unique URLs (with repetitions), simulating the assignment's load pattern.
+
+```bash
+# In Git Bash (Windows) or a terminal with bash available:
+
+# Option A: with credentials (the script auto-logs in)
+bash faros-ai-services/test/simulateRequests.sh \
+  http://localhost 3000/dev/wordcloud url 1 fedeirar@gmail.com YOUR_PASSWORD
+
+# Option B: with pre-obtained token (skips login)
+export TOKEN="eyJ..."
+bash faros-ai-services/test/simulateRequests.sh \
+  http://localhost 3000/dev/wordcloud url 1
+```
+
+**Expected responses:**
+- `202` — New URL, enqueued in SQS for processing
+- `200` — Duplicate URL, ignored (deduplication)
+
+---
+
+### Clean local data (to re-test from scratch)
+
+```bash
+# Delete Faros tables and recreate them
+aws dynamodb delete-table --table-name FarosProcessedUrls \
+  --endpoint-url http://localhost:8000 --region localhost
+aws dynamodb delete-table --table-name FarosWordCounts \
+  --endpoint-url http://localhost:8000 --region localhost
+npm run offline-db-migrate
+```
+
+---
+
+## Testing on AWS
+
+```bash
+# Deploy
+npm run deploy
+
+# Login
+curl -s -X POST "https://bk7xpquf2k.execute-api.us-east-2.amazonaws.com/dev/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"fedeirar@gmail.com","password":"YOUR_PASSWORD"}'
+
+# POST (submit URL)
+curl -X POST "https://bk7xpquf2k.execute-api.us-east-2.amazonaws.com/dev/wordcloud?url=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# GET (query word cloud)
+curl "https://bk7xpquf2k.execute-api.us-east-2.amazonaws.com/dev/wordcloud?top=20" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Full assignment simulation script on AWS
+export TOKEN="eyJ..."
+bash faros-ai-services/test/simulateRequests.sh \
+  https://bk7xpquf2k.execute-api.us-east-2.amazonaws.com dev/wordcloud url 1
+```
+
+In AWS the SQS processor triggers automatically — there is no need to run the local test script.
+
+---
+
+## Scalability
+
+| Component | Capacity | Justification |
+|-----------|----------|--------------|
+| POST handler | O(1) per request | Only DynamoDB conditional write + SQS enqueue |
+| SQS Standard Queue | Near-unlimited throughput | Standard queue vs FIFO (300/s limit) |
+| Processor Lambda | Auto-scales | Lambda concurrency controlled by maximumConcurrency: 10 |
+| DynamoDB word counts | No practical limit | Atomic ADD, PAY_PER_REQUEST billing |
+| GET handler | O(1) per request | Lambda in-memory cache → S3 fallback |
+
+To scale to 10,000+ req/sec: simply increase the processor's `maximumConcurrency` and the HTTP handler's Lambda reserved concurrency.
