@@ -2,6 +2,13 @@ service: fedeira-personal-services
 frameworkVersion: '4'
 variablesResolutionMode: 20210326
 
+build:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: false
+    target: 'node20'
+
 # AWS provider configuration:
 provider:
   name: aws
@@ -463,23 +470,23 @@ resources:
         QueueName: FarosWordCloudDeadLetterQueue
         MessageRetentionPeriod: 1209600
 
-    ReportsBucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: dev-fedeira-personal-services-reports
-        CorsConfiguration:
-          CorsRules:
-            - AllowedHeaders:
-                - '*'
-              AllowedMethods:
-                - GET
-                - PUT
-                - POST
-                - DELETE
-                - HEAD
-              AllowedOrigins:
-                - '*'
-              MaxAge: 3000
+    # ReportsBucket:
+    #   Type: AWS::S3::Bucket
+    #   Properties:
+    #     BucketName: dev-fedeira-personal-services-reports
+    #     CorsConfiguration:
+    #       CorsRules:
+    #         - AllowedHeaders:
+    #             - '*'
+    #           AllowedMethods:
+    #             - GET
+    #             - PUT
+    #             - POST
+    #             - DELETE
+    #             - HEAD
+    #           AllowedOrigins:
+    #             - '*'
+    #           MaxAge: 3000
     ReportRequestsQueue:
       Type: AWS::SQS::Queue
       Properties:

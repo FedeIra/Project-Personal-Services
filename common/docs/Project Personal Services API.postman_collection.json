@@ -97,7 +97,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImZlZGVpcmFyQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiYXNka2xqZjNrNGo1ISIsImlhdCI6MTc0MjU4Njg0NiwiZXhwIjoxNzQyNTkwNDQ2fQ.-qMBS5gWpQUJ3IHAzUbPoaLCeRRy-MoMZPGHyV117do\"\n}"
+              "body": "{\n    \"token\": \"xxxx\"\n}"
             }
           ]
         }
@@ -347,6 +347,7 @@
                 {
                   "key": "",
                   "type": "file",
+                  "uuid": "3a5433cd-a753-44df-aa81-88a65dbd41c4",
                   "src": "/C:/Users/Usuario/Downloads/3ef27609-00ea-4e39-9876-82c448e642e8.csv"
                 }
               ]
@@ -375,6 +376,7 @@
                     {
                       "key": "",
                       "type": "file",
+                      "uuid": "3a5433cd-a753-44df-aa81-88a65dbd41c4",
                       "src": "/C:/Users/Usuario/Downloads/3ef27609-00ea-4e39-9876-82c448e642e8.csv"
                     }
                   ]
@@ -393,11 +395,13 @@
               },
               "status": "Created",
               "code": 201,
-              "_postman_previewlanguage": null,
+              "_postman_previewlanguage": "json",
               "header": [
                 {
-                  "key": "content-type",
-                  "value": "text/plain; charset=utf-8"
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
                 },
                 {
                   "key": "content-length",
@@ -425,7 +429,406 @@
                 }
               ],
               "cookie": [],
-              "body": "{\"status\":\"success\",\"codeStatus\":201,\"data\":\"17374dd9-38e1-4e50-bb96-5189bd90f3f0\",\"errorMessage\":null}"
+              "body": "{\n    \"status\": \"success\",\n    \"codeStatus\": 201,\n    \"data\": \"17374dd9-38e1-4e50-bb96-5189bd90f3f0\",\n    \"errorMessage\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "faros-ai-services",
+      "item": [
+        {
+          "name": "get word cloud",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <tu-jwt-token>"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/dev/wordcloud?top=10",
+              "host": ["{{BASE_URL}}"],
+              "path": ["dev", "wordcloud"],
+              "query": [
+                {
+                  "key": "top",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "get word cloud",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer <tu-jwt-token>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/dev/wordcloud?top=10",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["dev", "wordcloud"],
+                  "query": [
+                    {
+                      "key": "top",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "content-length",
+                  "value": "347"
+                },
+                {
+                  "key": "date",
+                  "value": "Fri, 20 Mar 2026 23:24:37 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "vary",
+                  "value": "origin"
+                },
+                {
+                  "key": "access-control-expose-headers",
+                  "value": "WWW-Authenticate,Server-Authorization"
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "accept-ranges",
+                  "value": "bytes"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"status\": \"success\",\n    \"codeStatus\": 200,\n    \"data\": [\n        {\n            \"word\": \"sound\",\n            \"count\": 61\n        },\n        {\n            \"word\": \"bar\",\n            \"count\": 29\n        },\n        {\n            \"word\": \"audio\",\n            \"count\": 29\n        },\n        {\n            \"word\": \"soundbar\",\n            \"count\": 27\n        },\n        {\n            \"word\": \"vizio\",\n            \"count\": 16\n        },\n        {\n            \"word\": \"bluetooth\",\n            \"count\": 15\n        },\n        {\n            \"word\": \"dts\",\n            \"count\": 14\n        },\n        {\n            \"word\": \"off\",\n            \"count\": 13\n        },\n        {\n            \"word\": \"remote\",\n            \"count\": 13\n        },\n        {\n            \"word\": \"turn\",\n            \"count\": 12\n        }\n    ],\n    \"errorMessage\": null\n}"
+            },
+            {
+              "name": "get word cloud prod",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer <tu-jwt-token>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/dev/wordcloud?top=10",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["dev", "wordcloud"],
+                  "query": [
+                    {
+                      "key": "top",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": ":status",
+                  "value": 200
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "content-length",
+                  "value": "347"
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 23 Mar 2026 03:44:43 GMT"
+                },
+                {
+                  "key": "x-amzn-remapped-date",
+                  "value": "Mon, 23 Mar 2026 03:44:43 GMT"
+                },
+                {
+                  "key": "x-amzn-requestid",
+                  "value": "1a8855ed-f07c-4897-8a47-edd47ac1019b"
+                },
+                {
+                  "key": "x-amzn-remapped-content-length",
+                  "value": "347"
+                },
+                {
+                  "key": "x-amzn-remapped-connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "x-amz-apigw-id",
+                  "value": "aqGOzGXCCYcER2g="
+                },
+                {
+                  "key": "x-amzn-trace-id",
+                  "value": "Root=1-69c0b72b-195be0001c7630fb6291e6bc"
+                },
+                {
+                  "key": "x-cache",
+                  "value": "Miss from cloudfront"
+                },
+                {
+                  "key": "via",
+                  "value": "1.1 27de87ef88ec83a7376a2e5b5f6e6e7a.cloudfront.net (CloudFront)"
+                },
+                {
+                  "key": "x-amz-cf-pop",
+                  "value": "EZE50-P5"
+                },
+                {
+                  "key": "x-amz-cf-id",
+                  "value": "m4BSt27yA3O3bGy1za2GecqXj6gjEuFNRu0dd05s09bX16Q0j9GxIQ=="
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"status\": \"success\",\n    \"codeStatus\": 200,\n    \"data\": [\n        {\n            \"word\": \"sound\",\n            \"count\": 61\n        },\n        {\n            \"word\": \"bar\",\n            \"count\": 29\n        },\n        {\n            \"word\": \"audio\",\n            \"count\": 29\n        },\n        {\n            \"word\": \"soundbar\",\n            \"count\": 27\n        },\n        {\n            \"word\": \"vizio\",\n            \"count\": 16\n        },\n        {\n            \"word\": \"bluetooth\",\n            \"count\": 15\n        },\n        {\n            \"word\": \"dts\",\n            \"count\": 14\n        },\n        {\n            \"word\": \"off\",\n            \"count\": 13\n        },\n        {\n            \"word\": \"remote\",\n            \"count\": 13\n        },\n        {\n            \"word\": \"turn\",\n            \"count\": 12\n        }\n    ],\n    \"errorMessage\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "create wordcloud",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{TOKEN}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <tu-jwt-token>"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/dev/wordcloud?url=https://www.amazon.com/dp/B00VVOCSOM",
+              "host": ["{{BASE_URL}}"],
+              "path": ["dev", "wordcloud"],
+              "query": [
+                {
+                  "key": "url",
+                  "value": "https://www.amazon.com/dp/B00VVOCSOM"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "create wordcloud",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer <tu-jwt-token>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/dev/wordcloud?url=https://www.amazon.com/dp/B00VVOCSOM",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["dev", "wordcloud"],
+                  "query": [
+                    {
+                      "key": "url",
+                      "value": "https://www.amazon.com/dp/B00VVOCSOM"
+                    }
+                  ]
+                }
+              },
+              "status": "Accepted",
+              "code": 202,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "content-length",
+                  "value": "152"
+                },
+                {
+                  "key": "date",
+                  "value": "Fri, 20 Mar 2026 20:57:49 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "vary",
+                  "value": "origin"
+                },
+                {
+                  "key": "access-control-expose-headers",
+                  "value": "WWW-Authenticate,Server-Authorization"
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-cache"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"status\": \"success\",\n    \"codeStatus\": 202,\n    \"data\": {\n        \"message\": \"URL submitted for processing\",\n        \"url\": \"https://www.amazon.com/dp/B00VVOCSOM\"\n    },\n    \"errorMessage\": null\n}"
+            },
+            {
+              "name": "create wordcloud prod",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer <tu-jwt-token>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/dev/wordcloud?url=https://www.amazon.com/dp/B00VVOCSOM",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["dev", "wordcloud"],
+                  "query": [
+                    {
+                      "key": "url",
+                      "value": "https://www.amazon.com/dp/B00VVOCSOM"
+                    }
+                  ]
+                }
+              },
+              "status": "Accepted",
+              "code": 202,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": ":status",
+                  "value": 202
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "content-length",
+                  "value": "152"
+                },
+                {
+                  "key": "date",
+                  "value": "Mon, 23 Mar 2026 03:41:51 GMT"
+                },
+                {
+                  "key": "x-amzn-remapped-date",
+                  "value": "Mon, 23 Mar 2026 03:41:51 GMT"
+                },
+                {
+                  "key": "x-amzn-requestid",
+                  "value": "92b99c07-b56c-4bfa-9850-3afbf7682031"
+                },
+                {
+                  "key": "x-amzn-remapped-content-length",
+                  "value": "152"
+                },
+                {
+                  "key": "x-amzn-remapped-connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "x-amz-apigw-id",
+                  "value": "aqFzqHNfCYcEmQg="
+                },
+                {
+                  "key": "x-amzn-trace-id",
+                  "value": "Root=1-69c0b67d-65c883fe2a0db71c1bf8e5b0"
+                },
+                {
+                  "key": "x-cache",
+                  "value": "Miss from cloudfront"
+                },
+                {
+                  "key": "via",
+                  "value": "1.1 7a7d4588d2e255ab68ac20145650179e.cloudfront.net (CloudFront)"
+                },
+                {
+                  "key": "x-amz-cf-pop",
+                  "value": "EZE50-P5"
+                },
+                {
+                  "key": "x-amz-cf-id",
+                  "value": "Qp2MqEOZaGm9PMlfLcE0yVdqso7hXQn3usXVkDu6XXdVhLx8nfN2pQ=="
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"status\": \"success\",\n    \"codeStatus\": 202,\n    \"data\": {\n        \"message\": \"URL submitted for processing\",\n        \"url\": \"https://www.amazon.com/dp/B00VVOCSOM\"\n    },\n    \"errorMessage\": null\n}"
             }
           ]
         }
@@ -455,12 +858,12 @@
   "variable": [
     {
       "key": "BASE_URL",
-      "value": "http://localhost:3000",
-      "disabled": true
+      "value": "http://localhost:3000"
     },
     {
       "key": "BASE_URL",
-      "value": "https://f5tnbe0jn5.execute-api.us-east-2.amazonaws.com"
+      "value": "https://f5tnbe0jn5.execute-api.us-east-2.amazonaws.com",
+      "disabled": true
     },
     {
       "key": "TOKEN",

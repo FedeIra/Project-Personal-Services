@@ -32,7 +32,7 @@ POST /wordcloud?url=X                            GET /wordcloud?top=X
    1. Crawl Amazon (axios + retry + cheerio)
    2. Tokenize + filter stop words
    3. DynamoDB atomic ADD (word count)
-   4. Rebuild S3 cache (top 1000 sorted)
+   4. Rebuild S3 cache (top 1000, wordCount ≥ 3, sorted DESC)
    5. Mark URL as PROCESSED
 ```
 
@@ -53,7 +53,7 @@ POST /wordcloud?url=X                            GET /wordcloud?top=X
 4. Parses HTML with cheerio, extracting `#productDescription` and alternative selectors
 5. Tokenizes the text: lowercase → remove punctuation → split → filter stop words → filter < 3 chars
 6. Atomically increments word counts in DynamoDB using `ADD` expression (lock-free, no race conditions)
-7. Scans DynamoDB, sorts by count DESC, takes top 1000 → updates S3 cache
+7. Scans DynamoDB with `FilterExpression: wordCount >= 3` (excludes noise words), sorts by count DESC, takes top 1000 → updates S3 cache
 8. Marks URL as `PROCESSED` in DynamoDB
 
 ### Detailed GET Flow
@@ -93,6 +93,10 @@ POST /wordcloud?url=X                            GET /wordcloud?top=X
 ### 7. Hardcoded stop words
 
 **Why:** Simple and effective for English. List of ~120 common words (a, the, is, are, etc.) that don't contribute to the word cloud. Extensible to S3 if needed.
+
+### 8. Minimum word frequency filter (wordCount ≥ 3)
+
+**Why:** Words that appear fewer than 3 times across all processed URLs are statistical noise — they don't contribute meaningful signal to the word cloud. Filtering them at scan time reduces the dataset before sorting, improving efficiency.
 
 ---
 
