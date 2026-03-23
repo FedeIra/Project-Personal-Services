@@ -75,11 +75,6 @@ export class S3WordCloudCacheRepository implements IWordCloudCacheRepository {
           ContentType: 'application/json',
         })
         .promise();
-
-      // Update in-memory cache on the processor Lambda
-      // (Note: HTTP Lambda has its own in-memory cache with TTL expiry)
-      this.cachedData = words;
-      this.lastFetchTime = Date.now();
     } catch (error) {
       console.error(
         '[S3WordCloudCacheRepository] Error updating cache in S3:',

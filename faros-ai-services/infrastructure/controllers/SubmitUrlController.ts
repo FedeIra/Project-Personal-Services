@@ -47,6 +47,8 @@ export class SubmitUrlController {
       const result = await this.useCase.execute(url);
 
       const statusCode = result.submitted ? 202 : 200;
+
+      // Build and send response
       const response = buildResponse({
         status: 'success',
         codeStatus: statusCode,

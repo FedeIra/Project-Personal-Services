@@ -68,6 +68,8 @@ export class DynamoWordCountRepository implements IWordCountRepository {
         .scan({
           TableName: CONFIG.FAROS_WORD_COUNTS_TABLE,
           ExclusiveStartKey: lastEvaluatedKey,
+          FilterExpression: 'wordCount >= :minCount',
+          ExpressionAttributeValues: { ':minCount': 3 },
         })
         .promise();
 
