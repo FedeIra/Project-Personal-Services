@@ -22,14 +22,20 @@ export class AuthorizerUseCase {
 
     const token = event.authorizationToken.replace('Bearer ', '');
 
+    // Build wildcard ARN to allow all methods/paths on this API stage,
+    // so the cached policy works regardless of which method is called next.
+    const arnParts = event.methodArn.split(':');
+    const gatewayParts = arnParts[5].split('/');
+    const wildcardArn = `${arnParts.slice(0, 5).join(':')}:${gatewayParts[0]}/${gatewayParts[1]}/*/*`;
+
     try {
       // Verify token:
       this.tokenService.verifyToken(token);
 
       // Generate policy:
-      return AuthPolicy.generatePolicy('user', 'Allow', event.methodArn);
+      return AuthPolicy.generatePolicy('user', 'Allow', wildcardArn);
     } catch (error) {
-      return AuthPolicy.generatePolicy('user', 'Deny', event.methodArn);
+      return AuthPolicy.generatePolicy('user', 'Deny', wildcardArn);
     }
   }
 }
