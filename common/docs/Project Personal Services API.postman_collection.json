@@ -862,7 +862,7 @@
     },
     {
       "key": "BASE_URL",
-      "value": "https://f5tnbe0jn5.execute-api.us-east-2.amazonaws.com",
+      "value": "https://xxxx.execute-api.us-east-2.amazonaws.com",
       "disabled": true
     },
     {

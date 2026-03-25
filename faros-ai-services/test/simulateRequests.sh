@@ -5,10 +5,10 @@
 #   Reads API_BASE_URL from .env (root of project)
 #
 # Local example:
-#   API_BASE_URL=http://localhost:3000 ./simulateRequests.sh url 1 fedeirar@gmail.com mypassword
+#   API_BASE_URL=http://localhost:3000 ./simulateRequests.sh url 1 xxxx@gmail.com mypassword
 #
 # AWS example (API_BASE_URL set in .env):
-#   ./simulateRequests.sh url 1 fedeirar@gmail.com mypassword
+#   ./simulateRequests.sh url 1 xxxx@gmail.com mypassword
 
 # Load .env from project root if API_BASE_URL is not already set
 if [ -z "$API_BASE_URL" ]; then

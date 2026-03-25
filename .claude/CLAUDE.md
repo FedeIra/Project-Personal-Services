@@ -11,25 +11,33 @@
 ## Sub-proyectos
 
 ### 1. authorization-services
+
 Autenticación con JWT. Expone `POST /login` y un Lambda authorizer para validar tokens.
+
 - **DynamoDB:** `UserCredentials` (email como HASH key)
 - **Deps:** jsonwebtoken (HS256, 1h), bcryptjs
 - **Lambdas:** `auth-service-authorizer`, `authorization-service`
 
 ### 2. account-services
+
 CRUD de cuentas del usuario con contraseñas cifradas en reposo.
+
 - **Endpoint:** `GET /accounts` (paginado con nextToken base64, filtrable por nombre)
 - **DynamoDB:** `Accounts` (account + user como clave compuesta)
 - **Cifrado:** AES-256-CBC via Node.js crypto
 
 ### 3. investment-services
+
 Integración con la API externa de Portfolio Personal Inversiones (PPI).
+
 - **Endpoint:** `GET /investment/available-balance`
 - **Patrón:** OAuth2 token cacheado + retry exponencial (axios-retry, 3 intentos, 15s timeout)
 - **Ambientes:** sandbox y producción con credenciales separadas
 
 ### 4. report-services
+
 Recibe CSV por multipart y dispara proceso asíncrono de generación de reportes.
+
 - **Endpoint:** `POST /reports/{email}` (requiere autenticación)
 - **DynamoDB:** `ReportRequests` (id UUID, GSI por email, GSI por status)
 - **S3:** `reports/request/{date}/{email}/{id}.csv`
@@ -38,7 +46,9 @@ Recibe CSV por multipart y dispara proceso asíncrono de generación de reportes
 - **Patrón canónico para nuevos microservicios HTTP Fastify**
 
 ### 5. report-processor (en desarrollo activo)
+
 Lambda disparado por SQS. Procesa liquidaciones laborales de forma asíncrona.
+
 - **Arquitectura interna:** Message Dispatcher con registro de handlers por `reportType`
 - **Handler activo:** `GenerateLiquidationHandler` para `termination_liquidation`
 - **Flujo completo:** DynamoDB (fetch) → S3 (leer CSV) → parsear → calcular → DynamoDB (status) → S3 (guardar resultado) → SES (email)
@@ -48,7 +58,9 @@ Lambda disparado por SQS. Procesa liquidaciones laborales de forma asíncrona.
 - **Patrón canónico para nuevos microservicios SQS/async**
 
 ### 6. portfolio-services
+
 Lambda functions para el backend del portfolio personal.
+
 - **Comments:** `GET /portfolio/comments` (público) · `POST /portfolio/comments` (auth)
 - **Email:** `POST /portfolio/send-email` (público) — envía email de contacto vía SES
 - **Files (S3):** `POST /portfolio/files/upload` · `GET /portfolio/files` · `GET /portfolio/files/{fileName}` · `GET /portfolio/files/{fileName}/url` · `GET /portfolio/files/{fileName}/download` · `DELETE /portfolio/files/{fileName}`
@@ -57,6 +69,7 @@ Lambda functions para el backend del portfolio personal.
 - **Deps extra:** `busboy` para parsear multipart/form-data
 
 ### 7. common
+
 Utilidades compartidas: `ResponseBuilder`, `ErrorHandler`, `axiosConfiguration` con retries.
 
 ---
@@ -119,12 +132,12 @@ Utilidades compartidas: `ResponseBuilder`, `ErrorHandler`, `axiosConfiguration` 
 
 ## Capas de la Arquitectura (Clean Architecture)
 
-| Capa | Carpeta | Responsabilidad |
-|------|---------|----------------|
-| **Domain** | `domain/` | Modelos de datos puros, enums, tipos de negocio. Sin dependencias externas. |
-| **Application** | `application/usecases/`, `application/interfaces/` | Lógica de negocio, orquestación. Solo depende de interfaces (no de implementaciones). |
-| **Infrastructure** | `infrastructure/controllers/`, `infrastructure/repositories/` | Implementaciones concretas: DynamoDB, S3, SQS, validaciones HTTP. |
-| **Entry point** | `app.ts` / `lambda.ts` / `handler.ts` | Bootstrapping: DI manual, wiring de dependencias, registro de rutas. |
+| Capa               | Carpeta                                                       | Responsabilidad                                                                       |
+| ------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| **Domain**         | `domain/`                                                     | Modelos de datos puros, enums, tipos de negocio. Sin dependencias externas.           |
+| **Application**    | `application/usecases/`, `application/interfaces/`            | Lógica de negocio, orquestación. Solo depende de interfaces (no de implementaciones). |
+| **Infrastructure** | `infrastructure/controllers/`, `infrastructure/repositories/` | Implementaciones concretas: DynamoDB, S3, SQS, validaciones HTTP.                     |
+| **Entry point**    | `app.ts` / `lambda.ts` / `handler.ts`                         | Bootstrapping: DI manual, wiring de dependencias, registro de rutas.                  |
 
 **Regla de dependencias:** Domain ← Application ← Infrastructure. Las interfaces en `application/interfaces/` son contratos que define la aplicación y que infraestructura implementa.
 
@@ -135,6 +148,7 @@ Utilidades compartidas: `ResponseBuilder`, `ErrorHandler`, `axiosConfiguration` 
 ### Patrón: Lambda HTTP (Fastify)
 
 **`app.ts`** — construye e instancia todo via DI manual:
+
 ```typescript
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({ logger: true });
@@ -155,6 +169,7 @@ export async function buildApp(): Promise<FastifyInstance> {
 ```
 
 **`lambda.ts`** — wrapper estático para AWS Lambda (inicialización en frío una sola vez):
+
 ```typescript
 const appPromise = buildApp().then(async (app) => {
   const proxy = awsLambdaFastify(app);
@@ -162,7 +177,10 @@ const appPromise = buildApp().then(async (app) => {
   return proxy;
 });
 
-export const handler = async (event: APIGatewayProxyEvent, context: Context) => {
+export const handler = async (
+  event: APIGatewayProxyEvent,
+  context: Context
+) => {
   const proxy = await appPromise;
   return proxy(event, context);
 };
@@ -194,8 +212,8 @@ export class DoSomethingController {
 export class DoSomethingUseCase {
   constructor(
     private readonly entityRepository: IEntityRepository,
-    private readonly s3Repository: IS3Repository,    // solo si aplica
-    private readonly sqsRepository: ISQSRepository   // solo si aplica
+    private readonly s3Repository: IS3Repository, // solo si aplica
+    private readonly sqsRepository: ISQSRepository // solo si aplica
   ) {}
 
   async execute(input: InputType): Promise<OutputType> {
@@ -221,6 +239,7 @@ export const handler: SQSHandler = async (event): Promise<SQSBatchResponse> => {
   return { batchItemFailures };
 };
 ```
+
 `functionResponseType: ReportBatchItemFailures` en serverless.yml activa el partial batch failure reporting.
 
 ### Patrón: Dispatcher (registro de handlers por tipo de mensaje)
@@ -272,7 +291,9 @@ export class EntityRepository implements IEntityRepository {
   }
 
   async createEntity(entity: Entity): Promise<string> {
-    await this.client.put({ TableName: process.env.TABLE_NAME!, Item: entity }).promise();
+    await this.client
+      .put({ TableName: process.env.TABLE_NAME!, Item: entity })
+      .promise();
     return entity.id;
   }
 }
@@ -285,7 +306,10 @@ export class EntityRepository implements IEntityRepository {
 Usar siempre `common/utils/ResponseBuilder.ts`:
 
 ```typescript
-import { buildResponse, ErrorHandler } from '../../../common/utils/ResponseBuilder';
+import {
+  buildResponse,
+  ErrorHandler,
+} from '../../../common/utils/ResponseBuilder';
 
 // Éxito:
 reply.status(201).send(buildResponse('success', 201, data));
@@ -312,12 +336,12 @@ reply.status(400).send(ErrorHandler.handle(new Error('mensaje')));
 
 ## Manejo de Errores
 
-| Patrón | Dónde | Cómo |
-|--------|-------|------|
-| Validación HTTP | Controller | `return reply.status(400).send(ErrorHandler.handle(error))` |
-| Error de negocio | Use Case | `throw new Error('mensaje descriptivo')` |
-| Error de infra | Repository | `catch (error) { console.error(...); throw error; }` — dejar que suba |
-| SQS failure | handler.ts | Agregar `{ itemIdentifier: record.messageId }` a `batchItemFailures` |
+| Patrón           | Dónde      | Cómo                                                                  |
+| ---------------- | ---------- | --------------------------------------------------------------------- |
+| Validación HTTP  | Controller | `return reply.status(400).send(ErrorHandler.handle(error))`           |
+| Error de negocio | Use Case   | `throw new Error('mensaje descriptivo')`                              |
+| Error de infra   | Repository | `catch (error) { console.error(...); throw error; }` — dejar que suba |
+| SQS failure      | handler.ts | Agregar `{ itemIdentifier: record.messageId }` a `batchItemFailures`  |
 
 ---
 
@@ -339,23 +363,25 @@ import { MyUseCase } from './application/usecases/MyUseCase';
 
 ## Variables de Entorno
 
-| Variable | Descripción | Fuente en prod |
-|----------|-------------|---------------|
-| `IS_OFFLINE` | `'true'` local, `'false'` prod | hardcoded en yml |
-| `JWT_SECRET` | Secreto JWT | SSM `/fedeira-personal-services/auth/jwt/secret` |
-| `USER_EMAIL` / `USER_PASSWORD` | Credenciales de usuario | SSM |
-| `ENCRYPTION_KEY` | Clave AES-256 (64 chars hex) | SSM |
-| `AWS_REPORTS_BUCKET` | Nombre del bucket S3 de reportes | env var |
-| `AWS_REPORT_REQUESTS_QUEUE_URL` | URL SQS FIFO | `!Ref ReportRequestsQueue` en prod / `.env` offline |
-| `REPORT_REQUESTS_TABLE` | Nombre tabla DynamoDB | hardcoded `ReportRequests` |
-| `PORTFOLIO_COMMENTS_TABLE` | Nombre tabla DynamoDB | hardcoded `PortfolioComments` |
-| `PORTFOLIO_FROM_EMAIL` / `PORTFOLIO_TO_EMAIL` | Emails SES | SSM |
-| `ACCOUNT_NUMBER_PPI`, `CLIENT_KEY_PPI_*`, etc. | Credenciales PPI | SSM / `.env` |
+| Variable                                       | Descripción                      | Fuente en prod                                      |
+| ---------------------------------------------- | -------------------------------- | --------------------------------------------------- |
+| `IS_OFFLINE`                                   | `'true'` local, `'false'` prod   | hardcoded en yml                                    |
+| `JWT_SECRET`                                   | Secreto JWT                      | SSM `/fedeira-personal-services/auth/jwt/secret`    |
+| `USER_EMAIL` / `USER_PASSWORD`                 | Credenciales de usuario          | SSM                                                 |
+| `ENCRYPTION_KEY`                               | Clave AES-256 (64 chars hex)     | SSM                                                 |
+| `AWS_REPORTS_BUCKET`                           | Nombre del bucket S3 de reportes | env var                                             |
+| `AWS_REPORT_REQUESTS_QUEUE_URL`                | URL SQS FIFO                     | `!Ref ReportRequestsQueue` en prod / `.env` offline |
+| `REPORT_REQUESTS_TABLE`                        | Nombre tabla DynamoDB            | hardcoded `ReportRequests`                          |
+| `PORTFOLIO_COMMENTS_TABLE`                     | Nombre tabla DynamoDB            | hardcoded `PortfolioComments`                       |
+| `PORTFOLIO_FROM_EMAIL` / `PORTFOLIO_TO_EMAIL`  | Emails SES                       | SSM                                                 |
+| `ACCOUNT_NUMBER_PPI`, `CLIENT_KEY_PPI_*`, etc. | Credenciales PPI                 | SSM / `.env`                                        |
 
 **Patrón SSM en serverless.yml:**
+
 ```yaml
 JWT_SECRET: ${env:JWT_SECRET, ssm:/fedeira-personal-services/auth/jwt/secret}
 ```
+
 Primero intenta `env var`, si no existe usa SSM.
 
 **Para un microservicio nuevo** declarar las variables en ambos archivos yml y en `.env`.
@@ -364,16 +390,16 @@ Primero intenta `env var`, si no existe usa SSM.
 
 ## Infraestructura AWS
 
-| Servicio | Uso |
-|----------|-----|
-| Lambda | Una función por microservicio (HTTP) + una por handler SQS |
-| API Gateway | REST API unificada con Lambda authorizer TOKEN-based, CORS habilitado |
-| DynamoDB | Tablas: UserCredentials, Accounts, ReportRequests, PortfolioComments |
-| S3 | `dev-fedeira-personal-services-bucket` (portfolio, general) + `dev-fedeira-personal-services-reports` (CSVs y resultados) |
-| SQS FIFO | Cola + DLQ, visibilityTimeout 300s, retención 14 días, maxReceiveCount 5 |
-| SES | Envío del reporte generado por email |
-| SSM Parameter Store | Secretos en producción |
-| CloudWatch + X-Ray | Logs 30 días + tracing |
+| Servicio            | Uso                                                                                                                       |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Lambda              | Una función por microservicio (HTTP) + una por handler SQS                                                                |
+| API Gateway         | REST API unificada con Lambda authorizer TOKEN-based, CORS habilitado                                                     |
+| DynamoDB            | Tablas: UserCredentials, Accounts, ReportRequests, PortfolioComments                                                      |
+| S3                  | `dev-fedeira-personal-services-bucket` (portfolio, general) + `dev-fedeira-personal-services-reports` (CSVs y resultados) |
+| SQS FIFO            | Cola + DLQ, visibilityTimeout 300s, retención 14 días, maxReceiveCount 5                                                  |
+| SES                 | Envío del reporte generado por email                                                                                      |
+| SSM Parameter Store | Secretos en producción                                                                                                    |
+| CloudWatch + X-Ray  | Logs 30 días + tracing                                                                                                    |
 
 **Regla arquitectónica:** 1 Lambda por microservicio HTTP (Fastify maneja routing interno). Los SQS processors son Lambdas separadas.
 
@@ -382,10 +408,12 @@ Primero intenta `env var`, si no existe usa SSM.
 ## Dominio de Liquidación Laboral (report-processor)
 
 **Modelos clave:**
+
 - `EmploymentData`: grossSalary, bestMonthlySalary, recordedStartDate, realStartDate, endDate, includePriorNotice, previousVacationBalance, buenosAires, registered
 - `SeniorityAndTerminationData`: años/meses/días de antigüedad, desglose del mes de egreso
 
 **Cálculos implementados en LiquidationServices:**
+
 - Salario base diario, días trabajados en mes de egreso
 - SAC proporcional (lógica diferente para Buenos Aires)
 - Vacaciones proporcionales + SAC sobre vacaciones
@@ -428,6 +456,7 @@ Usuario
 Ver guía completa: `.claude/commands/new-services.md` o ejecutar `/new-services`.
 
 **Resumen:**
+
 1. Agregar tipo en `domain/<Entity>.ts`
 2. Agregar método en `application/interfaces/IEntityRepository.ts`
 3. Implementar en `infrastructure/repositories/EntityRepository.ts`
@@ -466,10 +495,11 @@ dotenv -e .env -- ts-node report-processor/test/execute-sqs-report-processor-han
 ```
 
 ### Variables de entorno mínimas para modo offline (`.env`)
+
 ```env
 IS_OFFLINE=true
 JWT_SECRET=<cualquier string>
-USER_EMAIL=fedeirar@gmail.com
+USER_EMAIL=xxxx@gmail.com
 USER_PASSWORD=<bcrypt hash>
 ENCRYPTION_KEY=<64 chars hex>
 ENCRYPTION_ALGORITHM=aes-256-cbc
@@ -483,12 +513,12 @@ REPORT_REQUESTS_TABLE=ReportRequests
 
 ## Documentación del Proyecto
 
-| Archivo | Descripción |
-|---------|-------------|
-| `common/docs/README.md` | Guía completa de instalación, ejecución local y despliegue |
-| `common/docs/architecture.png` | Diagrama visual de la arquitectura |
-| `common/docs/architecture.drawio` | Diagrama editable (draw.io) |
-| `common/docs/Project Personal Services API.postman_collection.json` | Colección Postman |
+| Archivo                                                             | Descripción                                                |
+| ------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `common/docs/README.md`                                             | Guía completa de instalación, ejecución local y despliegue |
+| `common/docs/architecture.png`                                      | Diagrama visual de la arquitectura                         |
+| `common/docs/architecture.drawio`                                   | Diagrama editable (draw.io)                                |
+| `common/docs/Project Personal Services API.postman_collection.json` | Colección Postman                                          |
 
 ---
 
@@ -497,6 +527,7 @@ REPORT_REQUESTS_TABLE=ReportRequests
 **Rama activa:** `Task/Faros-ai`
 
 ### Completado
+
 - Parser CSV (papaparse, latin1, separador `;`)
 - Cálculos de liquidación: días trabajados, SAC proporcional, vacaciones, antigüedad, preaviso, integración
 - Message Dispatcher con handler registry extensible
@@ -504,6 +535,7 @@ REPORT_REQUESTS_TABLE=ReportRequests
 - Portfolio services completo (comments, email, files S3)
 
 ### Pendiente
+
 - Persistir resultado de liquidación en DynamoDB (actualizar status)
 - Guardar reporte generado en S3 (`reports/response/{date}/{email}/{id}.json`)
 - Envío del reporte por SES

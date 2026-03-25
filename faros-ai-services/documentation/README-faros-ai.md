@@ -232,7 +232,7 @@ npm run offline
 ```bash
 curl -s -X POST "http://localhost:3000/dev/login" \
   -H "Content-Type: application/json" \
-  -d '{"email":"fedeirar@gmail.com","password":"YOUR_PASSWORD"}'
+  -d '{"email":"xxxx@gmail.com","password":"YOUR_PASSWORD"}'
 # Response: { "token": "eyJ..." }
 ```
 
@@ -303,7 +303,7 @@ The script sends 120 POSTs with 9 unique URLs (with repetitions), simulating the
 
 # Option A: with credentials (the script auto-logs in)
 bash faros-ai-services/test/simulateRequests.sh \
-  http://localhost 3000/dev/wordcloud url 1 fedeirar@gmail.com YOUR_PASSWORD
+  http://localhost 3000/dev/wordcloud url 1 xxxx@gmail.com YOUR_PASSWORD
 
 # Option B: with pre-obtained token (skips login)
 export TOKEN="eyJ..."
@@ -339,7 +339,7 @@ npm run deploy
 # Login
 curl -s -X POST "https://bk7xpquf2k.execute-api.us-east-2.amazonaws.com/dev/login" \
   -H "Content-Type: application/json" \
-  -d '{"email":"fedeirar@gmail.com","password":"YOUR_PASSWORD"}'
+  -d '{"email":"xxxx@gmail.com","password":"YOUR_PASSWORD"}'
 
 # POST (submit URL)
 curl -X POST "https://bk7xpquf2k.execute-api.us-east-2.amazonaws.com/dev/wordcloud?url=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fproduct%2FB00SMBESTI" \
