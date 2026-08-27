@@ -23,7 +23,7 @@ Services are the following:
 - **Account Service**: Manages user accounts.
 - **Report Service**: Handles CSV upload and async report generation (liquidation reports).
 - **Portfolio Service**: Portfolio comments, email, and file management (S3).
-- **Faros AI Service** (Assignment): Amazon Product Descriptions Word Cloud — crawls Amazon product pages and builds a word cloud of the most significant terms.
+- **Faros AI Service**: Amazon Product Descriptions Word Cloud — crawls Amazon product pages and builds a word cloud of the most significant terms.
 
 ## 🚀 Getting Started
 
@@ -152,7 +152,7 @@ Command Description:
 - npm run insert-user → Runs a script to insert a test user into DynamoDB.
 - npm run insert-accounts → Runs a script to insert test accounts into DynamoDB.
 
-## Faros AI Word Cloud Service (Assignment)
+## Faros AI Word Cloud Service
 
 ### Overview
 
@@ -195,7 +195,7 @@ POST /wordcloud?url=X                          GET /wordcloud?top=X
 5. **Conditional writes for deduplication**: `attribute_not_exists(url)` prevents race conditions when duplicate URLs arrive simultaneously.
 6. **Standard SQS queue (not FIFO)**: Better throughput for scaling to thousands of requests/second.
 
-### AWS Resources (Assignment-specific)
+### AWS Resources
 
 | Resource | Name | Purpose |
 |----------|------|---------|

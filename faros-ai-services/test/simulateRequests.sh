@@ -1,5 +1,5 @@
 #!/bin/sh
-# Faros AI Word Cloud - Request Simulator (assignment script)
+# Faros AI Word Cloud - Request Simulator
 #
 # Usage: ./simulateRequests.sh <PARAM> <SLEEP_TIME> <EMAIL> <PASSWORD>
 #   Reads API_BASE_URL from .env (root of project)

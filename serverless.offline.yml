@@ -49,7 +49,7 @@ provider:
     AWS_REPORT_REQUESTS_QUEUE_URL: ${env:AWS_REPORT_REQUESTS_QUEUE_URL}
     REPORT_REQUESTS_TABLE: ReportRequests
 
-    # [Faros AI Assignment] - Word Cloud service environment variables:
+    # [Faros AI Word Cloud] - Word Cloud service environment variables:
     FAROS_PROCESSED_URLS_TABLE: FarosProcessedUrls
     FAROS_WORD_COUNTS_TABLE: FarosWordCounts
     FAROS_WORDCLOUD_QUEUE_URL: ${env:FAROS_WORDCLOUD_QUEUE_URL}
@@ -100,7 +100,7 @@ functions:
           authorizer:
             name: auth-service-authorizer
             type: TOKEN
-  # [Faros AI Assignment] - Word Cloud HTTP Lambda (GET + POST /wordcloud):
+  # [Faros AI Word Cloud] - Word Cloud HTTP Lambda (GET + POST /wordcloud):
   faros-ai-service:
     handler: faros-ai-services/lambda.handler
     events:
@@ -117,7 +117,7 @@ functions:
           authorizer:
             name: auth-service-authorizer
 
-  # [Faros AI Assignment] - Word Cloud SQS Processor Lambda:
+  # [Faros AI Word Cloud] - Word Cloud SQS Processor Lambda:
   faros-ai-processor:
     handler: faros-ai-services/processor-handler.handler
     name: 'dev-fedeira-faros-ai-processor'
@@ -219,7 +219,7 @@ resources:
             Projection:
               ProjectionType: ALL
 
-    # [Faros AI Assignment] - DynamoDB table for URL deduplication:
+    # [Faros AI Word Cloud] - DynamoDB table for URL deduplication:
     FarosProcessedUrlsTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -232,7 +232,7 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
 
-    # [Faros AI Assignment] - DynamoDB table for word frequency counts:
+    # [Faros AI Word Cloud] - DynamoDB table for word frequency counts:
     FarosWordCountsTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -245,7 +245,7 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
 
-    # [Faros AI Assignment] - SQS Standard Queue for async URL processing:
+    # [Faros AI Word Cloud] - SQS Standard Queue for async URL processing:
     FarosWordCloudQueue:
       Type: AWS::SQS::Queue
       Properties:
