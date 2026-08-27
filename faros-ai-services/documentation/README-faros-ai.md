@@ -1,4 +1,4 @@
-# Faros AI Assignment — Amazon Product Descriptions Word Cloud
+# Faros AI Word Cloud Service — Amazon Product Descriptions Word Cloud
 
 ## Objective
 
@@ -72,7 +72,7 @@ POST /wordcloud?url=X                            GET /wordcloud?top=X
 
 ### 2. Standard Queue (not FIFO)
 
-**Why:** The assignment requires supporting "several orders of magnitude" more load. Standard Queues have near-unlimited throughput vs FIFO (300/s). URL deduplication is handled in DynamoDB, not SQS.
+**Why:** The service needs to support several orders of magnitude more load than a typical FIFO workload. Standard Queues have near-unlimited throughput vs FIFO (300/s). URL deduplication is handled in DynamoDB, not SQS.
 
 ### 3. DynamoDB atomic increments (ADD expression)
 
@@ -100,7 +100,7 @@ POST /wordcloud?url=X                            GET /wordcloud?top=X
 
 ---
 
-## AWS Infrastructure (assignment-specific)
+## AWS Infrastructure
 
 | Resource | Name | Purpose |
 |----------|------|----------|
@@ -162,15 +162,15 @@ faros-ai-services/
 │   └── simulateRequests.sh                         ← Request simulator using curl
 └── documentation/
     ├── README.md                                   ← This file
-    ├── assignment.md                               ← Assignment description
-    └── Amazon_Product_Descriptions_Word_Cloud.pdf  ← Assignment PDF
+    ├── faros-ai-services-flow.drawio               ← Editable architecture diagram
+    └── faros-ai-services-flow.png                  ← Architecture diagram (image)
 ```
 
 ---
 
 ## Modified Files (outside faros-ai-services/)
 
-All changes are marked with the `[Faros AI Assignment]` comment for easy identification and eventual cleanup.
+All changes are marked with the `[Faros AI Word Cloud]` comment for easy identification.
 
 | File | Changes |
 |------|---------|
@@ -294,9 +294,9 @@ aws dynamodb delete-item \
 
 ---
 
-### Run the assignment simulation script
+### Run the load simulation script
 
-The script sends 120 POSTs with 9 unique URLs (with repetitions), simulating the assignment's load pattern.
+The script sends 120 POSTs with 9 unique URLs (with repetitions), simulating a realistic load pattern.
 
 ```bash
 # In Git Bash (Windows) or a terminal with bash available:
@@ -349,7 +349,7 @@ curl -X POST "https://bk7xpquf2k.execute-api.us-east-2.amazonaws.com/dev/wordclo
 curl "https://bk7xpquf2k.execute-api.us-east-2.amazonaws.com/dev/wordcloud?top=20" \
   -H "Authorization: Bearer YOUR_TOKEN"
 
-# Full assignment simulation script on AWS
+# Full load simulation script on AWS
 export TOKEN="eyJ..."
 bash faros-ai-services/test/simulateRequests.sh \
   https://bk7xpquf2k.execute-api.us-east-2.amazonaws.com dev/wordcloud url 1
