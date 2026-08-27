@@ -1,0 +1,162 @@
+{
+  "metadata": {
+    "generatedAt": "2026-06-10T14:21:38.762Z",
+    "emlPath": "C:\\Users\\Usuario\\Downloads\\Federico_ your job alert for Node in Greater Buenos Aires has been created.eml",
+    "configPath": "C:\\Users\\Usuario\\Documents\\GitHub\\Project-Personal-Services\\common\\scripts\\linkedin-job-alert\\config.json",
+    "topN": 20,
+    "selectedCount": 6,
+    "discardedCount": 0
+  },
+  "selected": [
+    {
+      "title": "Backend Developer (Senior) – Node.js / TypeScript / AWS (Híbrido, CABA) |176550",
+      "company": "Talent Connect",
+      "location": "Greater Buenos Aires",
+      "urlRaw": "https://www.linkedin.com/comm/jobs/view/4424663514?alertAction=markasviewed&savedSearchId=15938968084&savedSearchAuthToken=1&AQHWIz1TMA-rOQAAAZ6xkulJ-muvYCmPlzqJcqInXpoPyXv1z-3H1o0g_xqNOgQklZOqEWS-4bAip7Clf2xkBlGu0hBp8V6iTrGD4KDszFWKed0prHiEQ33_axZzbseW0UMqhqMgm72bAkkOZ7EvtpKxXem-dplJU7xUjdPYfRMUeqvcrmR4q72Ms_mZwCr2HDo-dqz1Eezirq4M3u1wOWziSveaqhMpwWFjYyWm2MWJIdKaSwzSC9Hn74xQTqscVwrKAh0z42yQ4OxhPjKrkkTwWZ5X8ByZQ_SXYTjvqDt1JAh85xVNFJ4X=&AUoanS70OYCDcO-2FL2kluiEBGkp=&trackingId=hj7vLXt%2FWTgku%2FctyC%2Bugw%3D%3D&refId=9swkDY7ieqfO6o7O4bAfXg%3D%3D&lipi=urn%3Ali%3Apage%3Aemail_email_job_alert_confirmation_01%3B5LlBfYVEQa6LIyANvi%2BhwA%3D%3D&midToken=AQGe57lJ-cGFvQ&midSig=1FFs-1F1bnZcg1&trk=eml-email_job_alert_confirmation_01-email_job_alert_confirmation-0-view_job&trkEmail=eml-email_job_alert_confirmation_01-email_job_alert_confirmation-0-view_job-null-60ukcg~mq837fsn~p7-null-null&eid=60ukcg-mq837fsn-p7&otpToken=MTEwMzFhZTIxMDJkYzhjNGIwMjQwNGVkNGUxZmU3YmQ4OGNlZDc0NDllYWQ4YjYxNzBjNjAwNjY0OTU4NWRmYmYyZDBkZmE0MWFiMmJhZDg1ZWFiZjRlZjA1MWYxYjM0Y2FmNjY3NWExYjE0NjYyY2IzZjcyNCwxLDE%3D",
+      "urlClean": "https://www.linkedin.com/jobs/view/4424663514",
+      "modality": "hybrid",
+      "seniority": "senior",
+      "blockText": "You’ll receive notifications when new jobs are posted that match your search preferences. | Backend Developer (Senior) – Node.js / TypeScript / AWS (Híbrido, CABA) |176550 | Talent Connect | Greater Buenos Aires",
+      "matchedPreferredTech": [
+        "node",
+        "node.js",
+        "aws",
+        "typescript"
+      ],
+      "matchedExcludedTechMandatory": [],
+      "matchedExcludedTechOptional": [],
+      "languageFlags": [],
+      "score": 54,
+      "scoreBreakdown": [
+        "modality:hybrid(8)",
+        "preferredTech(24)",
+        "preferredSeniority(12)",
+        "preferredLocation(10)"
+      ],
+      "filteredOut": false,
+      "filteredReasons": []
+    },
+    {
+      "title": "Senior NodeJs Engineer",
+      "company": "Avenga",
+      "location": "Greater Buenos Aires",
+      "urlRaw": "https://www.linkedin.com/comm/jobs/view/4415815291?alertAction=markasviewed&savedSearchId=15938968084&savedSearchAuthToken=1&AQHWIz1TMA-rOQAAAZ6xkulJ-muvYCmPlzqJcqInXpoPyXv1z-3H1o0g_xqNOgQklZOqEWS-4bAip7Clf2xkBlGu0hBp8V6iTrGD4KDszFWKed0prHiEQ33_axZzbseW0UMqhqMgm72bAkkOZ7EvtpKxXem-dplJU7xUjdPYfRMUeqvcrmR4q72Ms_mZwCr2HDo-dqz1Eezirq4M3u1wOWziSveaqhMpwWFjYyWm2MWJIdKaSwzSC9Hn74xQTqscVwrKAh0z42yQ4OxhPjKrkkTwWZ5X8ByZQ_SXYTjvqDt1JAh85xVNFJ4X=&AUoanS70OYCDcO-2FL2kluiEBGkp=&trackingId=%2BfsMaHws%2B%2Bnw%2FWPN2BKpLw%3D%3D&refId=9swkDY7ieqfO6o7O4bAfXg%3D%3D&lipi=urn%3Ali%3Apage%3Aemail_email_job_alert_confirmation_01%3B5LlBfYVEQa6LIyANvi%2BhwA%3D%3D&midToken=AQGe57lJ-cGFvQ&midSig=1FFs-1F1bnZcg1&trk=eml-email_job_alert_confirmation_01-email_job_alert_confirmation-0-view_job&trkEmail=eml-email_job_alert_confirmation_01-email_job_alert_confirmation-0-view_job-null-60ukcg~mq837fsn~p7-null-null&eid=60ukcg-mq837fsn-p7&otpToken=MTEwMzFhZTIxMDJkYzhjNGIwMjQwNGVkNGUxZmU3YmQ4OGNlZDc0NDllYWQ4YjYxNzBjNjAwNjY0OTU4NWRmYmYyZDBkZmE0MWFiMmJhZDg1ZWFiZjRlZjA1MWYxYjM0Y2FmNjY3NWExYjE0NjYyY2IzZjcyNCwxLDE%3D",
+      "urlClean": "https://www.linkedin.com/jobs/view/4415815291",
+      "modality": "unknown",
+      "seniority": "senior",
+      "blockText": "Senior NodeJs Engineer | Avenga | Greater Buenos Aires | This company is actively hiring",
+      "matchedPreferredTech": [
+        "node"
+      ],
+      "matchedExcludedTechMandatory": [],
+      "matchedExcludedTechOptional": [],
+      "languageFlags": [],
+      "score": 40,
+      "scoreBreakdown": [
+        "modality:unknown_as_hybrid(8)",
+        "preferredTech(6)",
+        "preferredSeniority(12)",
+        "preferredLocation(10)",
+        "activeHiring(4)"
+      ],
+      "filteredOut": false,
+      "filteredReasons": []
+    },
+    {
+      "title": "Software Engineer (Node.js)",
+      "company": "EPAM Systems",
+      "location": "Greater Buenos Aires",
+      "urlRaw": "https://www.linkedin.com/comm/jobs/view/4402484433?alertAction=markasviewed&savedSearchId=15938968084&savedSearchAuthToken=1&AQHWIz1TMA-rOQAAAZ6xkulJ-muvYCmPlzqJcqInXpoPyXv1z-3H1o0g_xqNOgQklZOqEWS-4bAip7Clf2xkBlGu0hBp8V6iTrGD4KDszFWKed0prHiEQ33_axZzbseW0UMqhqMgm72bAkkOZ7EvtpKxXem-dplJU7xUjdPYfRMUeqvcrmR4q72Ms_mZwCr2HDo-dqz1Eezirq4M3u1wOWziSveaqhMpwWFjYyWm2MWJIdKaSwzSC9Hn74xQTqscVwrKAh0z42yQ4OxhPjKrkkTwWZ5X8ByZQ_SXYTjvqDt1JAh85xVNFJ4X=&AUoanS70OYCDcO-2FL2kluiEBGkp=&trackingId=f76ICLSF87osOPn380EMzA%3D%3D&refId=9swkDY7ieqfO6o7O4bAfXg%3D%3D&lipi=urn%3Ali%3Apage%3Aemail_email_job_alert_confirmation_01%3B5LlBfYVEQa6LIyANvi%2BhwA%3D%3D&midToken=AQGe57lJ-cGFvQ&midSig=1FFs-1F1bnZcg1&trk=eml-email_job_alert_confirmation_01-email_job_alert_confirmation-0-view_job&trkEmail=eml-email_job_alert_confirmation_01-email_job_alert_confirmation-0-view_job-null-60ukcg~mq837fsn~p7-null-null&eid=60ukcg-mq837fsn-p7&otpToken=MTEwMzFhZTIxMDJkYzhjNGIwMjQwNGVkNGUxZmU3YmQ4OGNlZDc0NDllYWQ4YjYxNzBjNjAwNjY0OTU4NWRmYmYyZDBkZmE0MWFiMmJhZDg1ZWFiZjRlZjA1MWYxYjM0Y2FmNjY3NWExYjE0NjYyY2IzZjcyNCwxLDE%3D",
+      "urlClean": "https://www.linkedin.com/jobs/view/4402484433",
+      "modality": "unknown",
+      "seniority": "unknown",
+      "blockText": "Software Engineer (Node.js) | EPAM Systems | Greater Buenos Aires",
+      "matchedPreferredTech": [
+        "node",
+        "node.js"
+      ],
+      "matchedExcludedTechMandatory": [],
+      "matchedExcludedTechOptional": [],
+      "languageFlags": [],
+      "score": 30,
+      "scoreBreakdown": [
+        "modality:unknown_as_hybrid(8)",
+        "preferredTech(12)",
+        "preferredLocation(10)"
+      ],
+      "filteredOut": false,
+      "filteredReasons": []
+    },
+    {
+      "title": "Node.js Developer (Mortgage Formula Experience Req.)",
+      "company": "Spheric",
+      "location": "Greater Buenos Aires",
+      "urlRaw": "https://www.linkedin.com/comm/jobs/view/4422760485?alertAction=markasviewed&savedSearchId=15938968084&savedSearchAuthToken=1&AQHWIz1TMA-rOQAAAZ6xkulJ-muvYCmPlzqJcqInXpoPyXv1z-3H1o0g_xqNOgQklZOqEWS-4bAip7Clf2xkBlGu0hBp8V6iTrGD4KDszFWKed0prHiEQ33_axZzbseW0UMqhqMgm72bAkkOZ7EvtpKxXem-dplJU7xUjdPYfRMUeqvcrmR4q72Ms_mZwCr2HDo-dqz1Eezirq4M3u1wOWziSveaqhMpwWFjYyWm2MWJIdKaSwzSC9Hn74xQTqscVwrKAh0z42yQ4OxhPjKrkkTwWZ5X8ByZQ_SXYTjvqDt1JAh85xVNFJ4X=&AUoanS70OYCDcO-2FL2kluiEBGkp=&trackingId=LwA6Djy474fSV6WBajV2IQ%3D%3D&refId=9swkDY7ieqfO6o7O4bAfXg%3D%3D&lipi=urn%3Ali%3Apage%3Aemail_email_job_alert_confirmation_01%3B5LlBfYVEQa6LIyANvi%2BhwA%3D%3D&midToken=AQGe57lJ-cGFvQ&midSig=1FFs-1F1bnZcg1&trk=eml-email_job_alert_confirmation_01-email_job_alert_confirmation-0-view_job&trkEmail=eml-email_job_alert_confirmation_01-email_job_alert_confirmation-0-view_job-null-60ukcg~mq837fsn~p7-null-null&eid=60ukcg-mq837fsn-p7&otpToken=MTEwMzFhZTIxMDJkYzhjNGIwMjQwNGVkNGUxZmU3YmQ4OGNlZDc0NDllYWQ4YjYxNzBjNjAwNjY0OTU4NWRmYmYyZDBkZmE0MWFiMmJhZDg1ZWFiZjRlZjA1MWYxYjM0Y2FmNjY3NWExYjE0NjYyY2IzZjcyNCwxLDE%3D",
+      "urlClean": "https://www.linkedin.com/jobs/view/4422760485",
+      "modality": "unknown",
+      "seniority": "unknown",
+      "blockText": "Node.js Developer (Mortgage Formula Experience Req.) | Spheric | Greater Buenos Aires",
+      "matchedPreferredTech": [
+        "node",
+        "node.js"
+      ],
+      "matchedExcludedTechMandatory": [],
+      "matchedExcludedTechOptional": [],
+      "languageFlags": [],
+      "score": 30,
+      "scoreBreakdown": [
+        "modality:unknown_as_hybrid(8)",
+        "preferredTech(12)",
+        "preferredLocation(10)"
+      ],
+      "filteredOut": false,
+      "filteredReasons": []
+    },
+    {
+      "title": "Sr Software Developer Back End",
+      "company": "Personal",
+      "location": "Greater Buenos Aires",
+      "urlRaw": "https://www.linkedin.com/comm/jobs/view/4415547159?alertAction=markasviewed&savedSearchId=15938968084&savedSearchAuthToken=1&AQHWIz1TMA-rOQAAAZ6xkulJ-muvYCmPlzqJcqInXpoPyXv1z-3H1o0g_xqNOgQklZOqEWS-4bAip7Clf2xkBlGu0hBp8V6iTrGD4KDszFWKed0prHiEQ33_axZzbseW0UMqhqMgm72bAkkOZ7EvtpKxXem-dplJU7xUjdPYfRMUeqvcrmR4q72Ms_mZwCr2HDo-dqz1Eezirq4M3u1wOWziSveaqhMpwWFjYyWm2MWJIdKaSwzSC9Hn74xQTqscVwrKAh0z42yQ4OxhPjKrkkTwWZ5X8ByZQ_SXYTjvqDt1JAh85xVNFJ4X=&AUoanS70OYCDcO-2FL2kluiEBGkp=&trackingId=0LUUTSlFqBhuuW%2FpoKmTaQ%3D%3D&refId=9swkDY7ieqfO6o7O4bAfXg%3D%3D&lipi=urn%3Ali%3Apage%3Aemail_email_job_alert_confirmation_01%3B5LlBfYVEQa6LIyANvi%2BhwA%3D%3D&midToken=AQGe57lJ-cGFvQ&midSig=1FFs-1F1bnZcg1&trk=eml-email_job_alert_confirmation_01-email_job_alert_confirmation-0-view_job&trkEmail=eml-email_job_alert_confirmation_01-email_job_alert_confirmation-0-view_job-null-60ukcg~mq837fsn~p7-null-null&eid=60ukcg-mq837fsn-p7&otpToken=MTEwMzFhZTIxMDJkYzhjNGIwMjQwNGVkNGUxZmU3YmQ4OGNlZDc0NDllYWQ4YjYxNzBjNjAwNjY0OTU4NWRmYmYyZDBkZmE0MWFiMmJhZDg1ZWFiZjRlZjA1MWYxYjM0Y2FmNjY3NWExYjE0NjYyY2IzZjcyNCwxLDE%3D",
+      "urlClean": "https://www.linkedin.com/jobs/view/4415547159",
+      "modality": "unknown",
+      "seniority": "senior",
+      "blockText": "Sr Software Developer Back End | Personal | Greater Buenos Aires",
+      "matchedPreferredTech": [],
+      "matchedExcludedTechMandatory": [],
+      "matchedExcludedTechOptional": [],
+      "languageFlags": [],
+      "score": 20,
+      "scoreBreakdown": [
+        "modality:unknown_as_hybrid(8)",
+        "noTargetTechPenalty(-10)",
+        "preferredSeniority(12)",
+        "preferredLocation(10)"
+      ],
+      "filteredOut": false,
+      "filteredReasons": []
+    },
+    {
+      "title": "Software Engineer Backend",
+      "company": "PedidosYa",
+      "location": "Greater Buenos Aires",
+      "urlRaw": "https://www.linkedin.com/comm/jobs/view/4406209734?alertAction=markasviewed&savedSearchId=15938968084&savedSearchAuthToken=1&AQHWIz1TMA-rOQAAAZ6xkulJ-muvYCmPlzqJcqInXpoPyXv1z-3H1o0g_xqNOgQklZOqEWS-4bAip7Clf2xkBlGu0hBp8V6iTrGD4KDszFWKed0prHiEQ33_axZzbseW0UMqhqMgm72bAkkOZ7EvtpKxXem-dplJU7xUjdPYfRMUeqvcrmR4q72Ms_mZwCr2HDo-dqz1Eezirq4M3u1wOWziSveaqhMpwWFjYyWm2MWJIdKaSwzSC9Hn74xQTqscVwrKAh0z42yQ4OxhPjKrkkTwWZ5X8ByZQ_SXYTjvqDt1JAh85xVNFJ4X=&AUoanS70OYCDcO-2FL2kluiEBGkp=&trackingId=yVLz0ubyCR6D1ehNkYQkbw%3D%3D&refId=9swkDY7ieqfO6o7O4bAfXg%3D%3D&lipi=urn%3Ali%3Apage%3Aemail_email_job_alert_confirmation_01%3B5LlBfYVEQa6LIyANvi%2BhwA%3D%3D&midToken=AQGe57lJ-cGFvQ&midSig=1FFs-1F1bnZcg1&trk=eml-email_job_alert_confirmation_01-email_job_alert_confirmation-0-view_job&trkEmail=eml-email_job_alert_confirmation_01-email_job_alert_confirmation-0-view_job-null-60ukcg~mq837fsn~p7-null-null&eid=60ukcg-mq837fsn-p7&otpToken=MTEwMzFhZTIxMDJkYzhjNGIwMjQwNGVkNGUxZmU3YmQ4OGNlZDc0NDllYWQ4YjYxNzBjNjAwNjY0OTU4NWRmYmYyZDBkZmE0MWFiMmJhZDg1ZWFiZjRlZjA1MWYxYjM0Y2FmNjY3NWExYjE0NjYyY2IzZjcyNCwxLDE%3D",
+      "urlClean": "https://www.linkedin.com/jobs/view/4406209734",
+      "modality": "unknown",
+      "seniority": "unknown",
+      "blockText": "Software Engineer Backend | PedidosYa | Greater Buenos Aires",
+      "matchedPreferredTech": [],
+      "matchedExcludedTechMandatory": [],
+      "matchedExcludedTechOptional": [],
+      "languageFlags": [],
+      "score": 8,
+      "scoreBreakdown": [
+        "modality:unknown_as_hybrid(8)",
+        "noTargetTechPenalty(-10)",
+        "preferredLocation(10)"
+      ],
+      "filteredOut": false,
+      "filteredReasons": []
+    }
+  ],
+  "discarded": []
+}

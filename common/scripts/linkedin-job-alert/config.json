@@ -1,0 +1,42 @@
+{
+  "topNDefault": 20,
+  "hardFilters": {
+    "excludeOnsite": true,
+    "excludeWhenContainsExcludedTech": true,
+    "excludeWhenLanguageNotEsEn": true
+  },
+  "preferredTech": [
+    "node",
+    "node.js",
+    "aws",
+    "postgresql",
+    "mongodb",
+    "javascript",
+    "typescript",
+    "react",
+    "redux"
+  ],
+  "excludedTech": ["python", "java", "angular"],
+  "preferredSeniority": ["senior", "semi senior", "mid"],
+  "preferredLocations": ["global remoto", "greater buenos aires"],
+  "languageExclusionKeywords": [
+    "german required",
+    "must speak german",
+    "french required",
+    "must speak french",
+    "portuguese required",
+    "must speak portuguese",
+    "mandarin required"
+  ],
+  "scoreWeights": {
+    "remote": 25,
+    "hybrid": 8,
+    "onsite": -30,
+    "preferredTechMatch": 6,
+    "preferredSeniority": 12,
+    "preferredLocation": 10,
+    "activeHiring": 4,
+    "noTargetTechPenalty": -10,
+    "optionalExcludedTechPenalty": -15
+  }
+}

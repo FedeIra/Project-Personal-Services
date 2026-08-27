@@ -20,7 +20,8 @@
     "predeploy": "npm run build && npm run typecheck && npm run lint",
     "deploy": "npm run build && serverless deploy",
     "insert-user": "ts-node common/scripts/insert-user.ts",
-    "insert-accounts": "ts-node common/scripts/insert-accounts.ts"
+    "insert-accounts": "ts-node common/scripts/insert-accounts.ts",
+    "linkedin-jobs": "ts-node common/scripts/linkedin-job-alert/process-linkedin-alert.ts"
   },
   "dependencies": {
     "@fastify/aws-lambda": "^6.1.1",
@@ -32,11 +33,13 @@
     "cheerio": "^1.2.0",
     "fastify": "^5.5.0",
     "jsonwebtoken": "^9.0.2",
+    "mailparser": "^3.9.9",
     "papaparse": "^5.4.1"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.147",
     "@types/jsonwebtoken": "^9.0.9",
+    "@types/mailparser": "^3.4.6",
     "@types/node": "^22.13.5",
     "@types/papaparse": "^5.3.14",
     "@types/uuid": "^10.0.0",
