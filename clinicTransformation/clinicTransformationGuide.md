@@ -14,7 +14,7 @@ Se carga a mano todos estos puntajes al word (informeFinal.docx) que vienen desd
 
 Luego aparece un gráfico de line donde selecciona el grafico y selecciona "modificar datos en excel" y ahí aparece un excel de dos columnas donde solo se introduce el valor Z reflejando el mismo excel en sus columnas PB y Z (excelPrimerGrafico.xlsx).
 
-Luego viene una escala sobre algo animico ("Escala K-10") que se trata también de un gráfico que se saca de la evaluacion pen la parte de Escala de Malestar Psicologico qe también se selecciona "modificar datos en excel" y ahí aparece un excel de dos columnas (excelSegundoGrafico.xlsx) donde se completa el Puntaje de cada Sintomatología s según los datos del excel completado en la evaluación (formulasExcelEvaluacion.xlsx).
+Luego viene una escala sobre algo animico ("Escala K-10") que se trata también de un gráfico que se saca de la evaluacion pen la parte de Escala de Malestar Psicologico qe también se selecciona "modificar datos en excel" y ahí aparece un excel de dos columnas (excelSegundoGrafico.xlsx) donde se completa el Puntaje de cada Sintomatología s según los datos de la evaluación (evaluacion.pdf).
 
 Luego en cada función cognitiva se debe explicar cómo rindió en palabras que se hace sobre una plantilla o informe anterior donde se va modificando según el rango de z. El archivo de evaluación.pdf ya viene con un texto sobre cómo rindio que se usa de modelo y se ajusta según los datos Z.
 
