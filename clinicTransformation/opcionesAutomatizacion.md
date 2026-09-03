@@ -231,47 +231,65 @@ independencia).
 
 **Impactan el diseño del Excel unificado (decidir antes de mandarlo):**
 
-1. [ ] **El Excel debe contener TODAS las filas de la tabla de síntesis**, no solo las 14 pruebas
-   graficadas + AVD + K-10. En el ejemplo real la tabla tiene ~35 filas, muchas cualitativas que hoy
-   NO están en `formulasExcelEvaluacion.xlsx`: subpuntajes del IFS (Total, Índice MT, SM, IC, CIM,
-   DA, MA, MTV, R, CIV), TRO, MMSE copia, Comprensión, Expresión, y los ensayos BEM-MS AS1/AS2/AS3.
-   Si no están en el Excel, el LLM no las puede completar y el "paste único" queda incompleto. → El
-   mockup debería tener una fila por cada fila de la tabla de síntesis.
+1. [x] **El Excel debe contener TODAS las filas de la tabla de síntesis** — confirmado leyendo la
+   tabla real de `informeFinal.docx` (ver `informe-neurocognitivo/orden-filas-sintesis.md`): son
+   exactamente **36 filas de datos** (no "~35"), más 2 filas de encabezado y 1 fila de leyenda al
+   pie que no llevan datos. Subpuntajes del IFS (Total, Índice MT, SM, IC, CIM, DA, MA, MTV, R, CIV),
+   TRO, MMSE copia, Comprensión, Expresión, y los ensayos BEM-MS AS1/AS2/AS3 confirmados en la lista.
+   → El mockup debe tener exactamente esas 36 filas, en ese orden.
 
 2. [ ] **¿De dónde salen los datos demográficos del paciente (bloque 1)?** Nombre, DNI, fecha, fecha
    de nacimiento, ocupación, etc. viven en la historia clínica online (jpegs), que NO se le pasa al
    LLM. Decidir: o se agregan como campos al Excel unificado, o esa cabecera se completa a mano (~6
-   campos). Afecta el mockup.
+   campos). Afecta el mockup. **Propuesta enviada en `excel-unificado-spec.md`: agregarlos como
+   bloque de cabecera en el Excel** (costo marginal nulo si de todos modos se está editando el
+   archivo).
 
-3. [ ] **Regla de desempate en los rangos de la X + caso especial FF.** Las 8 columnas de rango
-   tienen bordes que se solapan (`-2 a -1` y `-1 a 0` ambos tocan el -1). Fijar convención para
-   cuando el Z cae justo en un límite (ej. "el límite superior pertenece a la columna de la
-   derecha"). Además: FF aparece capado como `≥3` y sale DOS veces en la tabla (Atención y Lenguaje)
-   con el mismo PB/Z — la skill tiene que conocer el cap y la duplicación.
+3. [ ] **Regla de desempate en los rangos de la X.** Las 8 columnas de rango tienen bordes que se
+   solapan (`-2 a -1` y `-1 a 0` ambos tocan el -1). Propuesta a confirmar con el profesional:
+   **límite inferior inclusive, límite superior exclusivo** (Z = -1,0 exacto → cae en "-1 a 0", no en
+   "-2 a -1"). Falta confirmar.
+
+   **Caso FF — confirmado con el `.docx` real:** FF aparece dos veces con el mismo PB/Z, exactamente
+   como se sospechaba (fila "Atención y funciones ejecutivas" y fila "Lenguaje", PB=28, Z="≥3" en
+   ambas, capado, marca X en la última columna ">+3"). **TRO también se duplica** (Screening y
+   Visoconstrucción, PB "10/10" en ambas, cualitativa sin Z). MMSE, en cambio, NO se duplica en
+   sentido estricto: la segunda aparición se llama "MMSE copia" (nombre distinto). → Confirmado que
+   la lista de filas debe ser **posicional (una entrada por fila de tabla, en orden fijo)**, nunca un
+   diccionario `prueba → valor`, porque al menos 2 nombres (TRO, FF) colisionarían.
 
 **Inconsistencia lógica del plan:**
 
-4. [ ] **El flag manual "Sintomatología anímica relevante" es redundante con el corte de K-10.** Hay
-   corte duro (K-10 ≥ 24,5 = malestar presente), así que se puede DERIVAR del K-10 en vez de ser flag
-   manual "criterio clínico". Propuesta: la skill lo deriva por default (≥24,5 → presente) pero el
-   profesional puede sobrescribirlo. Así queda un solo flag realmente manual: "riesgo de evolución".
-   Confirmar este enfoque.
+4. [x] **El flag manual "Sintomatología anímica relevante" es redundante con el corte de K-10.**
+   Confirmado el enfoque: la skill lo **deriva por default del K-10** y el profesional puede
+   sobrescribirlo. Corte ajustado a **K-10 ≥ 25** (no 24,5): el K-10 es la suma de 10 ítems enteros,
+   así que un resultado exacto de 24,5 es imposible — "≥ 25" es el mismo corte sin la falsa precisión
+   decimal. Documentado en `regla-diagnostica.md`. Queda un solo flag realmente manual: "riesgo de
+   evolución".
 
 **Confiabilidad técnica (gotcha a documentar en el `SKILL.md`):**
 
-5. [ ] **Guardar el Excel en Excel antes de subirlo.** La skill lee el `.xlsx` con código
-   (openpyxl/pandas) y necesita los valores ya calculados de las fórmulas (VLOOKUP), que Excel cachea
-   solo al guardar. Si se sube sin guardar, o abierto con otro programa, las celdas con fórmula
-   pueden leerse vacías.
+5. [x] **Guardar el Excel en Excel antes de subirlo.** Documentado como advertencia explícita en
+   `SKILL.md`. La skill lee el `.xlsx` con código y necesita los valores ya calculados de las
+   fórmulas (VLOOKUP), que Excel cachea solo al guardar. Si se sube sin guardar, o abierto con otro
+   programa, las celdas con fórmula pueden leerse vacías.
 
-**Mejora opcional a evaluar:**
+**Mejora opcional a evaluar — hallazgo nuevo que la resuelve en favor de python-docx:**
 
-6. [ ] **Camino intermedio: que Claude complete el `.docx` casi entero automáticamente.** Como
-   Claude.ai tiene ejecución de código, podría abrir una copia de la plantilla `informeFinal.docx`
-   con `python-docx` y rellenar el texto + la tabla de síntesis completa, dejando los gráficos
-   embebidos intactos (python-docx no los toca). El profesional solo pegaría a mano los 2 datasets de
-   los gráficos. Elimina el paste de 35 filas y el pegado de párrafos. Sigue sin auto-enviar (se
-   revisa igual). Decidir: ¿evaluarlo como variante, o mantener copy/paste puro por control/simpleza?
+6. [x] **Riesgo técnico real encontrado en la tabla de síntesis: las celdas NO tienen 8 columnas de
+   rango uniformes en todas las filas.** Al leer el XML de `informeFinal.docx` (`w:gridSpan`), se ve
+   que Word ya tiene mergeadas algunas celdas de rango en ciertas filas de forma no uniforme (p. ej.
+   filas cualitativas como AVD/KPDS-10 muestran una celda extra fusionada respecto a filas como
+   MMSE/TRO). Esto significa que **el supuesto "10 valores separados por tab, siempre la misma
+   cantidad de columnas, en las 36 filas" no está garantizado** — un paste de tabs con conteo fijo
+   puede desalinearse en filas con celdas ya fusionadas de otra forma en la plantilla real del
+   paciente (la de `informeFinal.docx` es un ejemplo; la plantilla real puede variar).
+   → **Antes de confiar en el copy/paste de bloque 2, hace falta la prueba real de "Pegado especial"
+   en Word con datos de prueba** (linea 111-123). Si falla o es inconsistente entre filas, el camino
+   **python-docx (punto 6 original)** pasa de "variante opcional" a **camino primario** para esa
+   tabla — sigue sin auto-enviar, el profesional solo pegaría a mano los 2 datasets de los gráficos.
+   Esta prueba de Word requiere abrir la app (no se puede validar por código/CLI) — pendiente de que
+   la hagas vos con la plantilla real y datos ficticios.
 
 ## Opción 2 — Endpoint + UI en este repo
 
@@ -313,3 +331,11 @@ hacerla una sola vez sea cual sea el camino, porque es el activo clínico centra
       docx→pdf en Lambda.
 - [ ] Digitalizar las tablas de normas (`PRUEBAS`, `FLUENCIAS`, `MMSE`, `Stroop`,
       `Puntajes Equivalentes`) a un formato estructurado (JSON/CSV), independiente del camino elegido.
+- [ ] **Regla diagnóstica — caso no contemplado en `modeloDiagnosticoYSugerencias.docx`:** cuando
+      Z < -1,5 + AVD conservadas y aplican **simultáneamente** compromiso anímico relevante (K-10 ≥
+      25) Y riesgo de evolución (flag manual), ¿qué categoría prevalece — "DCL con compromiso
+      anímico relevante" o "DCL con mayor riesgo de evolución"? ¿O el informe debe señalar ambas?
+      No está definido en ningún documento fuente (chequeado en `opcionesAutomatizacion.md`,
+      `clinicTransformationGuide.md` y el texto completo de `modeloDiagnosticoYSugerencias.docx`) —
+      confirmar con el profesional. Documentado como TODO en
+      `informe-neurocognitivo/SKILL.md` y `informe-neurocognitivo/regla-diagnostica.md`.
