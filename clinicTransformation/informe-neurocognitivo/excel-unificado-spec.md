@@ -11,8 +11,17 @@ No solo las 14 pruebas que hoy se grafican + AVD + K-10. Lista completa y orden 
 `formulasExcelEvaluacion.xlsx`.
 
 Recomendación de layout por fila: `Área | Prueba | PB | Z` (mismas 4 columnas que ya tiene la hoja
-`TABLA DE FORMULAS`, simplemente con las filas faltantes agregadas). Para las filas cualitativas
-(sin Z numérico), la columna Z lleva el texto de interpretación (ej. "Normal", "Autónoma").
+`TABLA DE FORMULAS`). Para las filas cualitativas (sin Z numérico), la columna Z lleva el texto de
+interpretación (ej. "Normal", "Autónoma").
+
+**No mover las 15 filas actuales.** Las 15 pruebas que hoy tienen Z numérico por fórmula quedan
+**exactamente en su posición** (moverlas rompería las fórmulas). Las 21 filas faltantes se agregan
+**debajo del cuadro actual (~row 24/25)**, respetando el mismo formato: título agrupador (ej.
+"Atención y Funciones Ejecutivas"), columna Prueba, y PB / Z.
+
+**Las 8 columnas de rango NO van en el Excel.** "Deterioro significativo / Puntajes bajos / promedio
+/ superiores" no se completan acá — se derivan del Z al armar el bloque de Word (ver la regla de la X
+y el cap de ±3 en `orden-filas-sintesis.md`). El Excel solo aporta PB y Z.
 
 **Importante:** como TRO y FF se repiten con el mismo nombre en dos secciones distintas, el Excel
 tiene que tener **dos filas separadas para cada una** (no una fila + una referencia) — igual que ya

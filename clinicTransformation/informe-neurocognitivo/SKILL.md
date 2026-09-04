@@ -49,10 +49,15 @@ Devolver en el chat, en bloques separados y claramente etiquetados, listos para 
 
 1. **Tabla de datos del paciente** (cabecera del informe).
 2. **Filas de la tabla "SÍNTESIS DEL RENDIMIENTO"** — ver `orden-filas-sintesis.md` para el orden
-   exacto de las 36 filas y el formato de paste (10 valores por tab: PB, Z, 8 columnas de rango).
-   **Separador decimal: coma** (`1,14`), texto libre en celda de Word, sin parseo numérico.
-   Filas cualitativas: el campo Z lleva el texto de interpretación (ej. "Normal"), las 8 columnas
-   de rango quedan vacías.
+   exacto de las 36 filas, la regla de llenado (PB / Z / X de rango) y el cap de ±3. Formato de
+   paste: 10 valores por tab (PB, Z, 8 columnas de rango). **Separador decimal: coma** (`1,14`),
+   texto libre en celda de Word, sin parseo numérico.
+   Las 8 columnas de rango **no llevan números**: llevan una sola **X** en el tramo donde cae el Z,
+   y solo si Z es numérico. Si Z es texto (ej. AVD "Autónoma", KPDS-10 "Normal") o está vacío: la
+   celda Z lleva la palabra o queda vacía y las 8 columnas de rango quedan **sin X**.
+   ⚠️ El paste único de las 36 filas **no funciona** (celdas de rango fusionadas en las secciones
+   cualitativas — validado en Word 2026-09-03). Pegar por **segmentos contiguos Con-Z** (filas 5–9,
+   23–29, 30–32); las cualitativas se completan aparte a mano. Detalle en `orden-filas-sintesis.md`.
 3. **Valores para `excelPrimerGrafico.xlsx`** — ver `orden-categorias-graficos.md` (14 valores).
    **Separador decimal: punto** (`-1.32`), Excel necesita reconocerlo como número.
 4. **Valores para `excelSegundoGrafico.xlsx`** — ver `orden-categorias-graficos.md` (10 valores,
@@ -73,6 +78,9 @@ Devolver en el chat, en bloques separados y claramente etiquetados, listos para 
   inclusive/exclusive, ver opcionesAutomatizacion.md punto 3 -->**.
 - FF y TRO aparecen dos veces en la tabla de síntesis (ver `orden-filas-sintesis.md`) — completar
   ambas filas con el mismo PB/Z, no omitir ninguna.
+- Cap de Z fuera de ±3: mostrar `≥3` (si Z ≥ +3) o `≤−3` (si Z ≤ −3) en vez del número crudo; el
+  valor capado igual lleva X en la columna de rango del extremo. Convención a confirmar — ver
+  `orden-filas-sintesis.md`.
 
 ## Archivos de esta skill
 
