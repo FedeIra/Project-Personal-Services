@@ -1,5 +1,13 @@
 # Opciones de Automatización — Informes Neurocognitivos
 
+> ⚠️ **Documento parcialmente superado (2026-09-07).** Tras recibir `excelEvaluacionCompleto.xlsx` e
+> `informeFinal2.docx`, la fuente de verdad de la Opción 1 es
+> **`planSkillInformeNeurocognitivo.md`** y los archivos de `informe-neurocognitivo/` (en particular
+> el nuevo `mapeo-excel-a-word.md`). Lo que sigue vigente acá sin cambios: la comparación entre
+> opciones, el análisis de automatizabilidad y todo el detalle de la **Opción 2**.
+>
+> Correcciones puntuales marcadas abajo en los puntos 1, 2, 3 y 6 de "Revisión del plan".
+
 > Brainstorm inicial (sin plan todavía). Retomar desde acá.
 
 ## El pipeline actual (resumen)
@@ -91,7 +99,9 @@ Es una tabla con columnas **Área | Prueba | PB | Z** + 8 columnas de rango agru
 (Deterioro significativo: `<-3`, `-3 a -2` · Puntajes bajos: `-2 a -1` · Puntajes promedio: `-1 a 0`,
 `0 a +1` · Puntajes superiores: `+1 a +2`, `+2 a +3`, `>+3`), donde se marca una X en la columna que
 corresponde al Z de esa fila. Algunas filas no tienen Z (interpretación cualitativa: "Normal",
-"Autónoma", etc.) y en la plantilla esas celdas de rango tienen trazado diagonal en vez de X.
+"Autónomo", etc.) — ~~y en la plantilla esas celdas de rango tienen trazado diagonal en vez de X~~
+**(falso: no hay trazado diagonal en ninguna plantilla; van con relleno gris `D9D9D9`, y el texto
+cualitativo va en PB, no en Z — ver los puntos 6 y 7 de "Revisión del plan" más abajo).**
 
 **A diferencia de los Excel de gráficos, una celda de tabla de Word acepta cualquier texto sin
 problema de parseo numérico** — el separador decimal no es un tema acá.
@@ -108,19 +118,15 @@ ejemplo real):
 - **Lenguaje:** FF, FS, TBA (con Z) · Comprensión, Expresión (cualitativas — sin Z)
 - **Visoconstrucción:** TRO, MMSE copia (cualitativas — sin Z)
 
-**Cómo se pega en Word — en un solo paste (a validar con una prueba real, todavía no testeado):** el
-LLM devuelve un bloque de texto con **10 valores separados por tabulación por fila** (PB, Z, y las 8
-columnas de rango —
-vacío en 7, "X" en la que corresponde), un salto de línea por fila, en el orden fijo de las ~35
-filas de la batería. Se excluyen **Área y Prueba** del bloque a pegar (son fijas, ya están en la
-plantilla, y "Área" tiene celdas combinadas que romperían el conteo de columnas si se incluyeran).
+**Cómo se pega en Word — ⚠️ SUPERADO, no seguir lo que decía acá.** Esta subsección describía un
+**paste único de ~35 filas × 10 valores por tabulación**, con el texto cualitativo en la columna Z.
+Contando los `w:tc` de las tablas reales de los dos informes, eso **no puede funcionar**: 34 filas
+tienen 12 celdas (10 valores) pero AVD y KPDS-10 tienen 11 (9 valores), así que un bloque uniforme se
+desfasa a partir de la fila 3. Y el texto cualitativo va en **PB**, no en Z.
 
-Mecánica: parado en la celda **PB de la primera fila (MMSE)** de la tabla real, `Pegado especial →
-Texto sin formato` una sola vez — Word interpreta cada tab como "celda siguiente a la derecha" y
-cada salto de línea como "bajar una fila", igual que Excel, completando las ~35 filas × 10 columnas
-en un solo paste. Para las filas cualitativas, el campo "Z" lleva el texto (p. ej. "Normal") y las 8
-columnas de rango quedan vacías (no se toca el trazado diagonal). Conviene probarlo una vez con
-datos de prueba antes de confiarlo para un paciente real.
+La mecánica vigente es de **3 bloques** (filas 1–2 · filas 3–4 aparte · filas 5–36), y son 36 filas
+exactas, no "~35". Ver `planSkillInformeNeurocognitivo.md` §5 y
+`informe-neurocognitivo/orden-filas-sintesis.md`, que es la fuente de verdad de esta tabla.
 
 **Formato numérico en este bloque: coma decimal** (`1,14`, no `1.14`) — a diferencia de los Excel de
 gráficos, acá es texto libre en una celda de Word sin parseo numérico, así que se usa la notación
@@ -192,7 +198,9 @@ independencia).
 
 1. [ ] Mandar el diseño del Excel "unificado" (mockup de cómo quedarían los campos nuevos agregados
    a la hoja `TABLA DE FORMULAS`).
-2. [x] Corte de K-10 → ≥ 24,5 = sintomatología anímica relevante. **Confirmado.**
+2. [x] Corte de K-10 → **≥ 25** = sintomatología anímica relevante. (Ajustado de "≥ 24,5": el K-10 es
+   la suma de 10 ítems enteros, así que un resultado exacto de 24,5 es imposible — es el mismo corte
+   sin la falsa precisión decimal. Ver `informe-neurocognitivo/regla-diagnostica.md`.)
 3. [x] Corte de AVD → 0–5 = comprometidas, 6–8 = conservadas (criterio diagnóstico del profesional,
    no hay corte "oficial" de la escala original). **Confirmado.**
 4. [x] "Riesgo de evolución" — confirmado que es puro criterio clínico/observación en vivo durante
@@ -238,12 +246,12 @@ independencia).
    TRO, MMSE copia, Comprensión, Expresión, y los ensayos BEM-MS AS1/AS2/AS3 confirmados en la lista.
    → El mockup debe tener exactamente esas 36 filas, en ese orden.
 
-2. [ ] **¿De dónde salen los datos demográficos del paciente (bloque 1)?** Nombre, DNI, fecha, fecha
-   de nacimiento, ocupación, etc. viven en la historia clínica online (jpegs), que NO se le pasa al
-   LLM. Decidir: o se agregan como campos al Excel unificado, o esa cabecera se completa a mano (~6
-   campos). Afecta el mockup. **Propuesta enviada en `excel-unificado-spec.md`: agregarlos como
-   bloque de cabecera en el Excel** (costo marginal nulo si de todos modos se está editando el
-   archivo).
+2. [x] **¿De dónde salen los datos demográficos del paciente (bloque 1)? — RESUELTO.** Están en el
+   Excel unificado, en `C46:C51`. Los campos reales son paciente, edad, fecha de nacimiento, nivel
+   educativo, lateralidad y fecha de evaluación. **No hay DNI ni ocupación** — y la tabla del Word
+   tampoco los tiene en ninguno de los dos informes, así que la lista que figuraba acá estaba mal.
+   `informeFinal.docx` agrega una fila `Deriva:` que `informeFinal2.docx` no tiene. Las dos fechas se
+   guardan como **serial de Excel** y en el Word van como `dd/mm/aaaa`.
 
 3. [ ] **Regla de desempate en los rangos de la X.** Las 8 columnas de rango tienen bordes que se
    solapan (`-2 a -1` y `-1 a 0` ambos tocan el -1). Propuesta a confirmar con el profesional:
@@ -277,19 +285,49 @@ independencia).
 **Mejora opcional a evaluar — hallazgo nuevo que la resuelve en favor de python-docx:**
 
 6. [x] **Riesgo técnico real encontrado en la tabla de síntesis: las celdas NO tienen 8 columnas de
-   rango uniformes en todas las filas.** Al leer el XML de `informeFinal.docx` (`w:gridSpan`), se ve
-   que Word ya tiene mergeadas algunas celdas de rango en ciertas filas de forma no uniforme (p. ej.
-   filas cualitativas como AVD/KPDS-10 muestran una celda extra fusionada respecto a filas como
-   MMSE/TRO). Esto significa que **el supuesto "10 valores separados por tab, siempre la misma
-   cantidad de columnas, en las 36 filas" no está garantizado** — un paste de tabs con conteo fijo
-   puede desalinearse en filas con celdas ya fusionadas de otra forma en la plantilla real del
-   paciente (la de `informeFinal.docx` es un ejemplo; la plantilla real puede variar).
-   → **Antes de confiar en el copy/paste de bloque 2, hace falta la prueba real de "Pegado especial"
-   en Word con datos de prueba** (linea 111-123). Si falla o es inconsistente entre filas, el camino
-   **python-docx (punto 6 original)** pasa de "variante opcional" a **camino primario** para esa
-   tabla — sigue sin auto-enviar, el profesional solo pegaría a mano los 2 datasets de los gráficos.
-   Esta prueba de Word requiere abrir la app (no se puede validar por código/CLI) — pendiente de que
-   la hagas vos con la plantilla real y datos ficticios.
+   rango uniformes en todas las filas** — confirmado, pero **el alcance era mucho menor de lo que se
+   creía acá y de lo que se registró después**. Contados los `w:tc` de las tablas de
+   `informeFinal.docx` **e** `informeFinal2.docx` (idénticas entre sí):
+
+   | Filas | Celdas reales | Valores a pegar |
+   |---|---|---|
+   | 34 de las 36 | **12** | **10** |
+   | **AVD y KPDS-10 (filas 3 y 4)** | **11** (Z con `gridSpan=2`) | **9** |
+
+   Es decir: **sólo esas 2 filas rompen el conteo**, no "las filas cualitativas" en general. Las
+   demás cualitativas tienen las 8 celdas de rango separadas igual que las filas con Z — lo único
+   distinto es el relleno gris. **Tampoco hay trazado diagonal en ninguna de las dos plantillas**
+   (`w:tl2br`/`w:tr2bl` = 0 resultados), aunque la leyenda al pie lo mencione.
+
+   → El bloque único de 36 × 10 queda **descartado**, y la mecánica propuesta pasa a ser **3 bloques**
+   (filas 1–2 · filas 3–4 aparte · filas 5–36). Ver
+   `informe-neurocognitivo/orden-filas-sintesis.md`. La prueba en Word real **sigue pendiente**: lo
+   que está confirmado es la causa, no que el esquema de 3 bloques pegue bien. Si tampoco funciona, el
+   camino **python-docx** pasa de "variante opcional" a **camino primario** para esa tabla.
+
+7. [x] **El texto cualitativo va en la columna PB, no en Z** — corrección de un supuesto que atraviesa
+   este documento y las primeras versiones del plan. En 32 de las 34 filas cualitativas el valor va en
+   **PB** y Z queda vacía (`[MMSE][30/30][]`, `[IFS SM][3 normal][]`). Las únicas excepciones son AVD
+   y KPDS-10, que ponen el número en PB y la palabra en Z.
+
+8. [x] **Los gráficos usan los valores redondeados y capados, no el Z crudo.** La hoja embebida en
+   `informeFinal2.docx` guarda `0.45` (crudo `0.4482…`), `-0.3` (crudo `-0.29629…`) y `-3` para
+   BEM–MS Sem (crudo `-3.1067…`, capado). También cambia la columna destino según el archivo
+   (`B2:B15` en el suelto, `C2:C15` en el embebido) → la instrucción de pegado debe ser **posicional**.
+
+9. [ ] **El Excel unificado llegó pero no es autosuficiente todavía.** Faltan los 10 ítems del K-10
+   (bloquea el gráfico 2), el flag de riesgo de evolución (bloquea la categoría 5) y el C-QSM; y
+   `D31` vino corrompida por autoconversión a fecha. Detalle y arreglos en
+   `informe-neurocognitivo/excel-unificado-spec.md`.
+
+10. [x] **Los templates de sugerencias se adaptan al paciente**, no se copian literalmente — este
+    documento y el plan decían lo contrario. Los dos informes agregan un paréntesis específico del
+    paciente a la viñeta de hábitos y adaptan la frase de cierre. Ver
+    `informe-neurocognitivo/regla-diagnostica.md`.
+
+11. [ ] ⚠️ **`excelEvaluacionCompleto.xlsx` e `informeFinal2.docx` son de un paciente real.** El
+    Excel de entrada inevitablemente lleva datos reales; el **paquete que se sube a claude.ai** no
+    necesita llevarlos. Anonimizar antes de incluir `informeFinal2` como referencia de tono.
 
 ## Opción 2 — Endpoint + UI en este repo
 

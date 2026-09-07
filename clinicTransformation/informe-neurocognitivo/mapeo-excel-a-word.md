@@ -1,0 +1,294 @@
+# Mapeo Excel → Word — de dónde sale cada bloque del informe
+
+> Reconstruido comparando **`excelEvaluacionCompleto.xlsx`** con **`informeFinal2.docx`**, que es el
+> informe generado a partir de ese mismo Excel (par entrada/salida real, mismo paciente). Verificado
+> además contra `informeFinal.docx` (otro paciente): **la plantilla de Word es estructuralmente
+> idéntica en los dos informes**, así que lo de acá es la plantilla, no una particularidad.
+
+Cada bloque está clasificado por **tipo de trabajo**, que es lo que decide qué puede automatizarse:
+
+| Tipo | Significado |
+|---|---|
+| **FIJO** | Boilerplate idéntico en todos los informes. Ya está en la plantilla, nadie lo toca. |
+| **PASS** | Transcripción determinística de una celda del Excel. Cero criterio. |
+| **DERIV** | Cálculo determinístico a partir del Excel (redondeo, cap, elección de columna de rango). |
+| **LLM** | Redacción. Borrador para revisión obligatoria del profesional. |
+| **FUERA** | No está en el Excel. Hay que traerlo de otra parte (papel / historia clínica / criterio). |
+
+---
+
+## 1. Esquema real de `excelEvaluacionCompleto.xlsx`
+
+Una sola hoja aporta datos del paciente: **`TABLA DE FORMULAS`**. Las otras seis (`Stroop`, `MMSE`,
+`Puntajes Equivalentes`, `PRUEBAS`, `FLUENCIAS`, `BACK UP`) son tablas de normas/apoyo y **no se
+leen** — son el backend de los `VLOOKUP`.
+
+### Bloque de parámetros (celdas que manejan todas las fórmulas)
+
+| Celda | Contenido | Rol |
+|---|---|---|
+| `C3` | *(vacía)* | rótulo "Nombre" en `B3`, sin valor cargado — ver §5.7 |
+| `C4` | `61` | **Edad. Driver de todos los `VLOOKUP` a `PRUEBAS`/`FLUENCIAS`.** |
+| `C5` | `Terciario` | **Nivel educativo. Driver del `MATCH` de `FLUENCIAS`.** |
+
+### Cuadro de pruebas con Z (`C7:H22`) — columnas `C`=Prueba `D`=PB `E`=Z `G`=Media `H`=Desvío
+
+`D` la carga la persona; `E`, `G` y `H` son fórmulas. Las áreas están en `B` con celdas combinadas:
+`B8:B12` Atención y Funciones Ejecutivas · `B13:B19` Memoria episódica · `B20:B22` Lenguaje.
+
+| Fila | Prueba | PB | Z (crudo) |
+|---|---|---|---|
+| 8 | DD | `D8` | `E8` |
+| 9 | DI | `D9` | `E9` |
+| 10 | TMT A | `D10` | `E10` (la fórmula invierte el signo: `*(-1)`) |
+| 11 | TMT B | `D11` | `E11` (idem) |
+| 12 | FF | `D12` | `E12` |
+| 13 | BEM – MS AST | `D13` | `E13` |
+| 14 | BEM – MS RSE | `D14` | `E14` |
+| 15 | BEM – MS Sem | `D15` | `E15` |
+| 16 | BEM – MS Rec | `D16` | `E16` |
+| 17 | BEM – MS CE | `D17` | `E17` |
+| 18 | BEM – ML Inm | `D18` | `E18` |
+| 19 | BEM – ML Dif | `D19` | `E19` |
+| 20 | FF *(2ª aparición)* | `D20` | `E20` |
+| 21 | FS | `D21` | `E21` |
+| 22 | TBA | `D22` | `E22` |
+
+### Bloque auxiliar `J13:L16` — ensayos de memoria seriada
+
+Rotulado `MS - Signoret` (`J13:K13` combinadas). **Es la única fuente de los 3 ensayos**, que en el
+Word son 3 filas de la tabla de síntesis:
+
+| Celda | Contenido |
+|---|---|
+| `K14` | AS1 |
+| `K15` | AS2 |
+| `K16` | AS3 |
+| `L14` (comb. `L14:L16`) | `=(K14+K15+K16)/3` → alimenta el PB de AST (`D13`), **cargado a mano** |
+| `K19` | `=(D15+D16)/2` → chequeo del PB de CE (`D17`) |
+
+⚠️ **`D13` se carga a mano y en `informeFinal2` quedó truncado, no redondeado.** Ensayos 5, 8 y 10 →
+`L14` = `7,6667`, y el PB cargado fue **`7,66`** (redondear daría `7,67`). **No es cosmético: mueve el
+Z** — con 7,66 el Z es `-0,90`; con 7,67 sería `-0,89`. El otro informe no distingue (`5,3333` →
+`5,33` por las dos vías). **A confirmar** si el truncado es deliberado, y si conviene que `D13` salga
+por fórmula en vez de a mano (`preguntasParaLaProfesional.md` §A.5). Mientras no se confirme, la
+skill **usa el PB tal como está cargado en `D13`** y no lo recalcula.
+
+### Bloque cualitativo (`C25:F44`) — sin Z numérico
+
+| Fila | Prueba | PB | Interpretación |
+|---|---|---|---|
+| 25 | MMSE | `D25` (`30/30`) | — |
+| 26 | TRO | `D26` (`9.5/10`) | — |
+| 27 | AVD | `D27` (`8`) | `E27` (comb. `E27:F27`) = `Autónomo` |
+| 28 | KPDS-10 | `D28` (`15`) | `E28` (comb. `E28:F28`) = `Normal` |
+| 30 | IFS Total | `D30` (`26,5/30`) | — |
+| 31 | IFS Índice MT | `D31` | ⚠️ **corrupta** — ver §5.1 |
+| 32–39 | IFS SM, IC, CIM, DA, MA, MTV, R, CIV | `D32`…`D39` (`3 normal`, …) | — |
+| 41 | Comprensión | `D41` (`Normal`) | — |
+| 42 | Expresión | `D42` (`Normal`) | — |
+| 43 | TRO *(2ª aparición)* | `D43` (`9.5/10`) | — |
+| 44 | MMSE copia | `D44` (`Normal`) | — |
+
+### Bloque demográfico (`B46:C51`)
+
+| Celda | Campo |
+|---|---|
+| `C46` | Paciente (apellido, nombre) |
+| `C47` | Edad (texto: `61 años`) |
+| `C48` | Fecha de nacimiento (**serial de fecha**) |
+| `C49` | Nivel educativo alcanzado |
+| `C50` | Lateralidad |
+| `C51` | Fecha de evaluación (**serial de fecha**) |
+
+### Bloque de anamnesis (`B55:B64`)
+
+`B55` es el rótulo `MOTIVO DE CONSULTA Y ANTECEDENTES`; `B56`–`B64` son las notas crudas de la
+entrevista, una viñeta por celda, en telegrama y con comillas textuales del paciente.
+
+---
+
+## 2. Estructura del Word y de dónde viene cada parte
+
+En orden de aparición en `informeFinal2.docx`. ⚠️ **Esta numeración es el orden del documento Word y
+no coincide con la de los bloques de salida de `SKILL.md` / plan §3**, que agrupa distinto (11
+bloques de output, no 12 partes del documento). Cuando importe, referirse a los bloques por nombre.
+
+| # | Bloque del Word | Tipo | Origen |
+|---|---|---|---|
+| 1 | Título `EVALUACIÓN NEUROCOGNITIVA` | FIJO | plantilla |
+| 2 | `DATOS PERSONALES` + tabla de 6 filas | PASS | `C46:C51` |
+| 3 | `MOTIVO DE CONSULTA Y ANTECEDENTES` (7–9 párrafos) | **LLM** | `B56:B64` — ver §3 |
+| 4 | `PRUEBAS ADMINISTRADAS` (lista de 11–12 ítems) | FIJO/FUERA | plantilla; depende de la batería tomada |
+| 5 | Tabla `SÍNTESIS DEL RENDIMIENTO` (36 filas) | PASS + DERIV | ver `orden-filas-sintesis.md` |
+| 6 | Gráfico de líneas (14 valores Z) | DERIV | ver `orden-categorias-graficos.md` |
+| 7 | Gráfico `Escala K-10` (10 valores) | **FUERA** | **no está en el Excel** — ver §5.2 |
+| 8 | `SCREENING COGNITIVO, PSIQUIÁTRICO, FUNCIONALIDAD Y OBSERVACIONES CONDUCTUALES` | **LLM** | `D25`, `D26`, `D30`, `D27`/`E27`, `D28`/`E28` + observación en vivo |
+| 9 | 4 secciones por área cognitiva | **LLM** | columna `E` del cuadro con Z — ver §4.2 |
+| 10 | `CONCLUSIONES Y SUGERENCIAS` — párrafo de recap + frase de cierre | **LLM** | todas las Z + `regla-diagnostica.md` |
+| 11 | `Se sugiere:` (4–6 viñetas) | template + LLM | `regla-diagnostica.md` — ver §4.3 |
+| 12 | `Quedo a disposición…` + firma (`María Agustina Aceiro`, `Doctora en Psicología`, `M.N:67158`) | FIJO | plantilla |
+
+### 2.1 Tabla de datos personales (bloque 2)
+
+Pass-through directo, con tres detalles:
+
+- `C48` y `C51` son **seriales de fecha** de Excel. En el Word van como **`dd/mm/aaaa`**
+  (`23628` → `08/09/1964`; `46265` → `31/08/2026`). Al leer el `.xlsx` por código hay que convertir,
+  no imprimir el número.
+- El **juego de campos varía**: `informeFinal.docx` tiene una 7ª fila `Deriva:` que
+  `informeFinal2.docx` no tiene. Respetar la plantilla que traiga el profesional; no agregar ni
+  quitar filas.
+- **No hay DNI ni ocupación** en la tabla del Word de ninguno de los dos informes. La lista de campos
+  reales es exactamente la de `C46:C51`, más `Deriva` opcional.
+
+---
+
+## 3. Bloque 3 — anamnesis: el bloque de mayor riesgo del pipeline
+
+El Excel trae las notas crudas y el Word trae prosa en tercera persona, en presente, con las citas
+textuales conservadas entre comillas. La transformación es sistemática (una viñeta ≈ un párrafo,
+mismo orden) **pero no es fiel**. El par real:
+
+| `B63` (Excel) | Word |
+|---|---|
+| `- Animicamente: "bárbaro", "cierto estrés cerebral y financiero".` | `Anímicamente, se encuentra bien, "con poco estrés o sobrecarga laboral/finaciera".` |
+
+El Excel dice *"cierto estrés"*; el Word dice *"poco estrés"*, y le cambia el contenido a una comilla
+que se presenta como textual del paciente. Sea criterio clínico o error de tipeo, la conclusión
+operativa es la misma:
+
+> **Este bloque se entrega siempre como borrador y el profesional lo revisa frase por frase.** La
+> skill no debe suavizar, reinterpretar ni reencuadrar el contenido anímico: transcribe lo que dice
+> la nota. Si una nota es ambigua, la deja ambigua y lo señala; no elige una lectura.
+
+Convenciones observadas en los dos informes:
+
+- Primer párrafo, forma fija: `El Sr./La Sra. <Apellido> asiste solo/a a la consulta para la
+  realización de una evaluación (neuro)cognitiva (de control / por control).`
+- Último párrafo, forma fija: `Vive <situación> y, según autoreporte, es autónomo/a en las
+  actividades de la vida diaria.`
+- Verbos de reporte rotados: `Refiere` · `Relata` · `Reporta` · `Menciona` · `En lo que concierne a`.
+- Género y concordancia salen del paciente (`autónomo`/`autónoma`, `solo`/`sola`).
+- Las notas internas de protocolo **no se redactan**: `B56` = `- PROTOCOLO XTEND` no aparece en el
+  Word. Tampoco aparece el antecedente familiar de `B57` (`mamá con EA`) — se omitió.
+  → **Qué se omite es criterio del profesional. La skill incluye todo y marca lo dudoso**, en vez de
+  decidir sola qué dejar afuera.
+- `B58` está **truncada dentro del propio Excel** — ver §5.4.
+
+---
+
+## 4. Bloques 8–11 — narrativa clínica
+
+### 4.1 Sección de screening (bloque 8)
+
+Esqueleto casi fijo entre informes. Frases invariantes: discurso, nivel de alerta, orientación,
+autonomía en AVD. Lo único que se mueve son los puntajes intercalados, en este formato:
+
+`Rendimiento cognitivo general inicial (evaluado a partir de pruebas de screening) con puntajes
+conservados (MMSE=30/30; TRO= 9,5/10; INECO=26,5/30) para su edad y nivel educativo.`
+
+→ `MMSE` de `D25`, `TRO` de `D26`, `INECO` de `D30` (**el Word lo llama INECO; el Excel y la tabla de
+síntesis lo llaman IFS Total**).
+
+La frase de malestar psicológico se deriva de `D28`/`E28` y la de autonomía de `D27`/`E27`. La
+mención a quejas subjetivas de memoria sale del **C-QSM, que no está en el Excel** (§5.3).
+
+### 4.2 Secciones por área (bloque 9)
+
+Cuatro secciones, siempre en este orden y con esta forma de tres partes:
+
+1. Título en mayúsculas: `ATENCIÓN, VELOCIDAD DE PROCESAMIENTO Y FUNCIONES EJECUTIVAS` ·
+   `MEMORIA EPISÓDICA` · `LENGUAJE` · `VISOCONSTRUCCIÓN`.
+2. Una línea: `Impresión diagnóstica del área: rendimiento cognitivo <calificación>`.
+   ⚠️ **En los dos informes dice `del área` en las dos primeras secciones y `por área` en las dos
+   últimas.** Es una inconsistencia de la plantilla: **reproducirla tal cual**, no "corregirla".
+   Calificaciones observadas: `conservado`, `conservado-alto`.
+3. Un párrafo que recorre las pruebas del área traduciendo cada Z a vocabulario clínico.
+
+Léxico Z → palabra, **inferido** de los dos pares informe/Excel (no es una tabla que el profesional
+haya entregado — **a confirmar**): `alto` para Z ≳ +1 · `conservado` / `normal` para Z ≈ −1 a +1 ·
+`bajo (no deficitario)` para Z ≈ −1 a −2 · `deficitario` para Z ≲ −2. El párrafo nombra la función,
+no la sigla: `span atencional` (DD) · `retrogresión` / `memoria de trabajo` (DI) · `rastreo visual y
+velocidad de procesamiento` (TMT A) · `flexibilidad cognitiva` (TMT B) · `prueba ejecutiva` (IFS) ·
+`denominación` (TBA).
+
+### 4.3 Conclusiones y sugerencias (bloques 10–11)
+
+- Párrafo de recap: enumera área por área con conectores (`A su vez` · `En adición` · `También` ·
+  `Por último`), en orden inverso al de la tabla (arranca por visoconstrucción).
+- Frase de cierre: parte del template de `regla-diagnostica.md` **pero adaptada**. `informeFinal2`
+  cerró con `rendimiento cognitivo normal con leves fallas aisladas en recuperación de la memoria`,
+  donde el template de la categoría 2 dice `fallas atencionales/ejecutivas aisladas`.
+- Viñetas de sugerencias: las del template, **con un paréntesis específico del paciente agregado a la
+  viñeta de hábitos**:
+  - `informeFinal2`: `Promover hábitos de vida saludables (estrategias de compensación, no multitarea)`
+  - `informeFinal`: `Promover hábitos de vida saludables (mejorar calidad del sueño y técnicas de relajación)`
+
+→ **Corrección respecto de la versión anterior del plan**, que decía que las sugerencias se devuelven
+"tal cual, sin redactar nada propio": la evidencia de los dos informes es **template + localización
+específica del paciente**. Ver `regla-diagnostica.md`.
+
+---
+
+## 5. Hallazgos que impiden que el Excel sea autosuficiente
+
+Ordenados por impacto. La corrección propuesta para cada uno está en `excel-unificado-spec.md`.
+
+### 5.1 `D31` (IFS Índice MT) está corrompida por autoconversión a fecha
+
+`D31` guarda el número **`46302`** con formato de fecha, es decir **07/10/2026**. El Word dice `7/10`.
+Lo que pasó: se tipeó `7/10` y Excel lo interpretó como fecha.
+
+**El valor real es irrecuperable desde el Excel** — sólo se sabe que era `7/10` por haber leído el
+Word. Es el único hallazgo que **destruye datos en silencio**, y el más barato de arreglar.
+
+### 5.2 Los 10 ítems del K-10 no están — el gráfico 2 es imposible
+
+El gráfico `Escala K-10` necesita 10 valores por síntoma. La hoja de datos embebida en
+`informeFinal2.docx` tiene `2, 4, 1, 1, 2, 1, 1, 1, 1, 1` (suma **15**). El Excel guarda **sólo el
+total**, en `D28` = `15`.
+
+→ El **gráfico K-10** del informe **no puede generarse desde el Excel**. Hoy esos 10 valores se transcriben
+del papel.
+
+### 5.3 El C-QSM no está en el Excel
+
+`Cuestionario de quejas subjetivas de memoria (C-QSM)` figura en `PRUEBAS ADMINISTRADAS` y su
+resultado se usa en la narrativa de screening (`…ni quejas subjetivas de memoria significativas`),
+pero no aparece ni en el Excel ni en la tabla de síntesis. Es el único test administrado sin ninguna
+celda propia.
+
+### 5.4 `B58` está truncada dentro del Excel
+
+El texto de la celda termina en `- QSM: olvida cosas puntuales (fue a un partido y por ahi ` —
+paréntesis sin cerrar, frase cortada. Verificado en la cadena compartida del `.xlsx`: **no es un
+problema de lectura, la celda está así**. Se perdió parte de la nota de la entrevista.
+
+### 5.5 No hay flag de "Riesgo de evolución"
+
+Sin ese campo, la **categoría 5** de `regla-diagnostica.md` (DCL con mayor riesgo de evolución) es
+inalcanzable. Es criterio clínico puro: no se puede derivar de ninguna celda.
+
+### 5.6 Dos bloques demográficos que ya divergen
+
+`C4`/`C5` (que manejan los `VLOOKUP`) y `C47`/`C49` (que van al Word) guardan lo mismo dos veces, y
+ya no coinciden: `C5` = `Terciario`, `C49` = `Terciario ` (con espacio al final). `C47` además
+duplica la edad como texto (`61 años`). Nadie se enteraría si `C4` y `C47` quedaran desincronizadas,
+y `C4` es lo que decide contra qué norma se compara **todo** el informe.
+
+### 5.7 `C3` ("Nombre") quedó vacía
+
+El rótulo existe pero el valor no se carga; el nombre real vive en `C46`. Redundancia sin usar.
+
+---
+
+## 6. Datos sensibles
+
+`excelEvaluacionCompleto.xlsx` e `informeFinal2.docx` son de un **paciente real**: nombre y apellido,
+fecha de nacimiento, nivel educativo, lateralidad, antecedente familiar de Alzheimer, notas de sueño
+y estado de ánimo, y citas textuales de la entrevista.
+
+Eso es inevitable en el **Excel de entrada** (es el archivo de trabajo del profesional, se adjunta
+por paciente). No es inevitable en el **paquete de la skill**: lo que se sube a claude.ai queda
+publicado ahí de forma persistente. Ver la nota de `SKILL.md` sobre `ejemplo-informeFinal.docx`.

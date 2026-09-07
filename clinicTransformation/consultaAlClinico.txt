@@ -1,0 +1,242 @@
+Hola! Estuvimos probando armar el informe final a partir del Excel nuevo, y quedaron
+algunas partes del informe de ejemplo que no salen del archivo.
+
+Antes de molestarte revisamos también la evaluación en papel, las capturas de la
+historia clínica y el documento de criterios de cierre, así que varias de las que
+teníamos ya las pudimos rastrear solas. Quedaron 11.
+
+Están separadas en tres grupos, según qué necesitamos de vos:
+
+   PARTE 1 - ya sabemos de dónde salen. Sólo hay que decidir si los pasamos al Excel.
+   PARTE 2 - no encontramos de dónde salen.
+   PARTE 3 - los datos están, pero no sabemos con qué criterio los usás.
+
+(Aviso: abajo hay texto del informe de un paciente real, por si lo reenviás.)
+
+
+=====================================================================
+PARTE 1 - LOS UBICAMOS, PERO NO ESTÁN EN EL EXCEL
+=====================================================================
+
+1) EL GRÁFICO DE LA ESCALA K-10  (el más importante de todos)
+
+   El gráfico tiene un valor por síntoma:
+   Cansancio 2 / Nervios 4 / Nervios+ 1 / Desesperanza 1 / Inquietud 2 /
+   Inquietud+ 1 / Depresión 1 / Esfuerzo 1 / Tristeza 1 / Inutilidad 1
+
+   Ya sabemos que salen de la Escala de Malestar Psicológico de la evaluación en
+   papel, y que hoy van del papel directo al gráfico del Word.
+   En el Excel está sólo el total (KPDS-10 = 15).
+
+   -> ¿Te sirve cargar los 10 en el Excel?
+      Serían 10 celdas, el total se calcularía solo (así no puede quedar
+      descolgado de los ítems), y no habría que transcribirlos nunca más.
+      Es lo único que hoy obliga a abrir el papel para terminar el informe.
+
+
+2) "ASISTE SOLO" Y EL MOTIVO "POR CONTROL"
+
+   Primer párrafo del informe:
+   "El Sr. [apellido] asiste solo a la consulta para la realización de una
+    evaluación cognitiva por control."
+
+   Encontramos que la evaluación en papel tiene el campo "Acompañado: NO/SI",
+   y que el motivo de consulta va en la historia clínica online.
+
+   -> ¿Es de ahí? Y si sí: ¿los agregamos como dos celdas al Excel?
+      Serían las únicas dos cosas por las que habría que abrir la historia
+      clínica, teniendo el resto de la anamnesis ya cargada ahí.
+
+
+3) LA ORIENTACIÓN TEMPORAL Y ESPACIAL
+
+   Del párrafo de screening:
+   "Orientación temporal y espacial conservadas."
+
+   Vimos que el MMSE del papel tiene su propia sección "ORIENTACIÓN (10 puntos)",
+   así que entendemos que sale de ahí. En el Excel está sólo el MMSE total (30/30),
+   sin el desglose.
+
+   -> ¿Confirmás que sale del subpuntaje de orientación del MMSE?
+      ¿Y querés que ese subpuntaje tenga su celda, para los casos en que la
+      orientación NO esté conservada?
+
+
+4) EL QSM Y SU FRASE EN EL INFORME
+
+   Dos cosas que creemos son la misma:
+
+   a) En PRUEBAS ADMINISTRADAS figura
+      "Cuestionario de quejas subjetivas de memoria (C-QSM)"
+      y en el screening
+      "...ni quejas subjetivas de memoria significativas."
+      pero no encontramos ninguna celda ni fila con un puntaje del C-QSM.
+
+   b) En las notas de la anamnesis del Excel sí aparece nombrado, en la línea
+      "- QSM: olvida cosas puntuales (fue a un partido y por ahi "
+      ...que además quedó cortada a mitad de frase, con el paréntesis sin cerrar.
+      En el informe esa idea aparece completa:
+      "olvidos 'puntuales' (por ejemplo: olvidar cuántos goles metió su equipo)"
+
+   -> ¿El C-QSM da un puntaje, o lo usás sólo en forma descriptiva como en esa nota?
+      Si da puntaje, le hacemos una celda.
+      Y aparte: ¿te acordás cómo seguía la frase cortada de este paciente?
+
+
+=====================================================================
+PARTE 2 - NO ENCONTRAMOS DE DÓNDE SALEN
+=====================================================================
+
+5) IFS ÍNDICE MT = "7/10"
+
+   En la tabla de síntesis la fila "IFS Índice MT" dice 7/10.
+   En el Excel esa celda tiene guardado "07/10/2026": al escribir 7/10 Excel lo
+   interpretó como una fecha y se lo comió. El valor original ya no está.
+
+   -> ¿Me confirmás que era 7/10?
+      Y un detalle que importa: esto va a volver a pasar solo y sin avisar, en
+      cualquier paciente. Se arregla en un minuto poniendo esas celdas (las de
+      tipo 30/30, 9.5/10, 26,5/30) en formato Texto, una sola vez. Se ven igual,
+      pero ya no se convierten.
+
+
+6) EL PARÉNTESIS DE LA SUGERENCIA
+
+   "Promover hábitos de vida saludables
+    (estrategias de compensación, no multitarea)"
+
+   El paréntesis es específico de este paciente; en el otro informe dice
+   "(mejorar calidad del sueño y técnicas de relajación)". La plantilla de
+   criterios de cierre no tiene paréntesis en esa viñeta.
+
+   -> ¿Está bien que lo propongamos nosotros según el perfil, para que vos lo
+      ajustes? ¿O preferís escribirlo siempre a mano?
+
+
+=====================================================================
+PARTE 3 - LOS DATOS ESTÁN, NOS FALTA EL CRITERIO
+=====================================================================
+
+7) LA CATEGORÍA DIAGNÓSTICA  (esta es la que más nos importa entender)
+
+   El informe cierra así:
+   "En conclusión, el Sr. [apellido] presentó un rendimiento cognitivo normal
+    con leves fallas aisladas en recuperación de la memoria."
+   y usa las sugerencias de "rendimiento normal con fallas aisladas".
+
+   Cuando aplicamos el documento de criterios de cierre tal como está escrito,
+   nos da otra categoría, y bastante distinta:
+
+     - "Rendimiento normal con fallas aisladas" dice: Z entre -1 y -1,5 en
+       pruebas aisladas + AVD conservadas
+     - "DCL clásico" dice: Z < -1,5 + AVD conservadas
+
+   Este paciente tiene AVD 8 (conservadas), pero dos puntajes bastante por
+   debajo de -1,5:
+        BEM-MS Sem  ->  en la tabla figura "≤-3" (el valor calculado es -3,11)
+        BEM-MS CE   ->  -2,01
+   El resto va de -1,24 a +2,31.
+
+   Por el documento saldría "deterioro cognitivo leve", con seguimiento por
+   neurología y reevaluación a 12 meses. El informe dice "dentro de parámetros
+   normales" con seguimiento según evolución.
+
+   -> Entendemos que las leíste como fallas aisladas y no como perfil de DCL
+      (2 puntajes sobre 14, con el resto conservado o alto). Lo que nos falta es
+      el criterio para poder replicarlo:
+
+      - ¿Cuántas pruebas bajas hacen falta para que deje de ser "aislado"?
+      - ¿Pesan distinto según la prueba? (Sem y CE son submedidas de memoria
+        seriada; el puntaje general del área, el AST, dio -0,90, normal)
+      - ¿O se mira el área en conjunto más que prueba por prueba?
+
+      Revisamos el documento de criterios completo y esto no está definido ahí.
+      Es lo único que no se arregla agregando celdas al Excel, y es la parte que
+      define el diagnóstico y las recomendaciones que lee el paciente, así que
+      preferimos no adivinar.
+
+
+8) LAS PALABRAS DE CADA ÁREA
+
+   "Impresión diagnóstica del área: rendimiento cognitivo conservado"
+
+   Deducimos los cortes mirando los dos informes, pero es deducción nuestra:
+      alto            -> Z arriba de +1
+      conservado      -> Z entre -1 y +1
+      bajo, no defic. -> Z entre -1 y -2
+      deficitario     -> Z abajo de -2
+
+   -> ¿Son esos los cortes? ¿Y "conservado" y "normal" son lo mismo, o
+      significan cosas distintas?
+
+
+9) EL PUNTAJE BRUTO DEL BEM-MS AST
+
+   En la tabla figura PB 7,66.
+   Los tres ensayos son 5, 8 y 10, y el promedio da 7,6667. O sea que 7,66 está
+   truncado; redondeado sería 7,67.
+
+   No es un detalle estético: cambia el Z. Con 7,66 el Z sale -0,90, con 7,67
+   saldría -0,89.
+
+   -> ¿Truncás a propósito? Y si siempre es el promedio de los tres ensayos,
+      ¿te sirve que esa celda se calcule sola en vez de cargarla a mano?
+
+
+10) UNA FRASE DEL ÁNIMO QUE NOS DEJÓ DUDANDO
+
+   El informe dice:
+   "Anímicamente, se encuentra bien, 'con poco estrés o sobrecarga
+    laboral/finaciera'."
+
+   La nota del Excel dice:
+   "- Animicamente: 'bárbaro', 'cierto estrés cerebral y financiero'."
+
+   La nota dice "cierto estrés" y el informe "poco estrés", y el cambio quedó
+   dentro de una comilla que se lee como cita textual del paciente.
+
+   -> ¿Fue criterio tuyo (matizarlo por lo que viste en la entrevista) o se
+      escapó al tipear?
+
+      Te lo preguntamos porque define la regla: por ahora el sistema transcribe
+      la nota como está y no la suaviza. Si esperás que ajuste el tono según
+      criterio clínico, necesitamos que nos lo digas, porque es el punto donde
+      un error sería más difícil de detectar leyendo el informe terminado.
+
+
+11) LOS ANTECEDENTES FAMILIARES
+
+   En las notas del Excel está:
+   "- Antecedentes mamá con EA (temprano - a los 65 aprox)"
+   pero en el informe no aparece en ninguna parte.
+
+   -> ¿Los antecedentes familiares se omiten siempre del informe escrito, o en
+      este caso fue una decisión puntual?
+
+
+=====================================================================
+UN CAMPO QUE FALTA Y NO SE VE EN ESTE INFORME
+=====================================================================
+
+Además de los 11 de arriba, hay un dato que acá no hizo falta porque el paciente
+dio normal, pero que sí necesitamos para otros casos:
+
+   EL "RIESGO DE EVOLUCIÓN" (sí / no)
+
+Es una de las 6 categorías del documento de criterios ("DCL con mayor riesgo de
+evolución") y, por lo que nos contaste, es criterio clínico puro de lo que ves en
+la entrevista: no se saca de ningún puntaje.
+
+   -> ¿Agregamos una celda Sí/No en el Excel? Sin ella esa categoría nunca se
+      podría elegir.
+
+
+=====================================================================
+
+Y aparte de las dudas: el Excel nuevo resolvió un montón. Las 36 filas de la
+tabla, los datos del paciente, el AVD, el K-10 total, el gráfico de perfil
+cognitivo y las notas de la entrevista salen todos de ahí sin abrir nada más.
+Con el punto 1 cerrado ya no habría que tocar el papel, y con el 2 tampoco la
+historia clínica.
+
+Gracias!

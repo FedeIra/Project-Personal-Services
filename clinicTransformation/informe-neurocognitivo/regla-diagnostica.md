@@ -1,8 +1,55 @@
 # Regla diagnóstica y sugerencias
 
 > Extraído de `modeloDiagnosticoYSugerencias.docx`. 6 categorías, elegidas por Z + AVD + K-10 +
-> riesgo de evolución. La skill elige UNA categoría y devuelve su texto de sugerencias tal cual
-> (con los "(…)" completados según el paciente) — no debe redactar sugerencias propias.
+> riesgo de evolución. La skill elige UNA categoría y parte de su texto, completando los "(…)" según
+> el paciente.
+
+## 🚩 ANTES DE USAR ESTA REGLA: no reproduce la decisión real del profesional
+
+Aplicada literalmente al paciente de `informeFinal2.docx`, esta regla da una categoría **distinta**
+de la que eligió el profesional:
+
+- Datos: **AVD = 8** (conservadas) · dos Z por debajo de −1,5 (BEM–MS Sem `≤-3`, crudo −3,11; y
+  BEM–MS CE `-2,01`) · el resto entre −1,24 y +2,31.
+- **La regla de abajo** → "Z < −1,5 + AVD conservadas" = **categoría 3, DCL clásico**.
+- **El informe real** → "rendimiento cognitivo normal con leves fallas aisladas en recuperación de la
+  memoria", con las sugerencias de la **categoría 2**.
+
+Es la diferencia entre *"compatible con un deterioro cognitivo leve"* + seguimiento por neurología y
+reevaluación a 12 meses, y *"dentro de parámetros normales"* + seguimiento según evolución.
+
+Lo que falta en la regla escrita es **cuántas pruebas bajas, y de qué peso, configuran un perfil** en
+vez de "fallas aisladas" — dos submedidas de memoria seriada bajas sobre 14 pruebas, con el resto
+conservado o alto, el profesional las leyó como aisladas. La regla no tiene esa noción.
+
+> **Implicancia para la skill:** **no elegir categoría en silencio.** Proponer la que sale de la
+> regla, mostrar los Z que la disparan, y **advertir explícitamente** que el criterio de
+> "aisladas vs. perfil" no está definido y que la decisión final es del profesional. Vale tanto para
+> el límite de −1,5 como para la elección entre las 6 categorías.
+>
+> Pendiente de resolver: `../preguntasParaLaProfesional.md` §A.0 — es la pregunta de mayor impacto
+> de todo el pipeline.
+
+## ⚠️ Los templates se adaptan, no se copian literalmente
+
+La versión anterior de este archivo decía que las sugerencias se devuelven "tal cual, sin redactar
+nada propio". **Los dos informes reales lo contradicen**, de forma consistente:
+
+- **La viñeta de hábitos siempre lleva un paréntesis específico del paciente:**
+  - `informeFinal2.docx`: `Promover hábitos de vida saludables (estrategias de compensación, no multitarea)`
+  - `informeFinal.docx`: `Promover hábitos de vida saludables (mejorar calidad del sueño y técnicas de relajación)`
+  - Template (categorías 1 y 2): `Promover hábitos de vida saludables`, sin paréntesis.
+- **La frase de cierre también se adapta.** `informeFinal2` es categoría 2 y cerró con
+  `rendimiento cognitivo normal con leves fallas aisladas en recuperación de la memoria`, donde el
+  template dice `fallas atencionales/ejecutivas aisladas` — porque en ese paciente las fallas eran
+  mnésicas, no ejecutivas. `informeFinal` usó la primera oración del template de categoría 2 y
+  **omitió** la segunda.
+
+**Regla operativa:** el template es el punto de partida y la lista de viñetas se respeta (mismas
+viñetas, mismo orden, sin agregar ni quitar recomendaciones clínicas). Lo que se localiza es el
+paréntesis de hábitos y la redacción de la frase de cierre, para que describan a **este** paciente.
+La skill no inventa recomendaciones clínicas nuevas ni cambia el sentido de una viñeta; sí ajusta la
+localización, y entrega todo como borrador para revisión.
 
 ## Cortes de referencia
 
@@ -22,8 +69,19 @@
 
   Corte 0–5 = comprometidas / 6–8 = conservadas: es criterio diagnóstico del profesional (la escala
   original no distingue conservadas/comprometidas), ya confirmado.
+
+  ⚠️ **Esta tabla clasifica; no dicta el texto del informe.** La palabra que va en la columna Z de la
+  tabla de síntesis la escribe el profesional en el Excel (`E27`) y **se copia tal cual**. Los dos
+  informes usan `Autónomo` / `Autónoma` (según el género del paciente) donde esta tabla dice
+  `Independencia`. No "corregir" el Excel contra esta tabla: `E27` es pass-through.
+- **K-10:** la interpretación que va al Word sale de `E28` del Excel (`Normal` en `informeFinal2`,
+  con total 15). El corte ≥ 25 se usa para **elegir categoría diagnóstica**, no para redactar esa
+  celda.
 - **Riesgo de evolución:** flag 100% manual, criterio clínico/observación en vivo durante la
   entrevista. La skill **nunca** debe intentar inferirlo — llega ya decidido en el Excel.
+  ⚠️ **`excelEvaluacionCompleto.xlsx` todavía no tiene este campo**, así que la categoría 5 es
+  inalcanzable hasta que se agregue (ver `excel-unificado-spec.md` §A.3). Si falta, la skill debe
+  señalarlo en vez de asumir "No".
 
 ## Las 6 categorías
 

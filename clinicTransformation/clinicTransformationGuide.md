@@ -21,3 +21,40 @@ Luego en cada función cognitiva se debe explicar cómo rindió en palabras que 
 Luego de las funciones cognitivas viene una parte de conclusiones donde se resume lo anterior respecto a las funciones cognitivas donde dice qué función está conservada, cuál tiene un rendimiento alto, normal, bajo o deficitario que también ya viene con un texto sobre cómo rindio que se usa de modelo y se ajusta. Y concluye con un diagnóstico y sugerencias. Las sugerencias según los datos Z vienen de un archivo de word con cada tipo de diagnostico y qué sugiere en cada caso (modeloDiagnosticoYSugerencias.docx).
 
 Una vez finalizado el archivo de word se convierte en pdf y manda por email.
+
+---
+
+## Actualización — el pipeline cambió (2026-09-07)
+
+Este documento describe el flujo **original**, con dos archivos de entrada
+(`formulasExcelEvaluacion.xlsx` + `evaluacion.pdf`) más la historia clínica online. Sigue siendo
+válido como descripción del proceso manual, con estas correcciones:
+
+1. **Ya existe un Excel unificado: `excelEvaluacionCompleto.xlsx`.** Mantiene la hoja
+   `TABLA DE FORMULAS` con el cuadro de fórmulas original intacto y agrega debajo lo que antes sólo
+   vivía en el papel o en la historia clínica online: las 36 filas de la tabla de síntesis, AVD,
+   K-10, el bloque demográfico del paciente y las notas de la anamnesis. El objetivo es que sea la
+   **única** entrada necesaria. Todavía no lo es — ver los faltantes en
+   `planSkillInformeNeurocognitivo.md` §9.
+
+2. **Ejemplo de informe generado desde ese Excel: `informeFinal2.docx`.** Es el par entrada/salida
+   real del mismo paciente, y de ahí se reconstruyó el mapeo completo de qué celda alimenta qué
+   bloque del Word: `informe-neurocognitivo/mapeo-excel-a-word.md`.
+
+3. **Corrección de tipeo de este documento:** donde dice "el archivo de `evaluacion.pdf` ya viene con
+   un texto sobre cómo rindió que se usa de modelo" debería decir **`informeFinal.docx`**. Ése es el
+   archivo que se usa como referencia de tono/estilo para los párrafos por función cognitiva.
+
+4. **Precisión sobre la tabla SÍNTESIS DEL RENDIMIENTO:** este documento dice que se pasan a mano PB
+   y Z "y además agrega una X en la columna que corresponde". Correcto para las 15 pruebas con Z. Las
+   otras 21 filas son cualitativas: **el valor va en la columna PB y no llevan X** (salvo AVD y
+   KPDS-10, que ponen el número en PB y la palabra de interpretación en Z). Detalle en
+   `informe-neurocognitivo/orden-filas-sintesis.md`.
+
+5. **Precisión sobre los gráficos:** los valores que se pegan en "modificar datos en Excel" no son el
+   Z crudo, sino el **redondeado a 2 decimales y capado en ±3**, igual que en la tabla. El segundo
+   gráfico (K-10 por síntoma) todavía se transcribe del papel, porque el Excel guarda sólo el total.
+
+6. ⚠️ **`excelEvaluacionCompleto.xlsx` e `informeFinal2.docx` contienen datos de un paciente real**
+   (a diferencia de `informeFinal.docx`, que se había confirmado como ficticio). Tenerlo en cuenta
+   antes de compartirlos o de incluirlos en un paquete que se sube a un servicio externo.
