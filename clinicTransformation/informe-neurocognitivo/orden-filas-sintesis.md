@@ -56,8 +56,9 @@ Celdas de `excelEvaluacionCompleto.xlsx`, hoja `TABLA DE FORMULAS` (esquema comp
 | 35 | Visoconstrucción | TRO | Cualitativa | `D43` | — |
 | 36 | | MMSE copia | Cualitativa | `D44` | — |
 
-⚠️ `D31` está corrompida en el Excel entregado (guarda un serial de fecha en vez de `7/10`) — ver
-`excel-unificado-spec.md` §A.1.
+⚠️ `D31` está corrompida en el Excel entregado (guarda un serial de fecha en vez de `7/10`). ✅
+Aclarado (2026-09-07): el IFS Índice MT **deriva de Dígitos Atrás + Memoria de Trabajo Visual** — no
+es una fecha; conviene fórmula o formato Texto. Ver `excel-unificado-spec.md` §A.1.
 
 ## Cómo se completa cada fila: PB, Z y la X de rango
 
@@ -194,8 +195,9 @@ de 9 columnas, o se completan a mano (son 4 celdas en total).
 
 ## Pendiente
 
-> Ver también `../preguntasParaLaProfesional.md` (§B.5 desempate de rangos, §A.5 truncado del PB de
-> AST, §C.1 la leyenda del trazado diagonal).
+> Ver también `../preguntasParaLaProfesional.md` (§B.5 desempate de rangos, §C.1 la leyenda del
+> trazado diagonal). El §A.5 (truncado del PB de AST) quedó **resuelto**: promedio de los 3 trials
+> truncado a 2 decimales, por fórmula (`excel-unificado-spec.md` §A.6).
 
 - **Desempate cuando el Z cae justo en un límite** entre dos columnas (`-2 a -1` y `-1 a 0` ambos
   tocan el −1). Propuesta: límite inferior inclusive, superior exclusivo. **Los dos informes no lo

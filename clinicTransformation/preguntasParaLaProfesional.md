@@ -1,14 +1,47 @@
 # Preguntas pendientes para la profesional
 
-> Lista consolidada de todo lo que quedó sin confirmar, reunido de
-> `planSkillInformeNeurocognitivo.md`, `opcionesAutomatizacion.md` y los archivos de
-> `informe-neurocognitivo/`. Pensada para llevar a una sola conversación.
+> Lista consolidada de todo lo que quedó sin confirmar, reunido de `clinicTransformationGuide.md` y
+> los archivos de `informe-neurocognitivo/`. Pensada para llevar a una sola conversación.
 >
 > Ordenada por **impacto**: el bloque A cambia lo que la skill puede producir, el B define cuánta
 > libertad tiene al redactar, el C son detalles de la plantilla y el D es housekeeping. Si el tiempo
 > alcanza sólo para una parte, **el bloque A es el que desbloquea trabajo**.
 >
 > Cada pregunta trae el hallazgo que la motiva, para no tener que explicar el contexto de nuevo.
+
+---
+
+## ✅ Respondidas por la profesional (2026-09-07)
+
+La mayoría de las preguntas ya tienen respuesta. Resumen (el detalle ya se volcó a los `.md` de la
+skill y al `excel-unificado-spec.md`):
+
+| Pregunta | Respuesta / decisión |
+|---|---|
+| **A.0** categoría diagnóstica | La regla literal sobre-diagnostica. **CE es submedida** (promedio de Sem+Rec), "no pesa tanto"; la memoria se lee por sus índices (AST/RSE/Rec). Estrictamente este paciente = **fallas aisladas**, no DCL. La skill propone y **el médico decide**. → `informe-neurocognitivo/regla-diagnostica.md` (recuadro). Falta sólo un umbral numérico general (abierto). |
+| **A.1** 10 ítems K-10 | ✅ "Pasemos cada ítem al Excel." Total por `SUMA`. |
+| **A.2** riesgo de evolución | ✅ Agregar celda **Sí/No**; determina las sugerencias diagnósticas. |
+| **A.3** `D31` IFS Índice MT | ✅ No es fecha: **deriva de Dígitos Atrás + Memoria de Trabajo Visual**. Fórmula o formato Texto. |
+| **A.4** C-QSM | ✅ A veces se toma. Si se toma: quejas = **> 3 puntos**. Si no: sale de la anamnesis. Celda opcional. |
+| **A.5** PB de AST | ✅ **Promedio de los 3 trials, truncado a 2 decimales**, por fórmula. |
+| **B.1** anamnesis | ✅ **No matizar**, transcribir tal cual (ella toma notas más claras). Expandir el punteo a prosa, sin cambiar el fondo ni las citas. |
+| **B.2** antecedentes familiares | ✅ **Incluirlos** (no se omiten). |
+| **B.3** léxico Z → palabra | ✅ `alto` > 1 · `conservado`/`normal` (**lo mismo**) −1,49 a 1 · `bajo` −1,99 a −1,5 · `deficitario` ≤ −2. |
+| **B.4** paréntesis de sugerencias | ✅ La skill lo propone y ella lo edita; **se deriva de la anamnesis** (si ya usa la estrategia, no sugerirla). |
+| **Consulta §2** "asiste solo" | ✅ Agregar celdas **Acompañado Sí/No + por quién** (familiar/amigo/hijo/esposa). |
+| **Consulta §3** orientación | ✅ Agregar orientación temporal/espacial (subpuntaje del MMSE o dos Sí/No). |
+| **D.3** nota truncada `B58` | ✅ Son notas en vivo, error de tipeo suyo; irrecuperable, la skill la deja como está. |
+
+### Siguen abiertas
+- **B.5** desempate cuando el Z cae justo en un límite de rango.
+- **B.6** prioridad entre categorías (compromiso anímico + riesgo de evolución simultáneos).
+- **B.7** sobrescribir el corte de K-10.
+- **C.1–C.6** detalles de la plantilla de Word (leyenda diagonal, `del área`/`por área`, `Deriva:`,
+  `INECO` vs `IFS Total`, separador decimal del TRO, si PRUEBAS ADMINISTRADAS es lista fija).
+- **D.1** ejemplo anonimizado para el paquete · **D.2** hojas `Stroop`/`MMSE` · **D.4** columna vacía
+  de la hoja del gráfico.
+
+> El detalle original de cada pregunta se conserva abajo para referencia.
 
 ---
 

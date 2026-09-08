@@ -67,12 +67,11 @@ Word son 3 filas de la tabla de síntesis:
 | `L14` (comb. `L14:L16`) | `=(K14+K15+K16)/3` → alimenta el PB de AST (`D13`), **cargado a mano** |
 | `K19` | `=(D15+D16)/2` → chequeo del PB de CE (`D17`) |
 
-⚠️ **`D13` se carga a mano y en `informeFinal2` quedó truncado, no redondeado.** Ensayos 5, 8 y 10 →
-`L14` = `7,6667`, y el PB cargado fue **`7,66`** (redondear daría `7,67`). **No es cosmético: mueve el
-Z** — con 7,66 el Z es `-0,90`; con 7,67 sería `-0,89`. El otro informe no distingue (`5,3333` →
-`5,33` por las dos vías). **A confirmar** si el truncado es deliberado, y si conviene que `D13` salga
-por fórmula en vez de a mano (`preguntasParaLaProfesional.md` §A.5). Mientras no se confirme, la
-skill **usa el PB tal como está cargado en `D13`** y no lo recalcula.
+✅ **Confirmado (2026-09-07): `D13` = promedio de los 3 trials, truncado a 2 decimales.** Ensayos 5,
+8 y 10 → `L14` = `7,6667`, y el PB correcto es **`7,66`** (truncado, no `7,67`). **No es cosmético:
+mueve el Z** — con 7,66 el Z es `-0,90`; con 7,67 sería `-0,89`. La profesional prefiere que `D13`
+**se calcule solo** (fórmula tipo `=TRUNCAR(L14; 2)`) en vez de cargarse a mano — ver
+`excel-unificado-spec.md` §A.6. La skill **usa el PB tal como está en `D13`** y no lo recalcula.
 
 ### Bloque cualitativo (`C25:F44`) — sin Z numérico
 
@@ -111,8 +110,8 @@ entrevista, una viñeta por celda, en telegrama y con comillas textuales del pac
 ## 2. Estructura del Word y de dónde viene cada parte
 
 En orden de aparición en `informeFinal2.docx`. ⚠️ **Esta numeración es el orden del documento Word y
-no coincide con la de los bloques de salida de `SKILL.md` / plan §3**, que agrupa distinto (11
-bloques de output, no 12 partes del documento). Cuando importe, referirse a los bloques por nombre.
+no coincide con la de los bloques de salida de `SKILL.md`**, que agrupa distinto (11 bloques de
+output, no 12 partes del documento). Cuando importe, referirse a los bloques por nombre.
 
 | # | Bloque del Word | Tipo | Origen |
 |---|---|---|---|
@@ -162,6 +161,15 @@ operativa es la misma:
 > skill no debe suavizar, reinterpretar ni reencuadrar el contenido anímico: transcribe lo que dice
 > la nota. Si una nota es ambigua, la deja ambigua y lo señala; no elige una lectura.
 
+✅ **Confirmado (2026-09-07):** la profesional pidió **que NO matice** — *"que lo ponga tal cual yo lo
+tipié"* — y asume el trabajo de tomar notas más claras. El `"cierto estrés"` → `"poco estrés"` fue un
+desliz de tipeo suyo, no un criterio a replicar.
+
+**Matiz importante (no contradice lo anterior):** las notas son un **punteo en vivo**, en telegrama,
+que ella luego pasa "a texto más completo y coherente". Entonces la skill **sí expande** el punteo a
+prosa (gramática, conectores, tercera persona), pero **preserva el contenido y las citas textuales
+verbatim** — expande la *forma*, nunca cambia el *fondo* ni suaviza una comilla del paciente.
+
 Convenciones observadas en los dos informes:
 
 - Primer párrafo, forma fija: `El Sr./La Sra. <Apellido> asiste solo/a a la consulta para la
@@ -170,11 +178,17 @@ Convenciones observadas en los dos informes:
   actividades de la vida diaria.`
 - Verbos de reporte rotados: `Refiere` · `Relata` · `Reporta` · `Menciona` · `En lo que concierne a`.
 - Género y concordancia salen del paciente (`autónomo`/`autónoma`, `solo`/`sola`).
-- Las notas internas de protocolo **no se redactan**: `B56` = `- PROTOCOLO XTEND` no aparece en el
-  Word. Tampoco aparece el antecedente familiar de `B57` (`mamá con EA`) — se omitió.
-  → **Qué se omite es criterio del profesional. La skill incluye todo y marca lo dudoso**, en vez de
-  decidir sola qué dejar afuera.
-- `B58` está **truncada dentro del propio Excel** — ver §5.4.
+- Las **notas internas de protocolo no se redactan**: `B56` = `- PROTOCOLO XTEND` no aparece en el
+  Word (es nota de trabajo, no del informe).
+- **Antecedentes familiares → SÍ se incluyen.** ✅ Confirmado (2026-09-07): la omisión de `B57`
+  (`mamá con EA`) en `informeFinal2` no es la regla — *"a veces se mencionan, a veces no, pero no
+  estaría mal, más en este caso que hay antecedentes, mencionarlo"*. → La skill **incluye** el
+  antecedente familiar en la anamnesis (antes este archivo decía que se omitía).
+- En general: **la skill incluye todo y marca lo dudoso**, sin decidir sola qué dejar afuera; lo único
+  que no se redacta son las notas internas de protocolo.
+- `B58` está **truncada dentro del propio Excel** — ver §5.4. ✅ Aclarado: son notas en vivo con el
+  paciente enfrente y a veces quedan a medias; es error de tipeo de la profesional, no un problema de
+  lectura. **Irrecuperable** — la skill la deja como está y lo señala.
 
 ---
 
@@ -191,8 +205,17 @@ conservados (MMSE=30/30; TRO= 9,5/10; INECO=26,5/30) para su edad y nivel educat
 → `MMSE` de `D25`, `TRO` de `D26`, `INECO` de `D30` (**el Word lo llama INECO; el Excel y la tabla de
 síntesis lo llaman IFS Total**).
 
-La frase de malestar psicológico se deriva de `D28`/`E28` y la de autonomía de `D27`/`E27`. La
-mención a quejas subjetivas de memoria sale del **C-QSM, que no está en el Excel** (§5.3).
+La frase de malestar psicológico se deriva de `D28`/`E28` y la de autonomía de `D27`/`E27`.
+
+✅ **Aclarado (2026-09-07):**
+- **Orientación temporal y espacial:** sale del subpuntaje de orientación del MMSE (sección
+  `ORIENTACIÓN (10 puntos)` del papel), que hoy no está desglosado en el Excel. La profesional agrega
+  celdas para esto (subpuntaje o dos Sí/No — ver `excel-unificado-spec.md` §A.7). La frase pasa a
+  ser condicional: si alguna orientación **no** está conservada, la skill lo refleja en vez de dar el
+  boilerplate `orientación temporal y espacial conservadas`.
+- **Quejas subjetivas de memoria (C-QSM):** el C-QSM **a veces se toma y a veces no**. Si se tomó, la
+  presencia de quejas la determina un **corte > 3 puntos**; si no, la observación **deriva de la
+  anamnesis / motivo de consulta** (§5.3).
 
 ### 4.2 Secciones por área (bloque 9)
 
@@ -206,9 +229,17 @@ Cuatro secciones, siempre en este orden y con esta forma de tres partes:
    Calificaciones observadas: `conservado`, `conservado-alto`.
 3. Un párrafo que recorre las pruebas del área traduciendo cada Z a vocabulario clínico.
 
-Léxico Z → palabra, **inferido** de los dos pares informe/Excel (no es una tabla que el profesional
-haya entregado — **a confirmar**): `alto` para Z ≳ +1 · `conservado` / `normal` para Z ≈ −1 a +1 ·
-`bajo (no deficitario)` para Z ≈ −1 a −2 · `deficitario` para Z ≲ −2. El párrafo nombra la función,
+Léxico Z → palabra ✅ **confirmado por la profesional (2026-09-07)** — cortes exactos:
+
+| Palabra | Z |
+|---|---|
+| `alto` | > 1 |
+| `conservado` / `normal` (**son lo mismo**) | −1,49 a 1 |
+| `bajo` (no deficitario) | −1,99 a −1,5 |
+| `deficitario` | ≤ −2 |
+
+Nótese que el corte `conservado`/`bajo` cae en **−1,5**, el mismo umbral que separa "normal" de
+"DCL" en la regla diagnóstica. El párrafo nombra la función,
 no la sigla: `span atencional` (DD) · `retrogresión` / `memoria de trabajo` (DI) · `rastreo visual y
 velocidad de procesamiento` (TMT A) · `flexibilidad cognitiva` (TMT B) · `prueba ejecutiva` (IFS) ·
 `denominación` (TBA).
@@ -240,8 +271,10 @@ Ordenados por impacto. La corrección propuesta para cada uno está en `excel-un
 `D31` guarda el número **`46302`** con formato de fecha, es decir **07/10/2026**. El Word dice `7/10`.
 Lo que pasó: se tipeó `7/10` y Excel lo interpretó como fecha.
 
-**El valor real es irrecuperable desde el Excel** — sólo se sabe que era `7/10` por haber leído el
-Word. Es el único hallazgo que **destruye datos en silencio**, y el más barato de arreglar.
+✅ **Aclarado (2026-09-07): no es una fecha.** El IFS Índice MT **deriva de la suma de la puntuación
+de Dígitos Atrás + Memoria de Trabajo Visual.** → Si esos ítems están en el Excel, `D31` puede salir
+**por fórmula** y no depende de tipeo; si se deja manual, va en formato **Texto**. Ver
+`excel-unificado-spec.md` §A.1. (El valor puntual de este paciente igual se conoce del Word: `7/10`.)
 
 ### 5.2 Los 10 ítems del K-10 no están — el gráfico 2 es imposible
 
@@ -249,15 +282,21 @@ El gráfico `Escala K-10` necesita 10 valores por síntoma. La hoja de datos emb
 `informeFinal2.docx` tiene `2, 4, 1, 1, 2, 1, 1, 1, 1, 1` (suma **15**). El Excel guarda **sólo el
 total**, en `D28` = `15`.
 
-→ El **gráfico K-10** del informe **no puede generarse desde el Excel**. Hoy esos 10 valores se transcriben
-del papel.
+→ El **gráfico K-10** del informe **no puede generarse desde el Excel** todavía. ✅ Confirmado
+(2026-09-07): la profesional **agrega los 10 ítems al Excel** (total `D28` = `SUMA(...)`). Una vez
+actualizado el archivo, el gráfico sale del Excel; hasta entonces, esos 10 valores se transcriben del
+papel.
 
 ### 5.3 El C-QSM no está en el Excel
 
 `Cuestionario de quejas subjetivas de memoria (C-QSM)` figura en `PRUEBAS ADMINISTRADAS` y su
 resultado se usa en la narrativa de screening (`…ni quejas subjetivas de memoria significativas`),
-pero no aparece ni en el Excel ni en la tabla de síntesis. Es el único test administrado sin ninguna
-celda propia.
+pero no aparece ni en el Excel ni en la tabla de síntesis.
+
+✅ **Aclarado (2026-09-07):** el C-QSM **a veces se toma y a veces no** (aparecía fijo en PRUEBAS
+ADMINISTRADAS por error). **Cuando se toma:** presencia de quejas = **puntaje > 3**. **Cuando no:** la
+observación deriva de la anamnesis / motivo de consulta. Se agrega una **celda de puntaje opcional**
+(ver `excel-unificado-spec.md` §A.4); no es fila obligatoria de la tabla de síntesis.
 
 ### 5.4 `B58` está truncada dentro del Excel
 
@@ -285,10 +324,12 @@ El rótulo existe pero el valor no se carga; el nombre real vive en `C46`. Redun
 
 ## 6. Datos sensibles
 
-`excelEvaluacionCompleto.xlsx` e `informeFinal2.docx` son de un **paciente real**: nombre y apellido,
-fecha de nacimiento, nivel educativo, lateralidad, antecedente familiar de Alzheimer, notas de sueño
-y estado de ánimo, y citas textuales de la entrevista.
+`../ejemplos/excelEvaluacionCompleto.xlsx` e `../ejemplos/informeFinal2.docx` son de un **paciente
+real**: nombre y apellido, fecha de nacimiento, nivel educativo, lateralidad, antecedente familiar de
+Alzheimer, notas de sueño y estado de ánimo, y citas textuales de la entrevista.
 
 Eso es inevitable en el **Excel de entrada** (es el archivo de trabajo del profesional, se adjunta
 por paciente). No es inevitable en el **paquete de la skill**: lo que se sube a claude.ai queda
-publicado ahí de forma persistente. Ver la nota de `SKILL.md` sobre `ejemplo-informeFinal.docx`.
+publicado ahí de forma persistente. Por eso el modelo de tono del paquete es `ejemplo-informe.md`
+(datos ficticios), no `informeFinal2`. Ver la sección "Datos sensibles del paquete de la skill" en
+`SKILL.md`.

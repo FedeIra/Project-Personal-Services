@@ -98,11 +98,13 @@ Son enteros (1 a 5 por ítem), sin decimales ni cap.
 > (con espacio final). Están así en los dos archivos. Sólo importa si algún día se hace lookup por
 > nombre; para el paste de valores es irrelevante, porque es posicional.
 
-### ⚠️ Estos 10 valores hoy NO salen del Excel
+### ⚠️ Estos 10 valores todavía NO salen del Excel entregado (pero ya está acordado que sí saldrán)
 
 `excelEvaluacionCompleto.xlsx` guarda **sólo el total** del K-10 (`D28` = `15`), no el desglose. Los
 10 valores del gráfico de `informeFinal2.docx` (`2, 4, 1, 1, 2, 1, 1, 1, 1, 1`, que suman 15) se
 transcriben del papel.
 
-→ **La skill no puede generar este bloque desde el Excel.** Debe decirlo explícitamente en vez de
-inventar un desglose que sume el total. Arreglo propuesto en `excel-unificado-spec.md` §A.2.
+✅ **Confirmado (2026-09-07):** la profesional **agrega los 10 ítems al Excel** (total por `SUMA`),
+en este mismo orden. Una vez actualizado el archivo, la skill **sí genera** este bloque desde el
+Excel. Hasta entonces: **debe decir explícitamente que faltan** en vez de inventar un desglose que
+sume el total. Arreglo en `excel-unificado-spec.md` §A.2.

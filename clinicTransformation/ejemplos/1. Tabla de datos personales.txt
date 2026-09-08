@@ -1,0 +1,164 @@
+1. Tabla de datos personales
+Campo	Valor
+Paciente:	Bunader, José Alberto
+Edad:	61 años
+Fecha de nacimiento:	08/09/1964
+Nivel educativo alcanzado:	Terciario
+Lateralidad:	Diestro
+Fecha de evaluación:	31/08/2026
+2. MOTIVO DE CONSULTA Y ANTECEDENTES
+
+El Sr. Bunader asiste [PENDIENTE: falta el dato de "Acompañado" — no está en el Excel] a la consulta para la realización de una evaluación neurocognitiva de control.
+
+Refiere antecedentes familiares de enfermedad de Alzheimer en la madre, de inicio temprano (aproximadamente a los 65 años).
+
+En cuanto a quejas subjetivas de memoria, menciona que olvida cosas puntuales (relata que fue a un partido y por ahí [NOTA: la frase queda cortada tal cual está tipeada en el Excel — celda B58 truncada, irrecuperable]).
+
+Relata que maneja una empresa, con modalidad a veces presencial y a veces no, y que se encuentra "siempre con el bendito teléfono, siempre conectado"; algunos días se toma un descanso dedicado a la pesca, y refiere que "vuelve a casa liquidado".
+
+Mantiene vida social y familiar presente.
+
+En cuanto a la actividad física, realiza yoga dos veces por semana y gimnasio tres veces por semana, y refiere que "no lo negocia, lo hace con ganas".
+
+Con respecto al sueño, reporta que "duerme bien pero duerme poco", con despertares para ir al baño; a veces se despierta entre las 4 y las 5 y le cuesta volver a dormir, y en ocasiones duerme menos de 5 a 6 horas.
+
+Anímicamente, se encuentra "bárbaro", aunque menciona "cierto estrés cerebral y financiero".
+
+Vive en pareja y, según autoreporte, es autónomo en las actividades de la vida diaria.
+
+3. Tabla SÍNTESIS DEL RENDIMIENTO (3 bloques de paste)
+
+Bloque 1 — filas 1–2 (MMSE, TRO):
+
+30/30			
+9,5/10
+
+(PB, Z vacía, 8 vacías cada una)
+
+Bloque 2 — filas 3–4 (AVD, KPDS-10):
+
+8	Autónomo
+15	Normal
+
+Bloque 3 — filas 5–36 (formato: PB · Z · <-3 · -3a-2 · -2a-1 · -1a0 · 0a+1 · +1a+2 · +2a+3 · >+3):
+
+7	0,45					X		
+4	-0,35				X			
+38	-0,18				X			
+42	1,02					X		
+24	2,31						X	
+26,5/30						
+[PENDIENTE - dato corrupto]						
+3 normal						
+3 normal						
+3 normal						
+4 normal						
+2 normal						
+3 normal						
+2,5 normal						
+6 normal						
+5						
+8						
+10						
+7,66	-0,90				X			
+8	-0,13				X			
+8	≤-3	X						
+12	0,57					X		
+10	-2,01		X					
+7	-1,24			X				
+8	-0,51				X			
+24	2,31						X	
+20	-0,30				X			
+10	-0,86				X			
+Normal						
+Normal						
+9,5/10						
+Normal
+
+⚠️ Fila 11 (IFS Índice MT): la celda D31 guarda una fecha (07/10/2026) en vez del valor real — dato corrompido, no lo inventé. Ver bloque 11.
+
+4. Valores del gráfico 1 (14 valores Z, punto decimal)
+0.45
+-0.35
+-0.18
+1.02
+-0.9
+-0.13
+-3
+0.57
+-2.01
+-1.24
+-0.51
+2.31
+-0.3
+-0.86
+
+Pegar empezando en la celda inmediatamente debajo del encabezado con el año (2026).
+
+5. Valores del gráfico 2 (K-10)
+
+No se puede generar. El Excel solo trae el total (D28=15), no el desglose de los 10 ítems. Necesito que me pases el desglose del papel (o que la profesional lo cargue en el Excel) para completar este bloque.
+
+6. Sección de screening
+
+Rendimiento cognitivo general inicial (evaluado a partir de pruebas de screening) con puntajes conservados (MMSE=30/30; TRO=9,5/10; INECO=26,5/30) para su edad y nivel educativo.
+
+Orientación temporal y espacial: [PENDIENTE — no está desglosado en el Excel], no puedo confirmar si están conservadas.
+
+En cuanto a quejas subjetivas de memoria, no se administró cuestionario C-QSM; la observación surge de la anamnesis (episodios puntuales de olvido referidos por el paciente).
+
+No se observan elementos que sugieran malestar psicológico significativo (KPDS-10=15, interpretación: Normal).
+
+Autónomo en las actividades de la vida diaria (AVD=8).
+
+7. Cuatro secciones por área cognitiva
+
+ATENCIÓN, VELOCIDAD DE PROCESAMIENTO Y FUNCIONES EJECUTIVAS
+Impresión diagnóstica del área: rendimiento cognitivo conservado
+
+Presentó un span atencional conservado (DD=0,45) y adecuada memoria de trabajo (DI=-0,35). El rastreo visual y velocidad de procesamiento se mantuvieron conservados (TMT A=-0,18), con un desempeño de nivel superior en flexibilidad cognitiva (TMT B=1,02) y en fluencia fonológica (FF=2,31). Las subpruebas de la función ejecutiva evaluadas mediante el IFS se ubicaron dentro de parámetros normales (SM, IC, CIM, DA, MA, MTV, R y CIV), a excepción del Índice MT, cuyo valor no pudo confirmarse por un problema de registro en el Excel (ver bloque 11).
+
+MEMORIA EPISÓDICA
+Impresión diagnóstica del área: rendimiento cognitivo conservado
+
+Los índices principales de memoria se mantuvieron conservados: codificación (BEM–MS AST=-0,90), evocación (BEM–MS RSE=-0,13) y almacenamiento (BEM–MS Rec=0,57). Se observaron fallas aisladas en submedidas derivadas: memoria semántica (BEM–MS Sem ≤-3) y el índice compuesto CE (-2,01, promedio de Sem y Rec). La memoria lógica inmediata (BEM–ML Inm=-1,24) y diferida (BEM–ML Dif=-0,51) se mantuvieron conservadas.
+
+LENGUAJE
+Impresión diagnóstica por área: rendimiento cognitivo conservado
+
+Presentó un desempeño de nivel superior en fluencia fonológica (FF=2,31), y conservado en fluencia semántica (FS=-0,30) y denominación (TBA=-0,86). Comprensión y expresión normales.
+
+VISOCONSTRUCCIÓN
+Impresión diagnóstica por área: rendimiento cognitivo conservado
+
+Test del reloj (TRO) normal (9,5/10) y copia del MMSE normal, sin elementos de compromiso visoconstructivo.
+
+8. Párrafo de recap (orden inverso)
+
+En visoconstrucción, presentó un desempeño conservado, sin dificultades en la copia ni en la prueba del reloj. A su vez, en lenguaje el rendimiento fue conservado, con un desempeño de nivel superior en fluencia fonológica. En adición, en memoria episódica se observaron fallas aisladas en submedidas derivadas (memoria semántica y el índice compuesto CE), mientras que los índices principales de codificación, evocación y almacenamiento se mantuvieron conservados. Por último, en atención, velocidad de procesamiento y funciones ejecutivas el rendimiento fue conservado, con desempeño de nivel superior en flexibilidad cognitiva y fluencia fonológica.
+
+9. Frase de cierre
+
+El Sr. Bunader presentó un rendimiento cognitivo dentro de parámetros normales en la mayoría de las áreas evaluadas, acorde a su edad y nivel educativo. Se observaron fallas aisladas en submedidas de memoria episódica (memoria semántica y el índice compuesto CE) que, a la fecha, no impresionarían configurar un perfil cognitivo significativo.
+
+⚠️ No elegí la categoría en silencio: aplicada literalmente, la regla (Z < -1,5 + AVD conservadas) daría categoría 3 (DCL clásico), porque Sem (≤-3) y CE (-2,01) caen por debajo de ese umbral. Pero ambas son submedidas derivadas (CE = promedio de Sem y Rec), no índices principales — y los índices principales de memoria (AST, RSE, Rec) están conservados. Por eso propongo categoría 2. La decisión final es del médico.
+
+10. Categoría diagnóstica + sugerencias
+
+Categoría propuesta: 2 — Rendimiento dentro de parámetros normales con fallas aisladas
+
+Se sugiere:
+
+Interpretar estos resultados considerando la clínica del paciente y el resultado en estudios complementarios que se consideren pertinentes
+Seguimiento clínico según evolución
+Promover hábitos de vida saludables (ya realiza actividad física regular —yoga y gimnasio—, por lo que no se sugiere incorporarla; podría orientarse a mejorar la calidad del sueño y a estrategias de manejo del estrés laboral/financiero referido)
+Reevaluación en caso de cambios clínicos o persistencia de quejas
+11. Reporte de faltantes y dudas (no se pega en el Word)
+K-10 desglosado (gráfico 2): el Excel solo trae el total (15); no puedo generar el gráfico sin los 10 ítems del papel.
+D31 IFS Índice MT: corrupta como fecha (07/10/2026). Necesito el valor real (deriva de Dígitos Atrás + Memoria de Trabajo Visual).
+"Riesgo de evolución": no está en el Excel. No afecta la categoría propuesta (2, no llega a DCL), pero señalo su ausencia por si el médico decide otra lectura.
+C-QSM: sin puntaje; la observación salió de la anamnesis. Además B58 está truncada en el propio Excel ("fue a un partido y por ahí") — irrecuperable, la dejé tal cual.
+"Acompañado" (Sí/No + quién): no está en el Excel; marqué la primera frase de la anamnesis como pendiente.
+Orientación temporal/espacial: no desglosada en el Excel; marqué la frase de screening como pendiente.
+Categoría diagnóstica: ver el aviso del bloque 9 — Sem/CE disparan el umbral literal de DCL pero son submedidas; propongo categoría 2, a confirmar por el médico.
+Informe modelo: no llegó adjunto; usé la estructura/tono ya documentados en la skill.

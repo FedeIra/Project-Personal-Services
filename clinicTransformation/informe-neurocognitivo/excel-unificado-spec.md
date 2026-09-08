@@ -24,6 +24,28 @@ cumple.
 
 ---
 
+## ✅ Confirmado con la profesional (2026-09-07) — cambios al Excel acordados
+
+La profesional respondió las preguntas. Ajustes acordados para el Excel (detalle e implicancia de
+cada uno abajo):
+
+1. **10 ítems del K-10** por separado, con `D28 = SUMA(...)`. *("Pasemos cada ítem al Excel.")*
+2. **AST por fórmula** = promedio de los 3 trials, **truncado a 2 decimales** (no redondeado). Deja
+   de cargarse a mano.
+3. **IFS Índice MT (`D31`)**: **no es una fecha**; deriva de la **suma de Dígitos Atrás + Memoria de
+   Trabajo Visual**. Puede salir por fórmula; como mínimo, formato Texto.
+4. **Riesgo de evolución** Sí/No — determina las sugerencias diagnósticas (habilita la categoría 5).
+5. **Acompañado** Sí/No + **por quién** (familiar / amigo / hijo / esposa).
+6. **Orientación temporal** y **espacial** — como subpuntaje del MMSE con puntuación, **o** dos
+   celdas Sí/No (a elección de la profesional al armar el Excel).
+7. **C-QSM** (opcional): a veces se toma, a veces no. Cuando se toma, **corte > 3 puntos = quejas
+   presentes**; cuando no, la observación deriva de la entrevista/motivo. Celda de puntaje opcional.
+
+Los puntos 1–4 ya estaban propuestos abajo (§A.1–§A.4) y quedan **confirmados**; los puntos 5–7 son
+**campos nuevos** que surgieron de las respuestas (§A.6).
+
+---
+
 ## A. Bloqueantes — ordenados por costo/beneficio
 
 ### A.1 Formatear como texto las celdas `X/Y` (⚠️ hoy hay datos perdidos)
@@ -31,6 +53,11 @@ cumple.
 **Problema:** `D31` (IFS Índice MT) guarda `46302` con formato de fecha = **07/10/2026**. Se tipeó
 `7/10` y Excel lo convirtió a fecha. El valor original **ya no está en el archivo**; se sabe que era
 `7/10` sólo por haber leído el Word.
+
+✅ **Confirmado (2026-09-07): no es una fecha.** El IFS Índice MT **deriva de la suma de la puntuación
+de los ítems Dígitos Atrás + Memoria de Trabajo Visual.** → Mejor aún que formato Texto: si esos dos
+ítems están en el Excel, `D31` puede salir **por fórmula** (`= Dígitos Atrás + MTV`) y no vuelve a
+corromperse ni depende de tipeo. Si se deja manual, va en formato Texto sí o sí.
 
 Es el arreglo más urgente porque **falla en silencio**: nada en la pantalla avisa, y el próximo
 paciente puede perder otra celda.
@@ -44,6 +71,8 @@ paciente puede perder otra celda.
 una fecha donde debería haber un puntaje.
 
 ### A.2 Desglosar el K-10 en sus 10 ítems
+
+✅ **Confirmado (2026-09-07): "pasemos cada ítem al Excel".**
 
 **Problema:** el gráfico `Escala K-10` del Word necesita los 10 puntajes por síntoma. El Excel guarda
 sólo el total (`D28` = `15`). Ese bloque del informe **no se puede generar desde el Excel**.
@@ -68,6 +97,8 @@ solo.
 
 ### A.3 Agregar el flag "Riesgo de evolución" (Sí/No)
 
+✅ **Confirmado (2026-09-07): "agreguemos la celda… que eso determina las sugerencias diagnósticas".**
+
 **Problema:** sin ese campo, la **categoría 5** de `regla-diagnostica.md` (DCL con mayor riesgo de
 evolución) es inalcanzable. Es criterio clínico puro: no se deriva de ningún puntaje.
 
@@ -78,10 +109,19 @@ evolución) es inalcanzable. Es criterio clínico puro: no se deriva de ningún 
 
 **Problema:** el `Cuestionario de quejas subjetivas de memoria (C-QSM)` figura en `PRUEBAS
 ADMINISTRADAS` y su resultado se usa en la narrativa de screening del Word, pero no tiene ninguna
-celda. Es el único test administrado sin lugar en el archivo.
+celda.
 
-**Ajuste:** una fila (puntaje y/o interpretación), en el bloque cualitativo. **A confirmar** si va
-además como fila de la tabla de síntesis del Word — hoy no está ahí.
+✅ **Aclarado (2026-09-07):** el C-QSM **a veces se toma y a veces no** (antes figuraba fijo en
+PRUEBAS ADMINISTRADAS por error).
+- **Cuando se toma:** la presencia/ausencia de quejas la determina un **corte > 3 puntos** (más de 3 =
+  quejas presentes). → Conviene una **celda de puntaje opcional**; la skill deriva la frase de
+  screening del corte.
+- **Cuando no se toma:** la observación de quejas **deriva de la entrevista inicial / motivo de
+  consulta** (las notas de anamnesis), no de un puntaje.
+
+**Ajuste:** una celda de puntaje **opcional** (vacía si no se tomó). La skill: si hay puntaje, aplica
+el corte > 3; si no, toma la observación de la anamnesis. No es fila obligatoria de la tabla de
+síntesis.
 
 ### A.5 Unificar los dos bloques demográficos
 
@@ -102,6 +142,34 @@ actualiza `C47` y no `C4`, el informe sale con las normas del paciente anterior 
 
 Bonus del mismo arreglo: `C3` ("Nombre") está vacía y el nombre real vive en `C46`. O se borra el
 rótulo `B3`/`C3`, o `C3` → `=C46`.
+
+---
+
+### A.6 BEM–MS AST por fórmula (confirmado)
+
+✅ **Confirmado (2026-09-07):** el PB de AST **es el promedio de los 3 trials** y la profesional
+prefiere que **se calcule solo**, dejándolo **truncado a 2 decimales** (no redondeado). Hoy `L14`
+(`=(K14+K15+K16)/3`) ya hace el promedio pero el PB `D13` se carga a mano y quedó `7,66` (truncado,
+correcto).
+
+**Ajuste:** `D13` → fórmula que trunca `L14` a 2 decimales, p. ej. `=TRUNCAR(L14; 2)`. Así el PB no
+depende de cómo se redondeó ese día y el Z sale consistente. (Ver `mapeo-excel-a-word.md` §Bloque
+auxiliar.)
+
+### A.7 Campos nuevos que surgieron de las respuestas
+
+Tres datos que hoy salen del papel / la historia clínica y la profesional acordó llevar al Excel:
+
+- **Acompañado** Sí/No + **por quién** (familiar / amigo / hijo / esposa). Alimenta el primer párrafo
+  de la anamnesis (`asiste solo/acompañado`). Validación de lista en ambas celdas.
+- **Orientación temporal** y **espacial** — alimentan la frase de screening (`orientación temporal y
+  espacial conservadas`). Dos opciones a elección de la profesional al armar el Excel: (a) subpuntaje
+  del MMSE con puntuación, o (b) dos celdas Sí/No. Con cualquiera, la skill arma la frase y avisa si
+  alguna **no** está conservada.
+- **C-QSM** — celda de puntaje opcional (ver §A.4).
+
+Ninguno bloquea el pipeline actual del mismo modo que §A.1–§A.4, pero sin ellos esas frases del
+informe siguen dependiendo del papel / la historia clínica.
 
 ---
 
@@ -169,10 +237,9 @@ lo guardó; si no, pueden leerse vacías al procesarlas por código.
 - **Desempate en los rangos de la X** cuando el Z cae justo en un límite (`-2 a -1` y `-1 a 0` ambos
   tocan el −1). Propuesta: límite inferior inclusive, superior exclusivo. No afecta el diseño del
   Excel, sí a quien complete la tabla de síntesis. Los dos informes disponibles **no** contienen
-  ningún Z en un límite exacto, así que no lo resuelven.
+  ningún Z en un límite exacto, así que no lo resuelven. **(Sigue abierto.)**
 - **Prioridad entre categorías** cuando aplican simultáneamente compromiso anímico (K-10 ≥ 25) y
-  riesgo de evolución. `informeFinal2` es categoría 2, no toca el caso.
-- **Léxico Z → palabra** de los párrafos narrativos (`alto` / `conservado` / `bajo no deficitario` /
-  `deficitario`): hoy está **inferido** de los dos informes, no entregado. Ver
-  `mapeo-excel-a-word.md` §4.2.
-- **Si el C-QSM debe ser además una fila de la tabla de síntesis** (§A.4).
+  riesgo de evolución. `informeFinal2` es categoría 2, no toca el caso. **(Sigue abierto.)**
+
+Resueltos el 2026-09-07 (ya no pendientes): el **léxico Z → palabra** quedó confirmado
+(`mapeo-excel-a-word.md` §4.2), y el **C-QSM** no es fila obligatoria de la tabla de síntesis (§A.4).

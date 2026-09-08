@@ -4,31 +4,34 @@
 > riesgo de evolución. La skill elige UNA categoría y parte de su texto, completando los "(…)" según
 > el paciente.
 
-## 🚩 ANTES DE USAR ESTA REGLA: no reproduce la decisión real del profesional
+## 🚩 ANTES DE USAR ESTA REGLA: no basta el umbral de Z (aclarado por la profesional, 2026-09-07)
 
-Aplicada literalmente al paciente de `informeFinal2.docx`, esta regla da una categoría **distinta**
-de la que eligió el profesional:
+Aplicada **literalmente**, la regla sobre-diagnostica. En `informeFinal2.docx`: **AVD = 8**
+(conservadas) y dos Z por debajo de −1,5 (BEM–MS Sem `≤-3`, crudo −3,11; y BEM–MS CE `-2,01`), el
+resto entre −1,24 y +2,31. La regla literal ("Z < −1,5 + AVD conservadas") da **categoría 3 (DCL
+clásico)**, pero el informe real es **categoría 2 (normal con fallas aisladas)**.
 
-- Datos: **AVD = 8** (conservadas) · dos Z por debajo de −1,5 (BEM–MS Sem `≤-3`, crudo −3,11; y
-  BEM–MS CE `-2,01`) · el resto entre −1,24 y +2,31.
-- **La regla de abajo** → "Z < −1,5 + AVD conservadas" = **categoría 3, DCL clásico**.
-- **El informe real** → "rendimiento cognitivo normal con leves fallas aisladas en recuperación de la
-  memoria", con las sugerencias de la **categoría 2**.
+**Criterio de la profesional (por qué acá es fallas aisladas y no DCL):**
 
-Es la diferencia entre *"compatible con un deterioro cognitivo leve"* + seguimiento por neurología y
-reevaluación a 12 meses, y *"dentro de parámetros normales"* + seguimiento según evolución.
+- **El valor CE es una submedida derivada** — es el promedio de Sem y Rec (`(Sem+Rec)/2`) — y **"no
+  pesa/vale tanto"**; además la profesional lo considera **muy exigente**. Un CE bajo por sí solo
+  **no configura un perfil de DCL**.
+- **La memoria se lee como un proceso de tres etapas:** codificar (**AST**), evocar (**RSE**) y
+  almacenar (**Rec**). Lo que gobierna el perfil del área son esos índices, no las submedidas. Acá
+  el AST dio **−0,90 (conservado)**, así que la memoria como área está conservada.
+- Bajo esa lectura, **estrictamente este paciente tiene fallas aisladas, no DCL.**
 
-Lo que falta en la regla escrita es **cuántas pruebas bajas, y de qué peso, configuran un perfil** en
-vez de "fallas aisladas" — dos submedidas de memoria seriada bajas sobre 14 pruebas, con el resto
-conservado o alto, el profesional las leyó como aisladas. La regla no tiene esa noción.
-
-> **Implicancia para la skill:** **no elegir categoría en silencio.** Proponer la que sale de la
-> regla, mostrar los Z que la disparan, y **advertir explícitamente** que el criterio de
-> "aisladas vs. perfil" no está definido y que la decisión final es del profesional. Vale tanto para
-> el límite de −1,5 como para la elección entre las 6 categorías.
+> **Implicancia para la skill:** **no elegir categoría en silencio.**
+> 1. No tratar las submedidas derivadas (en especial **CE**, y en menor medida sus insumos Sem/Rec)
+>    como disparador independiente de DCL. Pesar los **índices de área / principales** (para memoria:
+>    AST, RSE, Rec); si esos están conservados y sólo caen submedidas, la lectura es **fallas
+>    aisladas (categoría 2)**.
+> 2. Proponer la categoría, mostrar los Z que la disparan y **cuáles son submedidas**, y dejar
+>    explícito que **la decisión final es del médico** — la profesional avaló tanto la lectura clínica
+>    (fallas aisladas) como quedarse con la literal (DCL) "y modificarla según criterio del médico".
 >
-> Pendiente de resolver: `../preguntasParaLaProfesional.md` §A.0 — es la pregunta de mayor impacto
-> de todo el pipeline.
+> Sigue **sin cerrarse un umbral numérico** de "cuántas pruebas principales bajas = perfil"; para el
+> caso submedida-vs-índice, el criterio de arriba alcanza.
 
 ## ⚠️ Los templates se adaptan, no se copian literalmente
 
@@ -50,6 +53,11 @@ viñetas, mismo orden, sin agregar ni quitar recomendaciones clínicas). Lo que 
 paréntesis de hábitos y la redacción de la frase de cierre, para que describan a **este** paciente.
 La skill no inventa recomendaciones clínicas nuevas ni cambia el sentido de una viñeta; sí ajusta la
 localización, y entrega todo como borrador para revisión.
+
+✅ **Confirmado (2026-09-07):** la profesional avaló que la skill **proponga** el paréntesis y ella lo
+edite. El paréntesis se **deriva de lo que el paciente dijo en la entrevista**: si ya usa estrategias
+de compensación (p. ej. anota) o ya hace actividad física, **no** se le sugiere incorporarlas. Es
+decir, la localización debe leer la anamnesis, no ser genérica.
 
 ## Cortes de referencia
 
@@ -79,9 +87,10 @@ localización, y entrega todo como borrador para revisión.
   celda.
 - **Riesgo de evolución:** flag 100% manual, criterio clínico/observación en vivo durante la
   entrevista. La skill **nunca** debe intentar inferirlo — llega ya decidido en el Excel.
-  ⚠️ **`excelEvaluacionCompleto.xlsx` todavía no tiene este campo**, así que la categoría 5 es
-  inalcanzable hasta que se agregue (ver `excel-unificado-spec.md` §A.3). Si falta, la skill debe
-  señalarlo en vez de asumir "No".
+  ✅ **Confirmado (2026-09-07): la profesional agrega una celda `Riesgo de evolución` Sí/No**, que
+  "determina las sugerencias diagnósticas" (habilita la categoría 5). Hasta que el Excel se actualice
+  el campo no existe; si falta, la skill debe **señalarlo** en vez de asumir "No" (ver
+  `excel-unificado-spec.md` §A.3).
 
 ## Las 6 categorías
 
