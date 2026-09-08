@@ -160,6 +160,27 @@ Dos viñetas del Excel no aparecen en el Word: `- PROTOCOLO XTEND` (nota interna
 > **¿Los antecedentes familiares se omiten siempre del informe, o fue una decisión de este caso?**
 > Hoy la skill incluye todo y marca lo dudoso, en vez de decidir sola qué dejar afuera.
 
+### B.2.b "Acompañado": ¿ranura para completar, o se asume `solo`?
+
+Surgió de la revisión del 2026-09-08 (`ejemplos/revision-salida-ia-vs-informeFinal2.md` §B9).
+
+La primera frase de la anamnesis tiene forma fija — `El Sr./La Sra. X asiste **solo/a** a la
+consulta…` — pero el Excel **no trae el dato de si vino acompañado y por quién**. `informeFinal2`
+dice `asiste solo`, y en las notas de la entrevista no hay ninguna mención a un acompañante.
+
+La skill hoy **no lo asume**: deducir "vino solo" del silencio de la nota es inventar un dato
+clínico. Emite una ranura acotada y lo lista como pendiente.
+
+> **¿Preferís que la skill deje la ranura `asiste [solo / acompañado por …] a la consulta` para que
+> la completes, o que asuma `solo` por default cuando la anamnesis no menciona acompañante y sólo lo
+> avise al final?**
+>
+> (La segunda opción ahorra una edición por informe, pero implica que en algún caso el borrador diga
+> `solo` sin que nadie lo haya afirmado.)
+
+Relacionado: la celda `Acompañado` Sí/No + quién ya está acordada para el Excel
+(`excel-unificado-spec.md`). Cuando exista, la pregunta se vuelve irrelevante.
+
 ### B.3 El léxico Z → palabra
 
 Los párrafos por área traducen cada Z a vocabulario clínico (`alto`, `conservado`, `normal`,
@@ -215,6 +236,59 @@ relleno gris claro. Parece texto que quedó de una versión anterior.
 
 > **¿Quiere corregir la leyenda** (cambiar "trazado diagonal" por "sombreado gris") o la dejamos como
 > está? Hoy la skill la reproduce tal cual, sin tocarla.
+
+✅ **Resuelto en parte (2026-09-08): la skill ya NO devuelve la leyenda.** Confirmaste que es
+idéntica en todos los informes, así que se conserva la de tu plantilla y no hay nada que pegarle
+encima. La pregunta queda sólo como decisión tuya sobre tu propio modelo, sin impacto en la salida.
+
+> ⚠️ **Ojo con un detalle práctico:** en el Word la leyenda es la **última fila de la tabla**, no un
+> párrafo aparte. Si borrás la tabla vieja entera para pegar la nueva, la leyenda se va con ella —
+> hay que volver a agregarla (como nunca cambia, se copia de cualquier informe anterior).
+
+<details>
+<summary>Contexto original de la pregunta</summary>
+
+**Se volvió más urgente con el cambio del 2026-09-08** (la skill ahora genera la tabla entera en vez
+de pegar valores sobre la existente — ver C.1.b). En la tabla generada las celdas que no llevan
+puntaje van marcadas con `N/A` en vez de gris, así que la leyenda original pasa a describir **dos**
+cosas que no se ven: un trazado diagonal que nunca existió y un sombreado que ahora tampoco está.
+
+Por default la skill sigue reproduciendo la leyenda original y ofrece en el bloque 11 esta variante
+adaptada, que dice lo mismo sobre la tabla que realmente se genera:
+
+> PB (puntaje bruto de la prueba) – Z (…). **Las celdas marcadas como `N/A`** indican que el puntaje no
+> lleva puntaje Z sino interpretación cualitativa. Las cruces ubicadas en las columnas `< -3` y
+> `-3 a -2` indican puntajes significativamente bajos e implican un deterioro moderado a severo en la
+> función evaluada. La cruz en la columna `-2 a -1` indica un puntaje por debajo de lo esperable pero
+> no implica déficit significativo al momento de la evaluación.
+
+> **¿Adoptamos la leyenda adaptada, o preferís seguir con la original?**
+
+</details>
+
+### C.1.b La tabla nueva: ¿markdown con `N/A`, o HTML con el gris real?
+
+✅ Ya confirmaste (2026-09-08) que **no hace falta conservar la tabla existente**: la skill puede
+entregar una tabla nueva completa mientras cumpla con lo que informa la original (mismas columnas,
+mismas filas y orden, mismos valores, los rangos agrupados, y marcadas las celdas que no se
+completan). Eso resolvió el problema más serio que tenía el pipeline.
+
+Queda elegir el formato de entrega:
+
+| | **Markdown** (default hoy) | **HTML** |
+|---|---|---|
+| Cómo la ves | ya renderizada como tabla en el chat | como bloque de código |
+| Cómo la pegás | seleccionar la tabla → copiar → pegar en Word | guardar como `.html`, abrirla en el navegador, seleccionar todo, copiar, pegar en Word |
+| Celdas sin puntaje | `N/A` | **gris real**, como la plantilla |
+| Pasos | 2 | 5 |
+
+> **¿Alcanza con el `N/A`, o preferís el gris aunque sean unos pasos más?** Se puede empezar con
+> markdown y cambiar después: el contenido de la tabla es el mismo, cambia sólo cómo se envuelve.
+
+También hay un cambio visual menor a validar: en la tabla nueva **la columna `ÁREA` repite el nombre
+en cada fila** en vez de estar combinada verticalmente (es lo que permite que todas las filas tengan
+la misma cantidad de columnas y no se desalineen). Si preferís las celdas combinadas, se puede hacer
+en Word después de pegar, o generar el HTML con `rowspan`.
 
 ### C.2 "Impresión diagnóstica **del** área" vs "**por** área"
 

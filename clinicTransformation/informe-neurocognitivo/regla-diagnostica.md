@@ -32,6 +32,13 @@ clásico)**, pero el informe real es **categoría 2 (normal con fallas aisladas)
 >
 > Sigue **sin cerrarse un umbral numérico** de "cuántas pruebas principales bajas = perfil"; para el
 > caso submedida-vs-índice, el criterio de arriba alcanza.
+>
+> 3. **CE tampoco se narra.** Que no dispare la categoría ya estaba dicho; lo que faltaba es que en
+>    los dos informes reales **CE no aparece en ningún párrafo** — ni en el de memoria, ni en el
+>    recap, ni en la frase de cierre. Es valor de tabla y de gráfico, nada más. Lo mismo vale para
+>    `Sem` como etiqueta: un Sem bajo se redacta como `bajo beneficio de la facilitación de claves
+>    semánticas`, **nunca** como una falla de memoria semántica. Ver `mapeo-excel-a-word.md` §4.2.
+>    ⚠️ La IA nombró CE en los tres lugares y etiquetó Sem como déficit (revisión 2026-09-08, §B3/§B6).
 
 ## ⚠️ Los templates se adaptan, no se copian literalmente
 
@@ -58,6 +65,27 @@ localización, y entrega todo como borrador para revisión.
 edite. El paréntesis se **deriva de lo que el paciente dijo en la entrevista**: si ya usa estrategias
 de compensación (p. ej. anota) o ya hace actividad física, **no** se le sugiere incorporarlas. Es
 decir, la localización debe leer la anamnesis, no ser genérica.
+
+### Forma del paréntesis: sintagma nominal corto, sin explicar el razonamiento
+
+⚠️ **Fallo observado (revisión 2026-09-08, §B8).** La IA eligió bien **qué** poner (leyó la anamnesis:
+ya hace actividad física, duerme mal, refiere estrés) y mal **cómo**:
+
+> ❌ `Promover hábitos de vida saludables (ya realiza actividad física regular —yoga y gimnasio—, por
+> lo que no se sugiere incorporarla; podría orientarse a mejorar la calidad del sueño y a estrategias
+> de manejo del estrés laboral/financiero referido)`
+>
+> ✅ `Promover hábitos de vida saludables (mejorar calidad del sueño, técnicas de manejo del estrés)`
+
+Reglas:
+
+- **3 a 8 palabras**, sintagma nominal o infinitivo, ítems separados por coma.
+- **Sólo lo que se sugiere.** Lo que el paciente ya hace no se nombra: se omite en silencio.
+- **Cero metacomentario.** `por lo que no se sugiere incorporarla` está dirigido al profesional, no
+  al paciente, y la viñeta va al informe. El razonamiento —qué se descartó y por qué— va al
+  **bloque 11**, donde el profesional lo lee y decide.
+- Referencia de largo: los dos informes reales usan `(estrategias de compensación, no multitarea)` y
+  `(mejorar calidad del sueño y técnicas de relajación)`.
 
 ## Cortes de referencia
 

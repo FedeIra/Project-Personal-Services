@@ -1,0 +1,37 @@
+ÁREA	PRUEBA	PB	Z	< -3	-3 a -2	-2 a -1	-1 a 0	0 a +1	+1 a +2	+2 a +3	> +3
+Screening cognitivo y psiquiátrico	MMSE	30/30	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Screening cognitivo y psiquiátrico	TRO	9.5/10	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Screening cognitivo y psiquiátrico	AVD	8	Autónomo	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Screening cognitivo y psiquiátrico	KPDS-10	15	Normal	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Atención y funciones ejecutivas	DD	7	0,45					X			
+Atención y funciones ejecutivas	DI	4	-0,35				X				
+Atención y funciones ejecutivas	TMT A	38	-0,18				X				
+Atención y funciones ejecutivas	TMT B	42	1,02						X		
+Atención y funciones ejecutivas	FF	24	2,31							X	
+Atención y funciones ejecutivas	IFS Total	26,5/30	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Atención y funciones ejecutivas	IFS Índice MT	7/10	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Atención y funciones ejecutivas	IFS SM	3 normal	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Atención y funciones ejecutivas	IFS IC	3 normal	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Atención y funciones ejecutivas	IFS CIM	3 normal	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Atención y funciones ejecutivas	IFS DA	4 normal	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Atención y funciones ejecutivas	IFS MA	2 normal	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Atención y funciones ejecutivas	IFS MTV	3 normal	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Atención y funciones ejecutivas	IFS R	2,5 normal	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Atención y funciones ejecutivas	IFS CIV	6 normal	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Memoria episódica	BEM – MS AS1	5	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Memoria episódica	BEM – MS AS2	8	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Memoria episódica	BEM – MS AS3	10	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Memoria episódica	BEM – MS AST	7,66	-0,90				X				
+Memoria episódica	BEM – MS RSE	8	-0,13				X				
+Memoria episódica	BEM – MS Sem	8	≤-3	X							
+Memoria episódica	BEM – MS Rec	12	0,57					X			
+Memoria episódica	BEM – MS CE	10	-2,01		X						
+Memoria episódica	BEM – ML Inm	7	-1,24			X					
+Memoria episódica	BEM – ML Dif	8	-0,51				X				
+Lenguaje	FF	24	2,31							X	
+Lenguaje	FS	20	-0,30				X				
+Lenguaje	TBA	10	-0,86				X				
+Lenguaje	Comprensión	Normal	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Lenguaje	Expresión	Normal	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Visoconstrucción	TRO	9.5/10	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A
+Visoconstrucción	MMSE copia	Normal	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A	N/A

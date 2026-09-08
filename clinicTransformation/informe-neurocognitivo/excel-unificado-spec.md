@@ -50,9 +50,9 @@ Los puntos 1–4 ya estaban propuestos abajo (§A.1–§A.4) y quedan **confirma
 
 ### A.1 Formatear como texto las celdas `X/Y` (⚠️ hoy hay datos perdidos)
 
-**Problema:** `D31` (IFS Índice MT) guarda `46302` con formato de fecha = **07/10/2026**. Se tipeó
-`7/10` y Excel lo convirtió a fecha. El valor original **ya no está en el archivo**; se sabe que era
-`7/10` sólo por haber leído el Word.
+**Problema:** `D31` (IFS Índice MT) puede guardar un serial de fecha en vez del valor real (ejemplo
+ficticio: `45936` con formato de fecha = **06/10/2025**, de haber tipeado `6/10`). Ya se dio un caso
+real donde el valor original recuperado del serial coincidió exactamente con lo que decía el Word.
 
 ✅ **Confirmado (2026-09-07): no es una fecha.** El IFS Índice MT **deriva de la suma de la puntuación
 de los ítems Dígitos Atrás + Memoria de Trabajo Visual.** → Mejor aún que formato Texto: si esos dos
@@ -195,8 +195,9 @@ al tipear notas largas.
 
 ### B.3 Separador decimal en los textos `X/Y` — cosmético, prioridad baja
 
-Hoy conviven `26,5/30` (coma) y `9.5/10` (punto) en el Excel, y el Word tiene `9,5/10` en la fila 2 y
-`9.5/10` en la fila 35 — o sea, se editó una a mano.
+Hoy conviven valores con coma (`27,5/30`) y con punto (`10.0/10`) en el Excel, y en un caso real el
+Word tenía el mismo puntaje de TRO con coma en la fila 2 y con punto en la fila 35 — o sea, se editó
+una a mano.
 
 **No afecta el procesamiento por IA**: son cadenas de texto que se copian tal cual al Word, no se
 parsean como número. Es una inconsistencia estética del informe entregado. Se menciona sólo para que

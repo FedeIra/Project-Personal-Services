@@ -195,7 +195,15 @@ M.N:67158
 - **Secciones por área:** título en mayúsculas + línea `Impresión diagnóstica del/por área:
   rendimiento cognitivo <calificación>` + un párrafo que nombra la **función** (no la sigla). Se
   reproduce la inconsistencia `del área` (áreas 1–2) / `por área` (áreas 3–4).
-- **Conclusiones:** recap área por área en **orden inverso** al de la tabla (arranca por
-  visoconstrucción), con conectores; luego la frase de cierre del template de la categoría, adaptada.
+  🚫 **Ni siglas ni valores Z dentro del párrafo** — mirar arriba: en todo este informe modelo no
+  aparece un solo `Z=` ni un solo `(DD=…)`. Tampoco aparecen `CE` ni los subpuntajes del IFS.
+  Reglas completas y tabla sigla → prosa en `mapeo-excel-a-word.md` §4.2.
+- **Screening y secciones por área son plantilla, no redacción libre.** Casi todas las frases de
+  arriba son invariantes entre informes y sólo cambian los puntajes intercalados. Están transcritas
+  literalmente en `mapeo-excel-a-word.md` §4.1 y §4.2 — copiar de ahí, no reconstruirlas de memoria.
+- **Conclusiones:** recap área por área con conectores, en el orden
+  **visoconstrucción → lenguaje → atención/ejecutivas → memoria** (inverso al de la tabla, salvo
+  memoria, que va última); luego la frase de cierre: **una oración**, abierta con `En conclusión,`,
+  del template de la categoría, adaptada.
 - **Sugerencias:** viñetas del template de `regla-diagnostica.md`, con el paréntesis de hábitos
-  localizado al paciente.
+  localizado al paciente — **3 a 8 palabras, sólo lo que se sugiere, sin explicar el razonamiento**.
