@@ -101,6 +101,7 @@ mueve el Z** — con 7,66 el Z es `-0,90`; con 7,67 sería `-0,89`. La profesion
 | `C49` | Nivel educativo alcanzado |
 | `C50` | Lateralidad |
 | `C51` | Fecha de evaluación (**serial de fecha**) |
+| `C52` | **Atiende** — `Solo` / `Pareja` (**pendiente**: todavía no está en el Excel entregado; se agrega debajo de `C51`. Reemplaza la propuesta anterior de `Acompañado` Sí/No + por quién — ver `excel-unificado-spec.md` §A.7). Alimenta la primera frase de la anamnesis (`asiste solo/acompañado`). |
 
 ### Bloque de anamnesis (`B55:B64`)
 

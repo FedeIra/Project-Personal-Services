@@ -55,9 +55,9 @@ inventar el dato:
    falta, señalarlo; **no** asumir "No". *(Se está agregando como celda Sí/No.)*
 4. **C-QSM** (opcional): a veces se toma, a veces no. Si hay puntaje, quejas presentes = **> 3**; si
    no hay, la observación sale de la anamnesis / motivo de consulta. No inventar un puntaje.
-5. **Campos que hoy salen del papel/historia clínica** y se están agregando: `Acompañado` Sí/No + por
-   quién, y `Orientación temporal/espacial`. Si faltan, la frase correspondiente se marca como
-   pendiente.
+5. **Campos que hoy salen del papel/historia clínica** y se están agregando: `Atiende` (`Solo` /
+   `Pareja`, nueva celda `C52` justo debajo de `Fecha de evaluación`) y `Orientación
+   temporal/espacial`. Si faltan, la frase correspondiente se marca como pendiente.
 6. **`C3` suele estar vacía**: el nombre del paciente está en `C46`.
 
 ## Qué NO debe hacer esta skill
@@ -86,6 +86,10 @@ una oración ni dentro de una celda de tabla.
 
 > ❌ `El Sr. X asiste [PENDIENTE: falta el dato de "Acompañado" — no está en el Excel] a la consulta…`
 > ❌ una celda de la tabla de síntesis con `[PENDIENTE - dato corrupto]`
+> ❌ `...menciona que olvida cosas puntuales — "fue a un partido y por ahí…" (nota incompleta en el
+> registro original, sin continuación).` — **el paciente puede leer este informe**; comentar el estado
+> del dato de origen (que la nota esté truncada, mal tipeada, etc.) es tan inapropiado ahí como un
+> `[PENDIENTE]` explícito, aunque no use esa palabra.
 >
 > ✅ prosa completa y gramatical + **el pendiente enumerado en el bloque 11**, citando la oración
 > exacta que hay que revisar.
@@ -118,14 +122,26 @@ está en `mapeo-excel-a-word.md` §2. Para el **tono y el fraseo** de los bloque
 agregar ni quitar filas respecto de la plantilla del profesional (`informeFinal.docx` tiene una fila
 `Deriva:` que `informeFinal2.docx` no tiene). No hay DNI ni ocupación.
 
+### Formato: **HTML por default**
+
+⚠️ **Mismo problema que motivó el cambio a HTML en el bloque 3** (fallo observado en prueba real,
+2026-09-08): una tabla en Markdown, copiada tal cual desde el chat, se pega en Word **corrida en un
+solo párrafo** (`PacienteBunader, José AlbertoEdad61 años…`), sin separación entre campo y valor ni
+salto de línea entre filas. Entregar este bloque también como **HTML**: tabla simple de 2 columnas
+(`Campo` / `Valor`), 6 filas (7 si aplica `Deriva:`). No hace falta sombreado ni bordes marcados —
+alcanza con que cada campo quede en su propia fila al pegar. Mismo mecanismo de paste que el bloque 3:
+guardar como `.html`, abrir en el navegador, seleccionar todo, copiar a Word.
+
 **2. `MOTIVO DE CONSULTA Y ANTECEDENTES`** — redacción de las viñetas de `B56:B64` a prosa en tercera
 persona y presente, una viñeta ≈ un párrafo, mismo orden, conservando las citas textuales entre
 comillas. Formas fijas del primer y último párrafo, verbos de reporte y concordancia de género: ver
 `mapeo-excel-a-word.md` §3.
 
 > ⚠️ **Bloque de mayor riesgo del pipeline.** No suavizar, reinterpretar ni reencuadrar el contenido
-> anímico: transcribir lo que dice la nota. Si una nota es ambigua o está truncada, dejarla ambigua y
-> señalarlo. Incluir todo y **marcar lo dudoso** en vez de decidir sola qué omitir.
+> anímico: transcribir lo que dice la nota. Si una nota es ambigua o está truncada, dejarla ambigua en
+> la prosa **tal cual llega, sin agregar ninguna aclaración sobre el estado del dato** — el paciente
+> puede leer este texto. Señalarlo **sólo en el bloque 11** (ver la convención de marcado de
+> pendientes más arriba). Incluir todo y **marcar lo dudoso ahí** en vez de decidir sola qué omitir.
 >
 > **Confirmado (2026-09-07):**
 > - **No matizar** — poner el contenido tal cual está tipeado (la profesional escribe notas más
@@ -150,6 +166,13 @@ de código HTML, ella lo guarda como `.html`, lo abre en el navegador, seleccion
 Markdown queda como alternativa rápida (2 pasos en vez de 5) **pero todavía sin probar en Word** y
 sin sombreado. Ofrecerlo si lo pide; no emitirlo por default.
 
+> ✅ **Ajuste de ancho post-paste, verificado (2026-09-08).** Con 12 columnas es esperable que la tabla
+> quede apretada por los márgenes de la página al pegarla. Solución probada por el usuario: clic
+> derecho dentro de la tabla ya pegada → **Autoajustar → "Autoajustar al contenido"** → de nuevo clic
+> derecho → **Propiedades de tabla → pestaña Tabla → Ancho preferido → 130 %**. Sin tocar márgenes del
+> documento ni el HTML. **Incluir este paso en el bloque 11** (o junto al bloque de la tabla) para que
+> el profesional lo aplique al pegar.
+
 ### Partes de la tabla
 
 Un solo bloque, con:
@@ -173,51 +196,68 @@ los informes**, así que se conserva la de su plantilla y la skill no la emite.
 > afectar la salida de la skill. Sigue abierta como decisión de ella sobre su propia plantilla
 > (`../preguntasParaLaProfesional.md` §C.1), pero la skill ya no la toca ni la reproduce.
 
-**12 columnas en todas las filas** — el `gridSpan` de la plantilla vieja no se replica, y la columna
-`ÁREA` **repite el nombre en cada fila** en vez de combinar celdas. Esa uniformidad es justamente lo
-que elimina el problema de alineación.
+**Columna `ÁREA`: celdas fusionadas verticalmente (`rowspan`), como en la plantilla original.**
+✅ Decisión 2026-09-08 — revierte la uniformidad anterior (que repetía el nombre en cada fila para
+simplificar la generación). Sólo la **primera fila de cada uno de los 5 grupos** lleva la celda
+`ÁREA` (con su `rowspan`); las demás filas del grupo **omiten esa celda por completo** — por eso
+tienen **11** `<td>` en vez de 12. Esto sólo es posible en HTML (Markdown no soporta `rowspan`), otra
+razón por la que la tabla se entrega siempre en HTML. Los 5 grupos y su `rowspan`:
+
+| Área | Filas | `rowspan` |
+|---|---|---|
+| `Screening cognitivo y psiquiátrico` | 1–4 | 4 |
+| `Atención y funciones ejecutivas` | 5–19 | 15 |
+| `Memoria episódica` | 20–29 | 10 |
+| `Lenguaje` | 30–34 | 5 |
+| `Visoconstrucción` | 35–36 | 2 |
 
 Los tres patrones de llenado siguen igual:
 
 - **Con Z** (15 filas): PB numérico · Z a **2 decimales con coma, con el cero final** (`-0,90`, no
   `-0,9`) o el cap · **1 X** en la columna de rango que corresponde · las otras 7 **vacías**.
 - **Cualitativa simple** (19 filas): el texto entero va en **PB** (`29/30`, `3 normal`, `Normal`) ·
-  **`N/A`** en Z y en las 8 columnas de rango.
-- **AVD y KPDS-10** (2 filas): PB numérico · la palabra de `E27`/`E28` en Z · **`N/A`** en las 8 de
-  rango.
+  **celda vacía, sin texto**, con fondo gris `#D9D9D9` en Z y en las 8 columnas de rango.
+- **AVD y KPDS-10** (2 filas): PB numérico · la palabra de `E27`/`E28` en Z · **celda vacía, sin
+  texto**, con fondo gris `#D9D9D9` en las 8 de rango.
 
 En una frase: **la X se completa si y solo si Z es numérico**, el texto cualitativo va en PB salvo en
-AVD y KPDS-10, y **`N/A` marca las celdas donde la prueba no lleva puntaje Z**.
+AVD y KPDS-10, y **el fondo gris `#D9D9D9` marca las celdas donde la prueba no lleva puntaje Z** — sin
+ningún texto adentro.
 
-En HTML, esas celdas llevan **`N/A` sobre fondo gris `#D9D9D9`** — las dos cosas: el texto porque la
-profesional lo pidió explícitamente, y el gris porque reproduce su plantilla. Las columnas de
-severidad de las filas con Z llevan `#A6A6A6` (`< -3`, `-3 a -2`) y `#D9D9D9` (`-2 a -1`), **vacías**.
+✅ **Cambio 2026-09-08: ya no se escribe `N/A`.** La celda queda **vacía, sólo con el fondo gris** —
+así lo hacía el Word original antes de que la skill agregara el texto como sustituto del color en
+Markdown. En HTML el color sobrevive el paste (verificado en Word real), así que el texto ya no hace
+falta y sólo agrandaba las columnas. Las columnas de severidad de las filas con Z llevan `#A6A6A6`
+(`< -3`, `-3 a -2`) y `#D9D9D9` (`-2 a -1`), **vacías**, igual que antes.
 
-> 🚩 **`N/A` no es lo mismo que celda vacía.** En una fila **con Z**, las 7 columnas de rango sin `X`
-> **van vacías, no `N/A`**: esos tramos sí aplican, el puntaje simplemente no cae ahí — poner `N/A`
-> en la columna `-3 a -2` de `DD` afirmaría algo falso. `N/A` = "esta prueba no tiene puntaje Z";
-> celda vacía = "el Z no cae en este tramo".
-> Control: **187 celdas `N/A`** (19 filas cualitativas × 9 + 2 de AVD/KPDS-10 × 8) y **15 filas con
-> una `X`**.
+> 🚩 **El gris de "no aplica" no es lo mismo que una celda vacía sin sombrear.** En una fila **con Z**,
+> las 7 columnas de rango sin `X` **van vacías y sin sombreado propio** (salvo las bandas de severidad,
+> que llevan su color fijo en todas las filas): esos tramos sí aplican, el puntaje simplemente no cae
+> ahí. El gris `#D9D9D9` uniforme en Z + las 8 de rango de las filas cualitativas/AVD/KPDS-10 significa
+> algo distinto: "esta prueba no tiene puntaje Z". Ninguna de las dos lleva texto — la diferencia la
+> hace sólo el patrón de sombreado.
+> Control: **187 celdas vacías por no llevar puntaje Z** (19 filas cualitativas × 9 + 2 de AVD/KPDS-10
+> × 8, todas con fondo `#D9D9D9`) y **15 filas con una `X`**.
 
 Cap: `Z ≥ +3` → `≥3`, `Z ≤ −3` → `≤-3`; el valor capado igual lleva X en la columna del extremo.
 
 ### 🚩 Autochequeo obligatorio — declararlo en la salida
 
-Son 36 filas × 12 celdas escritas a mano: los errores de transcripción son el riesgo principal y
-**todos estos números son verificables antes de entregar**. Contarlos y decir el resultado:
+Son 36 filas escritas a mano: los errores de transcripción son el riesgo principal y **todos estos
+números son verificables antes de entregar**. Contarlos y decir el resultado:
 
 | Chequeo | Valor esperado |
 |---|---|
 | Filas de datos | **36**, en el orden de `orden-filas-sintesis.md` |
-| Celdas por fila | **12**, todas |
+| Celdas por fila | **12** en las **5** filas que abren grupo de área (llevan el `rowspan`) · **11** en las **31** filas restantes (sin celda `ÁREA`, fusionada hacia arriba) |
+| Celdas `ÁREA` emitidas | **5** (una por grupo, no 36) — suma de sus `rowspan` = **36** (4+15+10+5+2) |
 | Suma de los `colspan` de la fila de agrupación | **8** (2+1+2+3) |
-| Celdas `N/A` | **187** (19 filas cualitativas × 9 + 2 de AVD/KPDS-10 × 8) |
+| Celdas vacías sin puntaje Z (fondo `#D9D9D9`) | **187** (19 filas cualitativas × 9 + 2 de AVD/KPDS-10 × 8) |
 | Filas con `X` | **15**, una `X` por fila, sólo donde Z es numérico |
 | Leyenda al pie | **ausente** |
 
-El conteo de `N/A` y el de `X` sólo valen para una batería completa; si falta alguna prueba, recalcular
-y decir de dónde sale la diferencia.
+El conteo de celdas vacías y el de `X` sólo valen para una batería completa; si falta alguna prueba,
+recalcular y decir de dónde sale la diferencia.
 
 ⚠️ **El chequeo del `colspan` nació de un error real** (prueba en Word del 2026-09-08): sin los
 `colspan`, cada rótulo ocupaba una sola columna, los cuatro tramos de la derecha quedaban sin rótulo
@@ -311,6 +351,8 @@ para el profesional. Incluye además:
 - **Las oraciones con ranura** (`[solo / acompañado por …]`), citadas textualmente.
 - **El razonamiento del paréntesis de hábitos**: qué se descartó de la anamnesis y por qué.
 - **Los conteos de campos** de los 3 bloques de pegado.
+- **Cómo ajustar el ancho de la tabla de síntesis después de pegarla** (ver §Formato del bloque 3):
+  Autoajustar al contenido + Ancho preferido 130 %.
 - **Ediciones a hacer sobre la plantilla del Word**, no sólo datos faltantes. La más frecuente:
   **`PRUEBAS ADMINISTRADAS` es una lista fija que incluye `Cuestionario de quejas subjetivas de
   memoria (C-QSM)`, y el C-QSM a veces no se toma** — si no se tomó, avisar que **hay que borrar esa

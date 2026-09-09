@@ -163,6 +163,11 @@ explicación:**
 El sombreado ya está en la plantilla y **no se pega**: gris oscuro = puntaje significativamente bajo,
 gris claro = bajo pero sin déficit significativo (así lo explica la leyenda).
 
+> ℹ️ **Diferencia deliberada en la tabla que genera la skill:** a diferencia de la plantilla original
+> (que no sombrea las 8 columnas de rango de AVD/KPDS-10), la tabla generada **sí** las sombrea con
+> `#D9D9D9` — mismo criterio que las filas cualitativas simples, para marcar "no aplica" de forma
+> consistente en todas las filas sin Z. No afecta lo que se informa (esas filas nunca llevan `X`).
+
 ## 🟢 Entrega: la skill genera la **tabla completa**, no valores sueltos
 
 ✅ **Decisión de la profesional (2026-09-08): no hace falta conservar la tabla que ya está en el
@@ -205,42 +210,53 @@ En este orden, de arriba abajo:
 | 36 filas de datos | las de la tabla de arriba, **en ese orden exacto** | sí |
 | ~~Leyenda al pie~~ | **no se genera** — ver abajo | — |
 
-**12 columnas en todas las filas.** La grilla de 13 columnas del original (con `gridSpan=2` en la
-última) y el `gridSpan` de la Z en AVD/KPDS-10 eran particularidades de la plantilla vieja: **no se
-replican**. Acá todas las filas tienen las mismas 12 columnas, que es justamente lo que elimina el
-problema de alineación.
+**12 columnas lógicas siempre** (`ÁREA` · `PRUEBA` · `PB` · `Z` + 8 de rango). La grilla de 13
+columnas del original (con `gridSpan=2` en la última) y el `gridSpan` de la Z en AVD/KPDS-10 eran
+particularidades de la plantilla vieja: **no se replican**. Lo que sí varía respecto de la versión
+anterior de este archivo: la celda `ÁREA` **no se repite por fila** — va fusionada con `rowspan` (ver
+convención 1 abajo), así que en `<td>` reales una fila **abre grupo con 12** y las demás **tienen 11**
+(sin la celda `ÁREA`, ya cubierta por el `rowspan` de la fila de arriba).
 
 ### Las 4 convenciones de llenado
 
-1. **Columna `ÁREA`:** se **repite el nombre en cada fila** en vez de combinar celdas verticalmente.
-   Es lo que permite que la tabla sea una grilla uniforme. Los cuatro valores son
-   `Screening cognitivo y psiquiátrico` (filas 1–4) · `Atención y funciones ejecutivas` (5–19) ·
-   `Memoria episódica` (20–29) · `Lenguaje` (30–34) · `Visoconstrucción` (35–36).
+1. **Columna `ÁREA`: celdas fusionadas verticalmente (`rowspan`), como en la plantilla original.**
+   ✅ Decisión 2026-09-08 — revierte la versión anterior de este archivo, que la repetía en cada fila
+   para simplificar la generación. Sólo la **primera fila** de cada grupo lleva la celda `ÁREA` (con
+   su `rowspan`); las demás filas del grupo la **omiten por completo** (11 `<td>` en vez de 12). Sólo
+   es posible en HTML — Markdown no soporta `rowspan`. Los cinco grupos:
+   `Screening cognitivo y psiquiátrico` (filas 1–4, `rowspan=4`) ·
+   `Atención y funciones ejecutivas` (5–19, `rowspan=15`) · `Memoria episódica` (20–29, `rowspan=10`) ·
+   `Lenguaje` (30–34, `rowspan=5`) · `Visoconstrucción` (35–36, `rowspan=2`).
 2. **Filas con Z** (5–9, 23–32): `PB` numérico · `Z` a 2 decimales con coma y cero final, o el cap ·
-   **una `X`** en la columna del tramo · las otras 7 columnas de rango **vacías** (no `N/A` — ver
-   abajo).
-3. **Filas cualitativas simples** (1–2, 10–22, 33–36): el texto entero en `PB` · **`N/A` en `Z` y en
-   las 8 columnas de rango**.
-4. **Filas AVD y KPDS-10** (3–4): `PB` numérico · la palabra de `E27`/`E28` en `Z` · **`N/A` en las 8
-   columnas de rango**.
+   **una `X`** en la columna del tramo · las otras 7 columnas de rango **vacías, sin sombreado propio**
+   (ver mapa de sombreado abajo).
+3. **Filas cualitativas simples** (1–2, 10–22, 33–36): el texto entero en `PB` · **`Z` y las 8
+   columnas de rango vacías, sin texto, con fondo gris `#D9D9D9`**.
+4. **Filas AVD y KPDS-10** (3–4): `PB` numérico · la palabra de `E27`/`E28` en `Z` · **las 8 columnas
+   de rango vacías, sin texto, con fondo gris `#D9D9D9`**.
 
-### `N/A` — el marcador de no-aplica, y dónde **no** va
+### El fondo gris — marcador de no-aplica, sin texto adentro
 
-En la tabla original, el gris `D9D9D9` sobre `Z` + las 8 columnas de rango de una fila cualitativa es
-lo que dice "esta prueba no lleva puntaje Z". Como la tabla generada es texto, ese gris se reemplaza
-por **`N/A`** escrito en cada una de esas celdas. Informa lo mismo, de forma explícita, y queda
-además explicado en la leyenda.
+En la tabla original, el gris `D9D9D9` sobre `Z` + las 8 columnas de rango de una fila cualitativa (o
+sobre las 8 de rango de AVD/KPDS-10) es lo que dice "esta prueba no lleva puntaje Z". La skill había
+agregado el texto **`N/A`** en esas celdas como sustituto del color para cuando la salida era texto
+plano (Markdown, sin sombreado). ✅ **Cambio 2026-09-08: ya no se escribe `N/A`.** Como el formato de
+salida es HTML por default y el color sí sobrevive el paste a Word (verificado), el texto quedó
+redundante y sólo ensanchaba las columnas — la celda ahora va **vacía, sólo con el fondo gris**, igual
+que en la plantilla original.
 
-> 🚩 **`N/A` va sólo donde el original tenía el gris-de-no-aplica.** En una fila **con Z**, las 7
-> columnas de rango sin `X` **no son N/A**: esos tramos sí aplican, el puntaje simplemente no cae
-> ahí. Poner `N/A` en la columna `-3 a -2` de `DD` afirmaría algo falso. **Van vacías**, igual que en
-> el Word original.
+> 🚩 **El gris-de-no-aplica no es lo mismo que una celda vacía sin sombrear.** En una fila **con Z**,
+> las 7 columnas de rango sin `X` **van vacías y sin sombreado propio** (salvo las bandas de severidad
+> fijas — ver abajo): esos tramos sí aplican, el puntaje simplemente no cae ahí. El gris uniforme en
+> las filas cualitativas/AVD/KPDS-10 dice algo distinto: "esta prueba no tiene puntaje Z". Ninguna de
+> las dos lleva texto — la diferencia la hace sólo el patrón de sombreado, no una palabra.
 >
-> Resumen: `N/A` = "esta prueba no tiene puntaje Z". Celda vacía = "el puntaje Z de esta prueba no
-> cae en este tramo".
+> Resumen: fondo `#D9D9D9` en Z + las 8 de rango = "esta prueba no tiene puntaje Z". Celda vacía sin
+> sombreado propio = "el puntaje Z de esta prueba no cae en este tramo".
 
-Conteo de control para este esquema: **21 filas** llevan `N/A` (19 cualitativas × 9 celdas + 2 de
-AVD/KPDS-10 × 8) = **187 celdas `N/A`**, y **15 filas** llevan exactamente una `X`.
+Conteo de control para este esquema: **21 filas** llevan el fondo gris de no-aplica (19 cualitativas ×
+9 celdas + 2 de AVD/KPDS-10 × 8) = **187 celdas vacías con fondo `#D9D9D9`**, y **15 filas** llevan
+exactamente una `X`.
 
 > ⚠️ El otro uso del gris en el original es distinto y **no** necesita marcador: el gris oscuro
 > `A6A6A6` sobre las columnas `< -3` y `-3 a -2`, y el claro sobre `-2 a -1`, marcan **zonas de
@@ -248,12 +264,9 @@ AVD/KPDS-10 × 8) = **187 celdas `N/A`**, y **15 filas** llevan exactamente una 
 > (`Deterioro significativo` / `Puntajes bajos` / `Puntajes promedio` / `Puntajes superiores`), así
 > que no se pierde nada al no sombrear.
 
-> **Compromiso conocido:** `N/A` es más ancho que la `X`, así que las 8 columnas de rango quedan más
-> anchas que en el original y la tabla se ensancha. Si al pegarla en Word no entra a lo ancho de la
-> página, la alternativa más liviana es poner `N/A` **sólo en la columna `Z`** y dejar vacías las 8
-> de rango: sin Z no puede haber X, así que la información se conserva. En HTML el problema no existe
-> — se usa una sola celda con `colspan="8"`. Pendiente de decidir con la profesional
-> (`../preguntasParaLaProfesional.md` §C.1.b).
+Al sacar el texto `N/A`, desaparece también el compromiso que antes ensanchaba las columnas de rango:
+una celda vacía no ocupa más lugar que una `X`, así que ya no hace falta la alternativa liviana de
+poner el marcador sólo en `Z`.
 
 ### 🚫 La leyenda al pie — **NO se genera**
 
@@ -353,7 +366,11 @@ En los dos casos, la tabla se entrega en **un solo bloque** y **entera**, títul
 
 1. En el Word, seleccionar la tabla vieja completa y borrarla.
 2. Copiar la tabla generada y pegarla en ese lugar.
-3. Ajustar ancho de columnas / fuente si hace falta (una vez, no por fila).
+3. Si queda apretada por los márgenes de la página (esperable con 12 columnas): clic derecho dentro de
+   la tabla → **Autoajustar → "Autoajustar al contenido"**, y después clic derecho → **Propiedades de
+   tabla → pestaña Tabla → Ancho preferido → 130 %**. ✅ Verificado por el usuario (2026-09-08) — sin
+   tocar márgenes del documento ni el HTML. Es un ajuste de la tabla pegada, se hace una vez por
+   informe, no por fila.
 
 ### ✅ Verificado en Word real (2026-09-08)
 
@@ -386,6 +403,13 @@ usado en la prueba está en `../ejemplos/generar-tabla-sintesis.js`; la salida, 
 
 Detalle menor sin corregir: el título `SÍNTESIS DEL RENDIMIENTO – PERFIL COGNITIVO` pega alineado a
 la derecha en vez de centrado. Se arregla en Word con un clic, o se puede meter como fila de la tabla.
+
+> ⚠️ **Esta verificación es anterior a los cambios del 2026-09-08 (sin `N/A` + `ÁREA` con `rowspan`).**
+> Lo confirmado arriba (colspan, 15 X en su columna, sombreado) sigue valiendo para la estructura base,
+> pero el **`rowspan` en `ÁREA` es un mecanismo nuevo, sin probar todavía en Word real** — hay que
+> verificar que al pegar, la celda fusionada efectivamente cubra las filas del grupo y no rompa el
+> resto de la fila. `../ejemplos/generar-tabla-sintesis.js` y `../ejemplos/ejemplo-tabla-sintesis.html`
+> ya están actualizados al esquema nuevo (sin `N/A`, con `rowspan`) para volver a probar.
 
 **Falta probar** el camino de markdown renderizado (copiar la tabla del chat directamente), que es el
 que va a usar la profesional en el día a día. El de HTML ya está confirmado y sirve de respaldo.

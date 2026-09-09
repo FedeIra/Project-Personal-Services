@@ -23,22 +23,30 @@ const zoneBg=[GD,GD,GC,'','','','',''];   // sombreado de severidad por columna 
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const td=(txt,bg,center)=>`<td style="border:1px solid #000;padding:2px 4px;`
   +(bg?`background:${bg};`:'')+(center?'text-align:center;':'')+`">${esc(txt)}</td>`;
+const tdArea=(txt,rowspan)=>`<td rowspan="${rowspan}" style="border:1px solid #000;padding:2px 4px;`
+  +`vertical-align:middle;">${esc(txt)}</td>`;
+
+// 2026-09-08: la columna ÁREA se fusiona verticalmente (rowspan) en vez de repetir el nombre en
+// cada fila, como en la plantilla original. Sólo la primera fila de cada grupo emite la celda.
+function spanOf(i){ let n=1; while(rows[i+n] && rows[i+n][0]===rows[i][0]) n++; return n; }
 
 let body='';
-for(const [area,prueba,pb,tipo,z,xc] of rows){
-  let cells=td(area)+td(prueba)+td(pb,'',true);
+rows.forEach(([area,prueba,pb,tipo,z,xc], i) => {
+  const areaCell = (i===0 || area!==rows[i-1][0]) ? tdArea(area, spanOf(i)) : '';
+  let cells=areaCell+td(prueba)+td(pb,'',true);
   if(tipo==='qual'){
-    cells+=td('N/A',GC,true);
-    for(let i=0;i<8;i++) cells+=td('N/A',GC,true);
+    // 2026-09-08: ya no se escribe "N/A" — la celda queda vacía, sólo con el fondo gris.
+    cells+=td('',GC,true);
+    for(let k=0;k<8;k++) cells+=td('',GC,true);
   } else if(tipo==='interp'){
     cells+=td(z,'',true);
-    for(let i=0;i<8;i++) cells+=td('N/A',GC,true);
+    for(let k=0;k<8;k++) cells+=td('',GC,true);
   } else {
     cells+=td(z,'',true);
-    for(let i=0;i<8;i++) cells+=td(i+1===xc?'X':'',zoneBg[i],true);
+    for(let k=0;k<8;k++) cells+=td(k+1===xc?'X':'',zoneBg[k],true);
   }
   body+=`  <tr>${cells}</tr>\n`;
-}
+});
 const th=(t,extra='')=>`<th style="border:1px solid #000;padding:3px 5px;${extra}">${t}</th>`;
 const thspan=(t,n,extra='')=>`<th colspan="${n}" style="border:1px solid #000;padding:3px 5px;text-align:center;${extra}">${t}</th>`;
 const html=`<!doctype html>
@@ -49,7 +57,8 @@ const html=`<!doctype html>
 <p style="background:#fffbe6;border:1px solid #e0c000;padding:10px;max-width:900px;font-size:10pt">
 <b>Cómo probar el pegado en Word:</b> seleccioná la tabla de abajo (clic antes del borde superior
 izquierdo y arrastrá hasta el final, o <b>Ctrl+A</b> para toda la página) → <b>Ctrl+C</b> → abrí Word
-y <b>Ctrl+V</b>. Debería entrar como <b>tabla de Word</b>, con el sombreado gris incluido.<br>
+y <b>Ctrl+V</b>. Debería entrar como <b>tabla de Word</b>, con el sombreado gris incluido y la columna
+ÁREA fusionada por grupo (no repetida en cada fila).<br>
 <b>Copiá el título y la tabla</b> — los recuadros de instrucciones no son parte del informe; si usás
 Ctrl+A también se copian, borralos en Word.<br><br>
 ⚠️ <b>La fila de leyenda al pie no está acá</b> (es idéntica en todos los informes, así que se

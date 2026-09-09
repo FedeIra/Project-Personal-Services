@@ -13,17 +13,19 @@
 
 ## EVALUACIÓN NEUROCOGNITIVA
 
-**Datos personales** (tabla)
+**Datos personales** (bloque HTML — ver SKILL.md §1 sobre por qué no va en Markdown)
 
-| Campo | Valor |
-|---|---|
-| Paciente | Bertagni, Paula |
-| Edad | 62 años |
-| Fecha de nacimiento | 02/04/1964 |
-| Nivel educativo alcanzado | Universitario |
-| Lateralidad | Diestra |
-| Fecha de evaluación | 14/08/2026 |
-| Deriva | - |
+```html
+<table>
+<tr><td>Paciente</td><td>Bertagni, Paula</td></tr>
+<tr><td>Edad</td><td>62 años</td></tr>
+<tr><td>Fecha de nacimiento</td><td>02/04/1964</td></tr>
+<tr><td>Nivel educativo alcanzado</td><td>Universitario</td></tr>
+<tr><td>Lateralidad</td><td>Diestra</td></tr>
+<tr><td>Fecha de evaluación</td><td>14/08/2026</td></tr>
+<tr><td>Deriva</td><td>-</td></tr>
+</table>
+```
 
 ## MOTIVO DE CONSULTA Y ANTECEDENTES
 

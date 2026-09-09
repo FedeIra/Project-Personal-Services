@@ -35,7 +35,8 @@ cada uno abajo):
 3. **IFS Índice MT (`D31`)**: **no es una fecha**; deriva de la **suma de Dígitos Atrás + Memoria de
    Trabajo Visual**. Puede salir por fórmula; como mínimo, formato Texto.
 4. **Riesgo de evolución** Sí/No — determina las sugerencias diagnósticas (habilita la categoría 5).
-5. **Acompañado** Sí/No + **por quién** (familiar / amigo / hijo / esposa).
+5. **Atiende**: `Solo` / `Pareja` — celda `C52`, debajo de `Fecha de evaluación` (`C51`), en el bloque
+   demográfico. Reemplaza la propuesta anterior de `Acompañado` Sí/No + por quién.
 6. **Orientación temporal** y **espacial** — como subpuntaje del MMSE con puntuación, **o** dos
    celdas Sí/No (a elección de la profesional al armar el Excel).
 7. **C-QSM** (opcional): a veces se toma, a veces no. Cuando se toma, **corte > 3 puntos = quejas
@@ -160,8 +161,9 @@ auxiliar.)
 
 Tres datos que hoy salen del papel / la historia clínica y la profesional acordó llevar al Excel:
 
-- **Acompañado** Sí/No + **por quién** (familiar / amigo / hijo / esposa). Alimenta el primer párrafo
-  de la anamnesis (`asiste solo/acompañado`). Validación de lista en ambas celdas.
+- **Atiende**: `Solo` / `Pareja` — celda `C52`, debajo de `Fecha de evaluación` (`C51`). Alimenta el
+  primer párrafo de la anamnesis (`asiste solo/acompañado`). Reemplaza la propuesta anterior de
+  `Acompañado` Sí/No + por quién (familiar/amigo/hijo/esposa).
 - **Orientación temporal** y **espacial** — alimentan la frase de screening (`orientación temporal y
   espacial conservadas`). Dos opciones a elección de la profesional al armar el Excel: (a) subpuntaje
   del MMSE con puntuación, o (b) dos celdas Sí/No. Con cualquiera, la skill arma la frase y avisa si
