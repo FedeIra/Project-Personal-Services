@@ -14,58 +14,64 @@ esta tabla (Excel unificado incluido) debe ser **posicional (índice de fila), n
 
 ## Las 36 filas, con su celda de origen en el Excel
 
-Celdas de `excelEvaluacionCompleto.xlsx`, hoja `TABLA DE FORMULAS` (esquema completo en
-`mapeo-excel-a-word.md` §1).
+Celdas de `excelEvaluacionCompletoV4.xlsx`, hoja `TABLA DE FORMULAS` (esquema completo y **única
+fuente de direcciones** en `mapeo-excel-a-word.md` §1).
+
+> 🚩 **La tabla tiene 36 filas y V3 no las cambia.** V3 agregó al Excel `Orientación temporal`
+> (`C14`) y `Orientación espacial` (`C15`) dentro del cuadro de pruebas, y campos nuevos en el bloque
+> demográfico (`B8`, `B9`, `B10`). **Ninguno es fila de esta tabla** — los dos informes reales tienen
+> exactamente estas 36 filas. La orientación alimenta la frase 3 del screening; el resto, la anamnesis
+> y la categoría diagnóstica. **No agregar filas para "que coincida con el Excel".**
 
 | # | Área | Prueba | Tipo | PB desde | Z desde |
 |---|------|--------|------|----------|---------|
-| 1 | Screening cognitivo y psiquiátrico | MMSE | Cualitativa | `D25` | — |
-| 2 | | TRO | Cualitativa | `D26` | — |
-| 3 | | AVD | Cualitativa **con interpretación en Z** | `D27` | `E27` |
-| 4 | | KPDS-10 | Cualitativa **con interpretación en Z** | `D28` | `E28` |
-| 5 | Atención y funciones ejecutivas | DD | Con Z | `D8` | `E8` |
-| 6 | | DI | Con Z | `D9` | `E9` |
-| 7 | | TMT A | Con Z | `D10` | `E10` |
-| 8 | | TMT B | Con Z | `D11` | `E11` |
-| 9 | | FF | Con Z | `D12` | `E12` |
-| 10 | | IFS Total | Cualitativa | `D30` | — |
-| 11 | | IFS Índice MT | Cualitativa | `D31` ⚠️ | — |
-| 12 | | IFS SM | Cualitativa | `D32` | — |
-| 13 | | IFS IC | Cualitativa | `D33` | — |
-| 14 | | IFS CIM | Cualitativa | `D34` | — |
-| 15 | | IFS DA | Cualitativa | `D35` | — |
-| 16 | | IFS MA | Cualitativa | `D36` | — |
-| 17 | | IFS MTV | Cualitativa | `D37` | — |
-| 18 | | IFS R | Cualitativa | `D38` | — |
-| 19 | | IFS CIV | Cualitativa | `D39` | — |
-| 20 | Memoria episódica | BEM–MS AS1 | Cualitativa (PB por ensayo) | `K14` | — |
-| 21 | | BEM–MS AS2 | Cualitativa (PB por ensayo) | `K15` | — |
-| 22 | | BEM–MS AS3 | Cualitativa (PB por ensayo) | `K16` | — |
-| 23 | | BEM–MS AST | Con Z | `D13` | `E13` |
-| 24 | | BEM–MS RSE | Con Z | `D14` | `E14` |
-| 25 | | BEM–MS Sem | Con Z | `D15` | `E15` |
-| 26 | | BEM–MS Rec | Con Z | `D16` | `E16` |
-| 27 | | BEM–MS CE | Con Z | `D17` | `E17` |
-| 28 | | BEM–ML Inm | Con Z | `D18` | `E18` |
-| 29 | | BEM–ML Dif | Con Z | `D19` | `E19` |
-| 30 | Lenguaje | FF | Con Z | `D20` | `E20` |
-| 31 | | FS | Con Z | `D21` | `E21` |
-| 32 | | TBA | Con Z | `D22` | `E22` |
-| 33 | | Comprensión | Cualitativa | `D41` | — |
-| 34 | | Expresión | Cualitativa | `D42` | — |
-| 35 | Visoconstrucción | TRO | Cualitativa | `D43` | — |
-| 36 | | MMSE copia | Cualitativa | `D44` | — |
+| 1 | Screening cognitivo y psiquiátrico | MMSE | Cualitativa | `C13` | — |
+| 2 | | TRO | Cualitativa | `C16` | — |
+| 3 | | AVD | Cualitativa **con interpretación en Z** | `C17` | `D17` |
+| 4 | | KPDS-10 | Cualitativa **con interpretación en Z** | `C18` | `D18` |
+| 5 | Atención y funciones ejecutivas | DD | Con Z | `C19` | `D19` |
+| 6 | | DI | Con Z | `C20` | `D20` |
+| 7 | | TMT A | Con Z | `C21` | `D21` |
+| 8 | | TMT B | Con Z | `C22` | `D22` |
+| 9 | | FF | Con Z | `C23` | `D23` |
+| 10 | | IFS Total | Cualitativa | `C24` | — |
+| 11 | | IFS Índice MT | Cualitativa | `C25` | — |
+| 12 | | IFS SM | Cualitativa | `C26` | — |
+| 13 | | IFS IC | Cualitativa | `C27` | — |
+| 14 | | IFS CIM | Cualitativa | `C28` | — |
+| 15 | | IFS DA | Cualitativa | `C29` | — |
+| 16 | | IFS MA | Cualitativa | `C30` | — |
+| 17 | | IFS MTV | Cualitativa | `C31` | — |
+| 18 | | IFS R | Cualitativa | `C32` | — |
+| 19 | | IFS CIV | Cualitativa | `C33` | — |
+| 20 | Memoria episódica | BEM–MS AS1 | Cualitativa (PB por ensayo) | `P35` | — |
+| 21 | | BEM–MS AS2 | Cualitativa (PB por ensayo) | `P36` | — |
+| 22 | | BEM–MS AS3 | Cualitativa (PB por ensayo) | `P37` | — |
+| 23 | | BEM–MS AST | Con Z | `C34` | `D34` |
+| 24 | | BEM–MS RSE | Con Z | `C35` | `D35` |
+| 25 | | BEM–MS Sem | Con Z | `C36` | `D36` |
+| 26 | | BEM–MS Rec | Con Z | `C37` | `D37` |
+| 27 | | BEM–MS CE | Con Z | `C38` | `D38` |
+| 28 | | BEM–ML Inm | Con Z | `C39` | `D39` |
+| 29 | | BEM–ML Dif | Con Z | `C40` | `D40` |
+| 30 | Lenguaje | FF | Con Z | `C41` | `D41` |
+| 31 | | FS | Con Z | `C42` | `D42` |
+| 32 | | TBA | Con Z | `C43` | `D43` |
+| 33 | | Comprensión | Cualitativa | `C44` | — |
+| 34 | | Expresión | Cualitativa | `C45` | — |
+| 35 | Visoconstrucción | TRO | Cualitativa | `C46` | — |
+| 36 | | MMSE copia | Cualitativa | `C47` | — |
 
-⚠️ `D31` está corrompida en el Excel entregado (guarda un serial de fecha en vez de `7/10`). ✅
-Aclarado (2026-09-07): el IFS Índice MT **deriva de Dígitos Atrás + Memoria de Trabajo Visual** — no
-es una fecha; conviene fórmula o formato Texto. Ver `excel-unificado-spec.md` §A.1.
+✅ **`C25` (IFS Índice MT) ya no se corrompe.** En V1 se autoconvertía a serial de fecha; **en V3 es
+texto** (`7/10`) y se copia tal cual. El valor deriva de Dígitos Atrás + Memoria de Trabajo Visual.
 
-✅ **Y es recuperable:** el serial de una celda `n/m` mal formateada, convertido con `d/m`, da el
-valor original — verificado con un caso real (paciente y fecha reales, no reproducidos acá) contra su
-informe correspondiente. Convertir, chequear que el denominador coincida con el máximo del subtest
-(`/10`), usar el valor en esta fila y anotarlo en el bloque 11 como recuperado a confirmar.
-Procedimiento completo en `mapeo-excel-a-word.md` §5.1.b. **Nunca** dejar `[PENDIENTE …]` escrito
-dentro de la celda.
+Si alguna vez vuelve a llegar como número (~45000–48000), la conversión **es reversible**: formatear
+el serial como `d/m` devuelve lo tipeado. Chequear que el denominador coincida con el máximo del
+subtest (`/10`), usar el valor en esta fila y anotarlo en el bloque 11 como recuperado a confirmar.
+**Nunca** dejar `[PENDIENTE …]` escrito dentro de la celda — celda sin dato = celda vacía.
+
+⚠️ **Fila 2 vs fila 35 (TRO):** en V3 `C16` y `C46` traen valores distintos. **Copiar cada celda en
+su fila**, no reconciliarlas, y anotar la diferencia en el bloque 11 (`mapeo-excel-a-word.md` §5.f).
 
 ## Cómo se completa cada fila: PB, Z y la X de rango
 
@@ -168,6 +174,12 @@ gris claro = bajo pero sin déficit significativo (así lo explica la leyenda).
 > `#D9D9D9` — mismo criterio que las filas cualitativas simples, para marcar "no aplica" de forma
 > consistente en todas las filas sin Z. No afecta lo que se informa (esas filas nunca llevan `X`).
 
+> 🔜 **Propuesta abierta (2026-09-15):** que la tabla la arme el **Excel** en una hoja derivada
+> (`TABLA INFORME`), con la X y el Z formateado por fórmula, y que el paso al Word sea un copy/paste.
+> Si prospera, la skill **deja de generar esta tabla** y todo lo que sigue en este archivo pasa a ser
+> la referencia de qué tiene que contener, no de qué tiene que emitir. Ver
+> `../clinicTransformationGuide.md` §5, "Para retomar". **Mientras tanto, vale lo de abajo.**
+
 ## 🟢 Entrega: la skill genera la **tabla completa**, no valores sueltos
 
 ✅ **Decisión de la profesional (2026-09-08): no hace falta conservar la tabla que ya está en el
@@ -232,7 +244,7 @@ convención 1 abajo), así que en `<td>` reales una fila **abre grupo con 12** y
    (ver mapa de sombreado abajo).
 3. **Filas cualitativas simples** (1–2, 10–22, 33–36): el texto entero en `PB` · **`Z` y las 8
    columnas de rango vacías, sin texto, con fondo gris `#D9D9D9`**.
-4. **Filas AVD y KPDS-10** (3–4): `PB` numérico · la palabra de `E27`/`E28` en `Z` · **las 8 columnas
+4. **Filas AVD y KPDS-10** (3–4): `PB` numérico · la palabra de `D17`/`D18` en `Z` · **las 8 columnas
    de rango vacías, sin texto, con fondo gris `#D9D9D9`**.
 
 ### El fondo gris — marcador de no-aplica, sin texto adentro

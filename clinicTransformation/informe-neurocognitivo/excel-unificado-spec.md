@@ -1,248 +1,307 @@
-# Excel unificado — estado del archivo entregado y ajustes propuestos
+# Excel unificado — estado del archivo entregado y ajustes pendientes
 
-> **Actualizado tras recibir `excelEvaluacionCompleto.xlsx`.** Este archivo dejó de ser una spec "a
-> mandar" y pasó a ser la **revisión del Excel real**: qué quedó cubierto, qué falta, y los ajustes
-> mínimos para que la IA pueda leerlo sin perder claridad para quien lo completa.
+> **Revisión de `excelEvaluacionCompletoV4.xlsx` (recibido 2026-09-15, verificado por código).** Este archivo no es una spec
+> "a mandar": es el **veredicto sobre el Excel real** — qué quedó cubierto, qué falta y los ajustes
+> mínimos que quedan.
 >
-> El esquema celda por celda está en `mapeo-excel-a-word.md` §1. Acá va sólo el veredicto y los
-> ajustes.
+> El esquema celda por celda está en `mapeo-excel-a-word.md` §1, que es la **única fuente de
+> direcciones** del paquete. Acá va sólo el estado y los ajustes.
 
 ## Veredicto general
 
-El archivo es **un salto grande**: incorporó las 36 filas de la tabla de síntesis, el bloque
-demográfico, la interpretación de AVD y K-10, y — algo que no estaba pedido y resultó muy útil — las
-**notas de anamnesis** (`B55:B64`), que son la única fuente del bloque `MOTIVO DE CONSULTA Y
-ANTECEDENTES` del Word.
+**V3 cierra todos los faltantes bloqueantes.** Con este archivo **no queda ningún bloque del informe
+que no se pueda generar desde el Excel**: los 10 ítems del K-10 habilitan el gráfico 2, el flag de
+riesgo de evolución habilita la categoría 5, la orientación temporal/espacial completa la frase 3 del
+screening, el `IFS Índice MT` dejó de corromperse y el bloque demográfico quedó unificado con el de
+parámetros.
 
-Está claro y bien organizado para la persona que lo completa: mantiene el cuadro de fórmulas
-original intacto y agrega los bloques nuevos debajo, con la misma lógica visual.
+**V4 (2026-09-15) aplicó §A.4, §A.6, §A.8 y casi todo §A.9**, y está **verificado por código**:
+`C18`=`=B60`, `C34`=`=TRUNC(Q35,2)`, `C38`=`=TRUNC(P40,2)`, `B62`=`2`, validación de lista en `B10`
+y en `B5`. Todos los valores cacheados están presentes y son coherentes con sus fórmulas, así que el
+archivo se puede leer por código sin reabrirlo en Excel.
 
-**Pero todavía no alcanza para generar la evaluación final sin otros archivos.** Hay tres faltantes
-que bloquean partes concretas del informe (§A.2, §A.3, §A.4) y una celda con datos corrompidos
-(§A.1). Con esos cuatro arreglos — todos de una a diez celdas — el objetivo de "un solo archivo" se
-cumple.
-
----
-
-## ✅ Confirmado con la profesional (2026-09-07) — cambios al Excel acordados
-
-La profesional respondió las preguntas. Ajustes acordados para el Excel (detalle e implicancia de
-cada uno abajo):
-
-1. **10 ítems del K-10** por separado, con `D28 = SUMA(...)`. *("Pasemos cada ítem al Excel.")*
-2. **AST por fórmula** = promedio de los 3 trials, **truncado a 2 decimales** (no redondeado). Deja
-   de cargarse a mano.
-3. **IFS Índice MT (`D31`)**: **no es una fecha**; deriva de la **suma de Dígitos Atrás + Memoria de
-   Trabajo Visual**. Puede salir por fórmula; como mínimo, formato Texto.
-4. **Riesgo de evolución** Sí/No — determina las sugerencias diagnósticas (habilita la categoría 5).
-5. **Atiende**: `Solo` / `Pareja` — celda `C52`, debajo de `Fecha de evaluación` (`C51`), en el bloque
-   demográfico. Reemplaza la propuesta anterior de `Acompañado` Sí/No + por quién.
-6. **Orientación temporal** y **espacial** — como subpuntaje del MMSE con puntuación, **o** dos
-   celdas Sí/No (a elección de la profesional al armar el Excel).
-7. **C-QSM** (opcional): a veces se toma, a veces no. Cuando se toma, **corte > 3 puntos = quejas
-   presentes**; cuando no, la observación deriva de la entrevista/motivo. Celda de puntaje opcional.
-
-Los puntos 1–4 ya estaban propuestos abajo (§A.1–§A.4) y quedan **confirmados**; los puntos 5–7 son
-**campos nuevos** que surgieron de las respuestas (§A.6).
+Queda **un error a corregir** (§A.9, la lista de `B6`), **dos validaciones que no se aplicaron**
+(`C14`/`C15`) y **dos preguntas de criterio** (§A.10, §A.11). Ninguno impide generar el informe.
 
 ---
 
-## A. Bloqueantes — ordenados por costo/beneficio
+## Lo que V3 y V4 resolvieron
 
-### A.1 Formatear como texto las celdas `X/Y` (⚠️ hoy hay datos perdidos)
+| Punto | Qué pedía | Cómo quedó en V3 |
+|---|---|---|
+| **A.1** Celdas `X/Y` formateadas como texto | evitar la autoconversión a serial de fecha del `IFS Índice MT` | ✅ `C25` es **texto** (`7/10`). Todas las celdas `X/Y` del cuadro son cadenas. |
+| **A.2** Desglosar el K-10 en sus 10 ítems | habilitar el gráfico `Escala K-10` | ✅ `A50:A59` rótulos + `B50:B59` puntajes, **en el orden del cuestionario y del gráfico**, con `B60` = `=SUMA(B50:B59)`. |
+| **A.3** Flag `Riesgo de evolución` Sí/No | habilitar la categoría 5 de `regla-diagnostica.md` | ✅ `B10`, con validación de lista `Si`/`No` desde V4. |
+| **A.5** Unificar los dos bloques demográficos | que la edad/nivel educativo no vivan en dos lugares | ✅ **Resuelto de raíz.** V3 tiene **un solo** bloque (`A1:B10`) y es el que manejan los `VLOOKUP`. Ya no puede desincronizarse, y se completa un campo menos por paciente. |
+| **A.7** Orientación temporal y espacial | completar la frase 3 del screening | ✅ `C14` y `C15`, `Si`/`No`, dentro del cuadro de pruebas. |
+| **A.7** Campo de acompañamiento | primera frase de la anamnesis | ⚠️ **Parcial** — existe `B8` pero con otro rótulo y otro dominio (§A.10). |
+| **B.1** Rótulos de área en los bloques cualitativos | hacer el archivo autoexplicativo | ✅ `A13`/`A19`/`A34`/`A41`/`A46` rotulan los 5 grupos. Además **no hay celdas combinadas** en toda la hoja, así que la lectura por código es directa. |
+| **A.6** PB de AST por fórmula | que el PB no dependa de cómo se redondeó ese día | ✅ **Aplicado 2026-09-15**, y extendido al PB de CE. Ver §A.6 — falta reemplazar la copia del repo para verificarlo. |
+| **A.8** Total del K-10 por fórmula | que el total de la tabla no se desincronice de los 10 ítems | ✅ **Aplicado 2026-09-15**: `C18` = `=B60`. Falta reemplazar la copia del repo para verificarlo. |
+| *(nuevo)* Campo de derivante | la fila `Deriva:` que tiene `informeFinal.docx` | ✅ `B9` (`Derivado por`). El **dato** ya no hay que buscarlo fuera del Excel; la **presencia** de la fila la sigue decidiendo la plantilla del profesional (`informeFinal.docx` la trae con `-`, `informeFinal2.docx` no la trae). |
 
-**Problema:** `D31` (IFS Índice MT) puede guardar un serial de fecha en vez del valor real (ejemplo
-ficticio: `45936` con formato de fecha = **06/10/2025**, de haber tipeado `6/10`). Ya se dio un caso
-real donde el valor original recuperado del serial coincidió exactamente con lo que decía el Word.
+Bonus no pedido: `C3` (el rótulo "Nombre" que quedaba vacío en V1) desapareció — el nombre vive sólo
+en `B2`.
 
-✅ **Confirmado (2026-09-07): no es una fecha.** El IFS Índice MT **deriva de la suma de la puntuación
-de los ítems Dígitos Atrás + Memoria de Trabajo Visual.** → Mejor aún que formato Texto: si esos dos
-ítems están en el Excel, `D31` puede salir **por fórmula** (`= Dígitos Atrás + MTV`) y no vuelve a
-corromperse ni depende de tipeo. Si se deja manual, va en formato Texto sí o sí.
+---
 
-Es el arreglo más urgente porque **falla en silencio**: nada en la pantalla avisa, y el próximo
-paciente puede perder otra celda.
+## A. Ajustes pendientes
 
-**Ajuste:** dar formato **Texto** a todo el bloque `D25:D44` (o al menos a las celdas que reciben
-`X/Y`: `D25`, `D26`, `D30`, `D31`, `D43`), una vez, y queda para siempre.
-*Cómo:* seleccionar el rango → `Inicio › Formato de número › Texto`.
-*Alternativa por celda:* tipear `'7/10` (apóstrofo adelante), pero es fácil de olvidar.
+### A.4 ✅ `C-QSM`: celda de puntaje opcional (aplicada en V4; no hay fórmula posible)
 
-**Impacto en la claridad:** ninguno. Se ve exactamente igual, y de hecho **mejor**: hoy `D31` muestra
-una fecha donde debería haber un puntaje.
+`A62` dice `C-QSM` y **no hay nada debajo**. Lo acordado era una **celda de puntaje opcional**
+(vacía si no se tomó).
 
-### A.2 Desglosar el K-10 en sus 10 ítems
+**No se puede derivar por fórmula.** A diferencia del `IFS Índice MT` (= Dígitos Atrás + MTV) o del
+`BEM–MS CE` (= `(Sem+Rec)/2`), el C-QSM es un **cuestionario autoinformado aparte**: no hay ningún
+insumo en la hoja del que pueda salir. Si se toma, el puntaje se tipea; si no, la celda queda vacía.
 
-✅ **Confirmado (2026-09-07): "pasemos cada ítem al Excel".**
+**Es un número, pero nunca aparece en el informe.** Verificado en los dos Word:
 
-**Problema:** el gráfico `Escala K-10` del Word necesita los 10 puntajes por síntoma. El Excel guarda
-sólo el total (`D28` = `15`). Ese bloque del informe **no se puede generar desde el Excel**.
+- **No** es fila de la tabla de síntesis (36 filas, ninguna es C-QSM).
+- **No** está en ninguno de los dos gráficos.
+- **No** aparece como puntaje en ningún párrafo.
 
-**Ajuste:** 10 celdas nuevas, en este orden exacto (el del cuestionario en papel y el del gráfico,
-ver `orden-categorias-graficos.md`):
+Lo único que produce es un **binario** que decide media frase del screening (frase 5, §4.1 de
+`mapeo-excel-a-word.md`): con **corte > 3** hay quejas presentes, y la negación se recorta a
+`…no reporta sintomatología vinculada al malestar psicológico.`. Si no se tomó, esa observación
+**deriva de la anamnesis / motivo de consulta**, que es lo que hacen hoy los dos informes reales.
 
-| # | Síntoma | | # | Síntoma |
-|---|---|---|---|---|
-| 1 | Cansancio | | 6 | Inquietud + |
-| 2 | Nervios | | 7 | Depresión |
-| 3 | Nervios + | | 8 | Esfuerzo |
-| 4 | Desesperanza | | 9 | Tristeza |
-| 5 | Inquietud | | 10 | Inutilidad |
+**Y efectivamente no va en toda evaluación** — está a la vista en los archivos:
 
-Y que **`D28` pase a ser `=SUMA(...)` de esas 10 celdas** en vez de un número tipeado. Así el total
-no puede quedar desincronizado de los ítems.
+| Informe | `PRUEBAS ADMINISTRADAS` | C-QSM |
+|---|---|---|
+| `informeFinal.docx` | 11 ítems | **no lo lista** |
+| `informeFinal2.docx` | 12 ítems | sí lo lista |
 
-**Impacto en la claridad:** positivo. Hoy los 10 ítems se transcriben del papel directo al gráfico
-del Word; con esto se cargan una sola vez, en el mismo lugar que todo el resto, y el total se calcula
-solo.
+✅ **Aplicado en V4: `B62` = `2`** (número entero, sin denominador — el formato recomendado). Para
+esta paciente eso es **≤ 3 ⇒ sin quejas subjetivas significativas**, así que la frase 5 del screening
+va completa.
 
-### A.3 Agregar el flag "Riesgo de evolución" (Sí/No)
+**Por qué la celda vale la pena aunque el campo sea opcional:** una celda de puntaje en
+`B62`, con el rótulo aclarando que va vacía si no se tomó. El valor no es que aporte un dato al
+informe — es que **distingue "no se tomó" de "se tomó y no se cargó"**, que hoy son
+indistinguibles. Con la celda vacía la skill sabe que tiene que avisar que **la línea del C-QSM se
+borra de `PRUEBAS ADMINISTRADAS`**; sin la celda, sólo puede suponerlo.
 
-✅ **Confirmado (2026-09-07): "agreguemos la celda… que eso determina las sugerencias diagnósticas".**
+#### Qué valor va y en qué celda
 
-**Problema:** sin ese campo, la **categoría 5** de `regla-diagnostica.md` (DCL con mayor riesgo de
-evolución) es inalcanzable. Es criterio clínico puro: no se deriva de ningún puntaje.
+El puntaje va en **`B62`**, al lado del rótulo — mismo patrón que el bloque de arriba
+(`A50:A59` rótulos / `B50:B59` valores) y que `A49`/`B49`.
 
-**Ajuste:** una celda, con validación de datos de lista `Sí` / `No` para que no queden variantes
-(`SI`, `si`, `x`, vacío).
+Va como **número entero suelto**, no como `X/Y`. Es el mismo criterio que ya usan las otras dos
+celdas cuyo valor sólo sirve para cruzar un corte:
 
-### A.4 Agregar el C-QSM
-
-**Problema:** el `Cuestionario de quejas subjetivas de memoria (C-QSM)` figura en `PRUEBAS
-ADMINISTRADAS` y su resultado se usa en la narrativa de screening del Word, pero no tiene ninguna
-celda.
-
-✅ **Aclarado (2026-09-07):** el C-QSM **a veces se toma y a veces no** (antes figuraba fijo en
-PRUEBAS ADMINISTRADAS por error).
-- **Cuando se toma:** la presencia/ausencia de quejas la determina un **corte > 3 puntos** (más de 3 =
-  quejas presentes). → Conviene una **celda de puntaje opcional**; la skill deriva la frase de
-  screening del corte.
-- **Cuando no se toma:** la observación de quejas **deriva de la entrevista inicial / motivo de
-  consulta** (las notas de anamnesis), no de un puntaje.
-
-**Ajuste:** una celda de puntaje **opcional** (vacía si no se tomó). La skill: si hay puntaje, aplica
-el corte > 3; si no, toma la observación de la anamnesis. No es fila obligatoria de la tabla de
-síntesis.
-
-### A.5 Unificar los dos bloques demográficos
-
-**Problema:** la edad y el nivel educativo están cargados **dos veces**, y ya divergieron:
-
-| Dato | Celda que maneja las fórmulas | Celda que va al Word | Estado |
+| Celda | Prueba | Formato | Por qué |
 |---|---|---|---|
-| Edad | `C4` = `61` | `C47` = `61 años` | duplicado |
-| Nivel educativo | `C5` = `Terciario` | `C49` = `Terciario ` | **ya divergen** (espacio final) |
+| `C17` | AVD | `8` — número | el corte (0–5 / 6–8) decide la interpretación |
+| `C18` | KPDS-10 | `24` — número | el corte (≥ 25) decide la categoría |
+| **`B62`** | **C-QSM** | **número** | **el corte (> 3) decide si hay quejas** |
 
-`C4` es lo que decide **contra qué norma de edad se compara todo el informe**. Si alguna vez se
-actualiza `C47` y no `C4`, el informe sale con las normas del paciente anterior y nada lo señala.
+(Las que sí van como texto `X/Y` — `C13` MMSE, `C16` TRO, `C24` IFS Total, `C25` Índice MT — son las
+que se **muestran** en el informe con esa forma. El C-QSM no se muestra nunca, así que no necesita
+el denominador.)
 
-**Ajuste:** elegir un bloque como canónico y que el otro lo referencie por fórmula. Concretamente:
-`C47` → `=C4 & " años"` y `C49` → `=C5`. Se carga en un solo lugar y no puede desincronizarse.
+Ejemplos, con la única regla confirmada (corte > 3):
 
-**Impacto en la claridad:** positivo — se completa un campo menos por paciente.
+| `B62` | Lectura | Efecto en la frase 5 del screening |
+|---|---|---|
+| *(vacía)* | no se tomó | la observación deriva de la anamnesis · **avisar que la línea del C-QSM se borra de `PRUEBAS ADMINISTRADAS`** |
+| `2` | ≤ 3 → sin quejas significativas | frase completa: `…no reporta sintomatología vinculada al malestar psicológico ni quejas subjetivas de memoria significativas.` |
+| `5` | > 3 → quejas presentes | la negación se recorta a `…no reporta sintomatología vinculada al malestar psicológico.` |
 
-Bonus del mismo arreglo: `C3` ("Nombre") está vacía y el nombre real vive en `C46`. O se borra el
-rótulo `B3`/`C3`, o `C3` → `=C46`.
+⚠️ **El puntaje máximo del cuestionario no está confirmado** — `../evaluacion.pdf` usa codificación de
+fuente propia y no se puede leer por código. Los ejemplos de arriba sólo respetan el corte > 3, que sí
+está confirmado (2026-09-07). Si el formulario en papel puntúa sobre un máximo y la profesional
+prefiere anotarlo como `X/Y`, la celda va en **formato Texto** — pero conviene el número suelto: la
+skill tendría que parsear el numerador para aplicar el corte, y eso es una fuente de error extra por
+un dato que no se imprime.
 
----
+### A.6 ✅ PB por fórmula — `BEM–MS AST` y `BEM–MS CE` (aplicado y verificado en V4)
 
-### A.6 BEM–MS AST por fórmula (confirmado)
+✅ Confirmado (2026-09-07): el PB de AST **es el promedio de los 3 trials**, **truncado a 2
+decimales** (no redondeado), y la profesional prefiere que se calcule solo.
 
-✅ **Confirmado (2026-09-07):** el PB de AST **es el promedio de los 3 trials** y la profesional
-prefiere que **se calcule solo**, dejándolo **truncado a 2 decimales** (no redondeado). Hoy `L14`
-(`=(K14+K15+K16)/3`) ya hace el promedio pero el PB `D13` se carga a mano y quedó `7,66` (truncado,
-correcto).
+**Aplicado por la profesional (2026-09-15)**, extendiendo la misma lógica al CE:
 
-**Ajuste:** `D13` → fórmula que trunca `L14` a 2 decimales, p. ej. `=TRUNCAR(L14; 2)`. Así el PB no
-depende de cómo se redondeó ese día y el Z sale consistente. (Ver `mapeo-excel-a-word.md` §Bloque
-auxiliar.)
+| Celda | Fórmula | Insumo |
+|---|---|---|
+| `C34` (PB de AST) | `=TRUNCAR(Q35;2)` | `Q35` = `(P35+P36+P37)/3`, el promedio de los 3 ensayos |
+| `C38` (PB de CE) | `=TRUNCAR(P40;2)` | `P40` = `(C36+C37)/2`, el promedio de Sem y Rec |
 
-### A.7 Campos nuevos que surgieron de las respuestas
+**Por qué en AST no era cosmético:** truncar y redondear dan PB distintos y **el PB mueve el Z**. Con
+un promedio de `7,6667`, el PB correcto es `7,66` (Z `-0,90`); `7,67` daría Z `-0,89`. Con la
+fórmula el PB deja de depender de cómo se redondeó ese día.
 
-Tres datos que hoy salen del papel / la historia clínica y la profesional acordó llevar al Excel:
+ℹ️ **En CE el truncado es inocuo pero el cambio igual suma.** `(Sem+Rec)/2` sobre dos enteros da
+siempre `,0` o `,5`: nunca hay un tercer decimal que truncar, así que `TRUNCAR` no puede cambiar el
+número (`10,5` sigue siendo `10,5`). Lo que sí gana es lo mismo que en AST y en §A.8: **elimina la
+doble carga manual** — antes `C38` se tipeaba y `P40` sólo lo chequeaba; ahora hay una sola fuente y
+no pueden divergir. `P40` pasó de celda de control a **insumo**.
 
-- **Atiende**: `Solo` / `Pareja` — celda `C52`, debajo de `Fecha de evaluación` (`C51`). Alimenta el
-  primer párrafo de la anamnesis (`asiste solo/acompañado`). Reemplaza la propuesta anterior de
-  `Acompañado` Sí/No + por quién (familiar/amigo/hijo/esposa).
-- **Orientación temporal** y **espacial** — alimentan la frase de screening (`orientación temporal y
-  espacial conservadas`). Dos opciones a elección de la profesional al armar el Excel: (a) subpuntaje
-  del MMSE con puntuación, o (b) dos celdas Sí/No. Con cualquiera, la skill arma la frase y avisa si
-  alguna **no** está conservada.
-- **C-QSM** — celda de puntaje opcional (ver §A.4).
+✅ **Verificado en V4:** `C34` = `=TRUNC(Q35,2)` → `10` (ensayos 7, 11, 12 → `Q35` = 10) y `C38` =
+`=TRUNC(P40,2)` → `12` (Sem 12, Rec 12 → `P40` = 12). Los dos con el valor cacheado coherente.
+(Excel guarda `TRUNCAR` como `TRUNC` en el XML; es lo mismo.)
 
-Ninguno bloquea el pipeline actual del mismo modo que §A.1–§A.4, pero sin ellos esas frases del
-informe siguen dependiendo del papel / la historia clínica.
+**La skill sigue usando el PB tal como viene** y no recalcula el Z. Como guarda para archivos
+viejos, compara `C34` con `TRUNCAR(Q35;2)` y `C38` con `TRUNCAR(P40;2)`; si no coinciden, lo señala
+en el bloque 11.
+
+### A.8 ✅ Total del K-10 por fórmula (aplicado y verificado en V4)
+
+`C18` (el PB del K-10 que va a la tabla de síntesis) era un número tipeado mientras `B60` ya era
+`=SUMA(B50:B59)`: el mismo modo de falla de §A.5 a menor escala — dos celdas con el mismo dato,
+cargadas por separado, sin nada que avise si divergen.
+
+**Aplicado:** `C18` → `=B60`. Los 10 ítems se cargan una sola vez y el total de la tabla de síntesis,
+el del gráfico y el que dispara el corte ≥ 25 **no pueden desincronizarse**.
+
+✅ **Verificado en V4:** `C18` = `=B60` → `24`, coherente con `B60` = `=SUM(B50:B59)` = `24`.
+
+ℹ️ Nota para `regla-diagnostica.md`: el corte de sintomatología anímica se deriva del K-10 por
+default, pero la profesional puede sobrescribirlo. Ahora eso implica **pisar una fórmula** en `C18`,
+no editar un número suelto — si algún archivo llega con `C18` tipeado y distinto de `B60`, puede ser
+un override deliberado: **señalarlo, no corregirlo**.
+
+### A.9 Validación de lista en los campos Sí/No y en lateralidad
+
+**Estado en V4 (verificado por código):**
+
+| Celda | Validación | Estado |
+|---|---|---|
+| `B10` Riesgo de evolución | lista `"Si,No"` | ✅ correcta |
+| `B5` Nivel educativo | lista → `FLUENCIAS!$B$2:$D$2` | ✅ **la mejor implementación posible** — apunta a los encabezados reales, así que no puede desfasarse de la hoja de normas |
+| `B6` Lateralidad | lista `"Diestro,Zurdo,Ambidiestro"` | 🚩 **incompleta — corregir** |
+| `C14`/`C15` Orientación | *(sin validación)* | pendiente |
+
+#### 🚩 `B6`: la lista sólo tiene las formas masculinas
+
+El origen cargado es `Diestro,Zurdo,Ambidiestro`, pero **el valor actual de la celda es `Diestra`** —
+o sea, la celda incumple su propia lista. Excel no lo marca porque la validación sólo controla lo que
+se tipea **después** de crearla; el valor que ya estaba queda intacto y en silencio.
+
+El valor se copia **verbatim** a la tabla de datos personales del Word, así que tiene que concordar
+en género con el paciente (`informeFinal.docx`: `Diestra`; Excel V1: `Diestro`). Con esta lista, el
+próximo paciente varón se carga bien pero **una paciente mujer no tiene opción válida**.
+
+**Corrección — reemplazar el origen por:**
+
+```
+Diestro;Diestra;Zurdo;Zurda;Ambidiestro;Ambidiestra
+```
+
+Después, volver a elegir `Diestra` en `B6` desde el desplegable para que la celda quede consistente.
+Para detectar casos así: **Datos** → flecha de **Validación de datos** → **Rodear con un círculo los
+datos no válidos**.
+
+#### Cómo aplicar una validación (por si hace falta para `C14`/`C15`)
+
+1. Seleccionar la celda. Para las dos juntas: clic en `C14`, **Ctrl** + clic en `C15`.
+2. Pestaña **Datos** → *Herramientas de datos* → **Validación de datos** → **Validación de datos…**
+3. Pestaña **Configuración**: *Permitir* = **Lista**; *Origen* = `Si;No`; dejar tildado **Celda con
+   lista desplegable**.
+4. Pestaña **Mensaje de error**: *Estilo* = **Detener** (con *Advertencia* o *Información* el valor
+   entra igual).
+5. **Aceptar.**
+
+ℹ️ El separador que se tipea depende de la configuración regional (`;` acá, el mismo de
+`=TRUNCAR(Q35;2)`), pero Excel lo **guarda siempre con coma** en el XML — por eso `B10` figura como
+`"Si,No"` aunque se haya escrito con punto y coma. No es un error.
+
+🚩 **Usar `Si` sin tilde.** Los valores ya cargados en `B10`, `C14` y `C15` son `Si`/`No` sin tilde, y
+la lista de `B10` ya quedó definida así. Mantener la coherencia.
+
+Sin validación la skill normaliza tolerantemente (mayúsculas/minúsculas, con y sin tilde), pero un
+valor no interpretable se queda en "señalarlo y no asumir", que es un ida y vuelta evitable.
+
+### A.10 `B8` quedó como `Asiste acompañado con`, no como `Atiende: Solo / Pareja`
+
+Lo acordado era un campo con dominio **`Solo` / `Pareja`**. El rótulo de V3 termina en "con", que pide
+un nombre o un vínculo, pero el valor cargado es `No`.
+
+Las dos lecturas son plausibles y la frase de apertura de la anamnesis depende de esto
+(`asiste sola a la consulta` vs `asiste acompañada por su …`).
+
+**Pregunta para la profesional:** ¿el campo es Sí/No, o es "con quién"? Mientras tanto la skill lee
+`No` o vacío ⇒ `asiste solo/a`; cualquier otro texto ⇒ `asiste acompañado/a por <texto>` — y lo deja
+anotado en el bloque 11.
+
+### A.11 Las dos filas de TRO traen valores distintos
+
+`C16` (TRO en screening) = `10/10` y `C46` (TRO en visoconstrucción) = `9.5/10`. En V1 y en los dos
+informes reales, las dos apariciones de TRO llevan **el mismo** valor.
+
+Puede ser una distinción real (dos criterios de puntuación sobre la misma prueba) o una celda que
+quedó vieja. **La skill no las reconcilia**: copia cada celda en su fila y anota la diferencia en el
+bloque 11.
+
+**Pregunta para la profesional:** ¿son dos puntuaciones distintas a propósito?
 
 ---
 
 ## B. Ajustes opcionales — no bloquean nada
 
-### B.1 Rótulos de área en los bloques cualitativos
+### B.2 La nota truncada de `A67`
 
-En el cuadro con Z las áreas están en la columna `B` con celdas combinadas (`B8:B12`, `B13:B19`,
-`B20:B22`). En los bloques cualitativos (`C25:C28`, `C30:C39`, `C41:C44`) **no hay rótulo de área**,
-aunque en el Word esas filas sí pertenecen a un área (Screening, Atención, Memoria, Lenguaje,
-Visoconstrucción).
-
-No es bloqueante: el orden de las 36 filas es fijo y está documentado en `orden-filas-sintesis.md`,
-así que la asignación de área es posicional. Agregar los rótulos haría al archivo autoexplicativo y
-más robusto si alguna vez se reordena algo.
-
-### B.2 Cerrar la nota truncada de `B58`
-
-`B58` termina en `- QSM: olvida cosas puntuales (fue a un partido y por ahi ` — paréntesis sin
-cerrar, frase cortada. **La celda está así en el archivo**, no es un problema de lectura: se perdió
-parte de la nota de la entrevista. Nada que "arreglar" en el diseño; sólo vale saber que puede pasar
-al tipear notas largas.
+`A67` termina en `QSM: olvida cosas puntuales (fue a un partido y por ahi ` — paréntesis sin cerrar,
+frase cortada. **La celda está así en el archivo**, no es un problema de lectura: son notas tomadas en
+vivo con el paciente enfrente y a veces quedan a medias. Irrecuperable; la skill la deja como está y
+lo señala **sólo en el bloque 11**, nunca comentando el estado del dato dentro del informe.
 
 ### B.3 Separador decimal en los textos `X/Y` — cosmético, prioridad baja
 
-Hoy conviven valores con coma (`27,5/30`) y con punto (`10.0/10`) en el Excel, y en un caso real el
-Word tenía el mismo puntaje de TRO con coma en la fila 2 y con punto en la fila 35 — o sea, se editó
-una a mano.
+Conviven valores con coma y con punto (`27/30`, `9.5/10`). **No afecta el procesamiento por IA**: son
+cadenas de texto que se copian tal cual al Word, no se parsean como número. Es una inconsistencia
+estética del informe entregado.
 
-**No afecta el procesamiento por IA**: son cadenas de texto que se copian tal cual al Word, no se
-parsean como número. Es una inconsistencia estética del informe entregado. Se menciona sólo para que
-no compita en prioridad con §A.1, que sí destruye datos.
-
-⚠️ Ojo: unificar a coma **no** sería obligatorio, pero unificar a punto tampoco resuelve nada, y
-tocar el formato de estas celdas sin haber hecho §A.1 primero es lo que causó la corrupción de `D31`.
-**Hacer §A.1 antes que esto.**
+⚠️ Ojo: en V1 fue justamente tocar el formato de estas celdas lo que corrompió el `IFS Índice MT`.
+Ahora están en Texto y el riesgo desapareció, pero **unificar el separador no aporta nada
+funcional** — no vale el riesgo de reformatear el bloque.
 
 ### B.4 Lo que expresamente NO conviene hacer
 
-- **No agregar las 8 columnas de rango** ("Deterioro significativo / Puntajes bajos / promedio /
-  superiores") al Excel. Se derivan del Z de forma determinística al armar el bloque de Word (ver
-  `orden-filas-sintesis.md`). Ponerlas en el Excel es trabajo manual duplicado.
+- **No agregar filas de orientación a la tabla de síntesis.** `C14`/`C15` son nuevas en el Excel pero
+  **no** son filas del informe: la tabla del Word tiene **36 filas** en los dos informes reales y la
+  orientación no está en ninguno. Alimentan la frase 3 del screening y nada más.
+- **No agregar las 8 columnas de rango cargadas a mano.** Se derivan del Z de forma determinística
+  (ver `orden-filas-sintesis.md`), así que tipearlas es trabajo duplicado.
+  🔜 **Ojo: esto no vale si se agregan por fórmula.** Hay una propuesta abierta de que el Excel arme
+  la tabla entera en una hoja derivada (`TABLA INFORME`) y el paso al Word sea un copy/paste, con lo
+  que la IA dejaría de transcribir números. Ahí las 8 columnas **sí** van, calculadas. Detalle,
+  fórmulas y la prueba que falta hacer: `../clinicTransformationGuide.md` §5, "Para retomar".
 - **No hacer una hoja paralela "para la IA"** con los mismos datos en formato máquina. Duplica el
-  mantenimiento del profesional y crea una segunda fuente que puede divergir — el mismo problema de
-  §A.5, a mayor escala. Los ajustes de §A alcanzan.
-- **No mover las 15 filas del cuadro de fórmulas** (`C8:H22`). Están referenciadas por las fórmulas y
-  por los rangos `PRUEBAS`/`FLUENCIAS`.
+  mantenimiento y crea una segunda fuente que puede divergir — el mismo problema que V3 acaba de
+  eliminar en los demográficos, a mayor escala.
+- **No mover el cuadro de pruebas** (`A12:D47`) ni los bloques auxiliares (`L29:M43`, `O34:Q40`).
+  Están referenciados por las fórmulas y por los rangos de `PRUEBAS`/`FLUENCIAS`.
 - **No agregar DNI ni ocupación.** La tabla de datos personales del Word no los tiene en ninguno de
-  los dos informes; los campos reales son los de `C46:C51` (+ `Deriva` opcional).
+  los dos informes; los campos reales son `B2:B7` + `Deriva` (`B9`) opcional.
 
 ---
 
 ## C. Recordatorio operativo (sigue vigente)
 
 Guardar el archivo **en Excel** antes de mandarlo — no sólo cerrarlo, ni editarlo con otro programa.
-Las celdas con fórmula (`E`, `G`, `H`, `L14`, `K19`) sólo tienen el valor calculado cacheado si Excel
-lo guardó; si no, pueden leerse vacías al procesarlas por código.
+Las celdas con fórmula (la columna `D` de las filas con Z, `L29:M43`, `Q35`, `P40`, `B60`) sólo tienen
+el valor calculado cacheado si Excel lo guardó; si no, pueden leerse vacías al procesarlas por código.
 
 ---
 
-## D. Sigue pendiente de confirmar con el profesional
+## D. Sigue pendiente de confirmar con la profesional
 
-> Lista completa y redactada para llevar a una conversación: `../preguntasParaLaProfesional.md`.
-> Lo de abajo es sólo lo que toca a este archivo.
+> Las dos primeras (§A.10 y §A.11) **nacieron con V3 y todavía no están** en
+> `../preguntasParaLaProfesional.md`: agregarlas ahí antes de la próxima conversación. El resto de
+> las preguntas abiertas del proyecto sí está en ese archivo.
 
+- **El formato de `B8`** (§A.10): Sí/No o "con quién".
+- **Las dos puntuaciones de TRO** (§A.11): ¿distinción real o celda vieja?
 - **Desempate en los rangos de la X** cuando el Z cae justo en un límite (`-2 a -1` y `-1 a 0` ambos
   tocan el −1). Propuesta: límite inferior inclusive, superior exclusivo. No afecta el diseño del
-  Excel, sí a quien complete la tabla de síntesis. Los dos informes disponibles **no** contienen
-  ningún Z en un límite exacto, así que no lo resuelven. **(Sigue abierto.)**
+  Excel, sí a quien complete la tabla de síntesis. Los informes disponibles **no** contienen ningún Z
+  en un límite exacto, así que no lo resuelven. **(Sigue abierto.)**
 - **Prioridad entre categorías** cuando aplican simultáneamente compromiso anímico (K-10 ≥ 25) y
-  riesgo de evolución. `informeFinal2` es categoría 2, no toca el caso. **(Sigue abierto.)**
+  riesgo de evolución. Ahora que `B10` existe, el caso **es alcanzable** y la prioridad importa.
+  **(Sigue abierto.)**
 
 Resueltos el 2026-09-07 (ya no pendientes): el **léxico Z → palabra** quedó confirmado
 (`mapeo-excel-a-word.md` §4.2), y el **C-QSM** no es fila obligatoria de la tabla de síntesis (§A.4).

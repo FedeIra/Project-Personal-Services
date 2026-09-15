@@ -89,7 +89,7 @@ Reglas:
 
 ## Cortes de referencia
 
-- **K-10 (sintomatología anímica):** suma de los 10 ítems ≥ **25** ⇒ "sintomatología anímica
+- **K-10 (sintomatología anímica):** suma de los 10 ítems (`B50:B59`, total en `B60`) ≥ **25** ⇒ "sintomatología anímica
   relevante" presente. (No 24,5: el K-10 es una suma de 10 enteros, un resultado exacto de 24,5 es
   imposible — 25 es el mismo corte sin la falsa precisión decimal.) **Se deriva del K-10 por
   default; el profesional puede sobrescribirlo manualmente en el Excel.**
@@ -107,18 +107,18 @@ Reglas:
   original no distingue conservadas/comprometidas), ya confirmado.
 
   ⚠️ **Esta tabla clasifica; no dicta el texto del informe.** La palabra que va en la columna Z de la
-  tabla de síntesis la escribe el profesional en el Excel (`E27`) y **se copia tal cual**. Los dos
+  tabla de síntesis la escribe el profesional en el Excel (`D17`, columna `Z` de la fila 17) y **se copia tal cual**. Los dos
   informes usan `Autónomo` / `Autónoma` (según el género del paciente) donde esta tabla dice
-  `Independencia`. No "corregir" el Excel contra esta tabla: `E27` es pass-through.
-- **K-10:** la interpretación que va al Word sale de `E28` del Excel (`Normal` en `informeFinal2`,
+  `Independencia`. No "corregir" el Excel contra esta tabla: `D17` es pass-through.
+- **K-10:** la interpretación que va al Word sale de `D18` del Excel (columna `Z` de la fila 18) (`Normal` en `informeFinal2`,
   con total 15). El corte ≥ 25 se usa para **elegir categoría diagnóstica**, no para redactar esa
   celda.
 - **Riesgo de evolución:** flag 100% manual, criterio clínico/observación en vivo durante la
   entrevista. La skill **nunca** debe intentar inferirlo — llega ya decidido en el Excel.
-  ✅ **Confirmado (2026-09-07): la profesional agrega una celda `Riesgo de evolución` Sí/No**, que
-  "determina las sugerencias diagnósticas" (habilita la categoría 5). Hasta que el Excel se actualice
-  el campo no existe; si falta, la skill debe **señalarlo** en vez de asumir "No" (ver
-  `excel-unificado-spec.md` §A.3).
+  ✅ **Ya está en el Excel: `B10` (`Riesgo de evolución`, `Sí`/`No`)**, desde V3 (2026-09-15).
+  Habilita la **categoría 5**. La celda **no tiene validación de lista**, así que puede llegar como
+  `Sí`/`si`/`SI`/`No`/`no`: normalizar tolerantemente y, si el valor no es interpretable como sí/no,
+  **señalarlo** en vez de asumir "No". Ver `mapeo-excel-a-word.md` §5.e.
 
 ## Las 6 categorías
 

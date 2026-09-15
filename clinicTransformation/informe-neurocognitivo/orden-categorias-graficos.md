@@ -14,22 +14,23 @@
 
 | # | Prueba | Z desde |
 |---|---|---|
-| 1 | DD | `E8` |
-| 2 | DI | `E9` |
-| 3 | TMT A | `E10` |
-| 4 | TMT B | `E11` |
-| 5 | BEM–MS AST | `E13` |
-| 6 | BEM–MS RSE | `E14` |
-| 7 | BEM–MS Sem | `E15` |
-| 8 | BEM–MS Rec | `E16` |
-| 9 | BEM–MS CE | `E17` |
-| 10 | BEM–ML Inm | `E18` |
-| 11 | BEM–ML Dif | `E19` |
-| 12 | FF | `E20` |
-| 13 | FS | `E21` |
-| 14 | TBA | `E22` |
+| 1 | DD | `D19` |
+| 2 | DI | `D20` |
+| 3 | TMT A | `D21` |
+| 4 | TMT B | `D22` |
+| 5 | BEM–MS AST | `D34` |
+| 6 | BEM–MS RSE | `D35` |
+| 7 | BEM–MS Sem | `D36` |
+| 8 | BEM–MS Rec | `D37` |
+| 9 | BEM–MS CE | `D38` |
+| 10 | BEM–ML Inm | `D39` |
+| 11 | BEM–ML Dif | `D40` |
+| 12 | FF | `D41` |
+| 13 | FS | `D42` |
+| 14 | TBA | `D43` |
 
-(Celdas de `excelEvaluacionCompleto.xlsx`, hoja `TABLA DE FORMULAS`.)
+(Celdas de `excelEvaluacionCompletoV4.xlsx`, hoja `TABLA DE FORMULAS` — direcciones definidas en
+`mapeo-excel-a-word.md` §1.)
 
 No todas las pruebas de la batería se grafican: MMSE, Stroop, Test del Reloj e IFS no aparecen acá.
 Devolver valores **sólo para estas 14, en este orden**.
@@ -98,13 +99,31 @@ Son enteros (1 a 5 por ítem), sin decimales ni cap.
 > (con espacio final). Están así en los dos archivos. Sólo importa si algún día se hace lookup por
 > nombre; para el paste de valores es irrelevante, porque es posicional.
 
-### ⚠️ Estos 10 valores todavía NO salen del Excel entregado (pero ya está acordado que sí saldrán)
+### ✅ Los 10 valores ya salen del Excel (desde V3, 2026-09-15)
 
-`excelEvaluacionCompleto.xlsx` guarda **sólo el total** del K-10 (`D28` = `15`), no el desglose. Los
-10 valores del gráfico de `informeFinal2.docx` (`2, 4, 1, 1, 2, 1, 1, 1, 1, 1`, que suman 15) se
-transcriben del papel.
+| # | Síntoma | Celda |
+|---|---|---|
+| 1 | Cansancio | `B50` |
+| 2 | Nervios | `B51` |
+| 3 | Nervios + | `B52` |
+| 4 | Desesperanza | `B53` |
+| 5 | Inquietud | `B54` |
+| 6 | Inquietud + | `B55` |
+| 7 | Depresión | `B56` |
+| 8 | Esfuerzo | `B57` |
+| 9 | Tristeza | `B58` |
+| 10 | Inutilidad | `B59` |
 
-✅ **Confirmado (2026-09-07):** la profesional **agrega los 10 ítems al Excel** (total por `SUMA`),
-en este mismo orden. Una vez actualizado el archivo, la skill **sí genera** este bloque desde el
-Excel. Hasta entonces: **debe decir explícitamente que faltan** en vez de inventar un desglose que
-sume el total. Arreglo en `excel-unificado-spec.md` §A.2.
+Los rótulos están en `A50:A59` **en este mismo orden**, así que el paste es posicional y directo.
+`B60` = `=SUMA(B50:B59)` es el total.
+
+**Dos chequeos antes de emitir el bloque:**
+
+1. La suma de los 10 valores tiene que dar `B60`.
+2. `B60` tiene que coincidir con `C18`, el PB del K-10 de la tabla de síntesis. Desde 2026-09-15
+   `C18` es `=B60`, así que coinciden por construcción; en archivos anteriores `C18` estaba tipeado.
+   Si difieren, **decirlo en el bloque 11 y no elegir por cuenta propia**.
+
+Versiones anteriores del Excel guardaban **sólo el total**, así que este gráfico se transcribía del
+papel; era el faltante §A.2 de `excel-unificado-spec.md`. **Ya no aplica.** Si llegara un archivo
+viejo sin el desglose, decir explícitamente que faltan en vez de inventar números que sumen el total.
