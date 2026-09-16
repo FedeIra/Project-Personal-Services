@@ -89,7 +89,7 @@ Reglas:
 
 ## Cortes de referencia
 
-- **K-10 (sintomatología anímica):** suma de los 10 ítems (`B50:B59`, total en `B60`) ≥ **25** ⇒ "sintomatología anímica
+- **K-10 (sintomatología anímica):** suma de los 10 ítems (`B53:B62`, total en `B63`) ≥ **25** ⇒ "sintomatología anímica
   relevante" presente. (No 24,5: el K-10 es una suma de 10 enteros, un resultado exacto de 24,5 es
   imposible — 25 es el mismo corte sin la falsa precisión decimal.) **Se deriva del K-10 por
   default; el profesional puede sobrescribirlo manualmente en el Excel.**
@@ -115,8 +115,8 @@ Reglas:
   celda.
 - **Riesgo de evolución:** flag 100% manual, criterio clínico/observación en vivo durante la
   entrevista. La skill **nunca** debe intentar inferirlo — llega ya decidido en el Excel.
-  ✅ **Ya está en el Excel: `B10` (`Riesgo de evolución`, `Sí`/`No`)**, desde V3 (2026-09-15).
-  Habilita la **categoría 5**. La celda **no tiene validación de lista**, así que puede llegar como
+  ✅ **Ya está en el Excel: `B10` (`Riesgo de evolución`, `Si`/`No`)**, desde V3 (2026-09-15), **con
+  validación de lista desde V4**. Habilita la **categoría 5**. En archivos viejos puede llegar como
   `Sí`/`si`/`SI`/`No`/`no`: normalizar tolerantemente y, si el valor no es interpretable como sí/no,
   **señalarlo** en vez de asumir "No". Ver `mapeo-excel-a-word.md` §5.e.
 

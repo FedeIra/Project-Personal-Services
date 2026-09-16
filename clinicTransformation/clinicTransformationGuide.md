@@ -71,10 +71,10 @@ Un **paquete de contexto para cualquier LLM** (se sube a claude.ai). Recibe el E
 paciente y devuelve, en bloques listos para copy/paste, todo lo que hoy se transcribe a mano. **No**
 genera el `.docx` final ni envía nada: es siempre borrador para revisión del profesional.
 
-- **Qué recibe:** un único Excel unificado (`ejemplos/excelEvaluacionCompletoV4.xlsx` es el ejemplo
-  vigente, 2026-09-15), hoja `TABLA DE FORMULAS`. Esquema celda por celda →
+- **Qué recibe:** un único Excel unificado (`ejemplos/excelEvaluacionCompletoV5.xlsx` es el ejemplo
+  vigente, 2026-09-16), hoja `TABLA DE FORMULAS`. Esquema celda por celda →
   `informe-neurocognitivo/mapeo-excel-a-word.md` §1, que es la **única fuente de direcciones** del
-  paquete.
+  paquete. 🚩 **V5 movió filas y columnas**: las direcciones de V3/V4 ya no sirven.
 - **Qué devuelve:** 11 bloques (datos personales, anamnesis, tabla de síntesis, los 2 gráficos,
   screening, párrafos por área, conclusiones, categoría + sugerencias, y un reporte de faltantes).
   Detalle → `informe-neurocognitivo/SKILL.md`.
@@ -97,7 +97,7 @@ historial ni persistencia, calidad dependiente del prompt.
 | `informe-neurocognitivo/orden-filas-sintesis.md` | Las 36 filas de la tabla de síntesis, celda de origen, patrones de llenado, paste. |
 | `informe-neurocognitivo/orden-categorias-graficos.md` | Los 2 gráficos: orden, redondeo/cap, celdas destino. |
 | `informe-neurocognitivo/regla-diagnostica.md` | Las 6 categorías + sugerencias + cortes K-10/AVD. |
-| `informe-neurocognitivo/excel-unificado-spec.md` | Estado del Excel V3 y los ajustes que quedan. |
+| `informe-neurocognitivo/excel-unificado-spec.md` | Estado del Excel V5 y los ajustes que quedan. |
 
 ---
 
@@ -141,11 +141,14 @@ lo aprendido del tono/prompts como insumo del paso 4.
 - Cap de ±3 confirmado de los dos lados; los gráficos usan el Z redondeado y capado, no el crudo.
 - La plantilla no tiene trazado diagonal; el texto cualitativo va en PB.
 - Los templates de sugerencias se adaptan al paciente (no se copian literalmente).
-- El Excel unificado llegó y está mapeado celda por celda. **V3 (`ejemplos/excelEvaluacionCompletoV4.xlsx`,
-  2026-09-15) cierra todos los faltantes bloqueantes**: ya no queda ningún bloque del informe que no
+- El Excel unificado llegó y está mapeado celda por celda. **V5 (`ejemplos/excelEvaluacionCompletoV5.xlsx`,
+  2026-09-16) cierra todos los faltantes bloqueantes**: ya no queda ningún bloque del informe que no
   se pueda generar desde el Excel.
-- La tabla de síntesis sigue teniendo **36 filas**: los campos nuevos de V3 (orientación, derivante,
-  riesgo de evolución, acompañamiento) **no** son filas del informe.
+- La tabla de síntesis sigue teniendo **36 filas**: los campos nuevos (orientación, derivante,
+  riesgo de evolución, acompañamiento) **no** son filas del informe. El cuadro del Excel tiene **38**,
+  por las dos de orientación — son dos sistemas de numeración distintos y conviene no mezclarlos.
+- **El Excel calcula la X de cada tramo** (8 columnas `E:L` por fórmula) y **muestra el cap de ±3**
+  (formato de número). La skill **sigue armando la tabla**, pero lee la X en vez de derivarla.
 
 ### Respondido por la profesional (2026-09-07)
 La profesional contestó las 11 preguntas (resumen en `preguntasParaLaProfesional.md`, detalle volcado
@@ -162,124 +165,77 @@ a los `.md` de la skill). Quedó definido:
 
 ### Pendiente
 
-**Del Excel (V4)** — ninguno bloquea la generación del informe; detalle en
-`informe-neurocognitivo/excel-unificado-spec.md` §A. **V4 aplicó §A.4, §A.6, §A.8 y casi todo §A.9,
-y está verificado por código.** Queda:
-- 🚩 **Corregir la lista de `B6` (Lateralidad)**: quedó sólo con las formas masculinas y el valor
-  actual (`Diestra`) incumple su propia lista. Falta también validar `C14`/`C15`.
+**Del Excel (V5)** — ninguno bloquea la generación del informe; detalle en
+`informe-neurocognitivo/excel-unificado-spec.md` §A. **V5 cerró §A.4, §A.6, §A.8, §A.9 y agregó §A.12
+(las 8 columnas de rango), todo verificado por código.** Queda:
 - **Confirmar el formato de `B8`** (`Asiste acompañado con`: ¿Sí/No o con quién?) y **si las dos
-  filas de TRO llevan valores distintos a propósito** (`C16` = `10/10` vs `C46` = `9.5/10`).
+  filas de TRO llevan valores distintos a propósito** (`C16` = `10/10` vs `C49` = `9.5/10`).
+- Menor: la lista de `B6` incluye un `-` como opción de lateralidad; confirmar si es deliberado.
 
 **Del pipeline:**
 - **Probar en Word real** la tabla de síntesis con `rowspan` en la columna ÁREA (el resto del camino
   HTML → navegador → Word ya está verificado).
-- **Correr la skill con V4 de punta a punta** — es el primer Excel con el que se puede generar el
-  informe completo, incluido el gráfico K-10.
+- **Correr la skill con V5 de punta a punta** — es el primer Excel con el que se puede generar el
+  informe completo, incluido el gráfico K-10, y el primero que trae la X ya calculada.
 - **Anonimizar un informe modelo** para incluirlo dentro del paquete de la skill (ver §7).
-- Confirmar los puntos aún abiertos: desempate de rangos (B.5), prioridad entre categorías (B.6),
-  sobrescribir el corte de K-10 (B.7), detalles de plantilla (C.1–C.6) y housekeeping (D.2, D.4).
+- Confirmar los puntos aún abiertos: desempate de rangos (B.5 — **ya implementado** en las fórmulas de
+  `E:L`, falta el visto bueno), prioridad entre categorías (B.6), sobrescribir el corte de K-10 (B.7),
+  detalles de plantilla (C.1–C.6) y housekeeping (D.2, D.4).
 - Definir un **umbral numérico** general de "cuántas pruebas principales bajas = perfil" (el criterio
   de submedidas ya está; el umbral general sigue abierto).
+- **Decidir el camino de pegado al Word.** Hoy hay tres sobre la mesa: que la IA arme la tabla (el
+  vigente), copy/paste desde el Excel, o screenshot del Excel ocultando las dos filas de orientación.
 
 
-### 🔜 Para retomar — hoja "TABLA INFORME": que el Excel arme la tabla de síntesis entera
+### ✅ Hecho (2026-09-16) — el Excel ya calcula la X y muestra el cap
 
-> **Anotado 2026-09-15 para retomar el 2026-09-16.** Idea de Federico, a partir de haber automatizado
-> ya la interpretación de KPDS-10 por fórmula: **si la X de cada rango también se calcula sola, el
-> Excel termina conteniendo la tabla de síntesis completa y el paso al Word es un copy/paste**, sin
-> que la IA transcriba un solo número.
+> **Resultado de la idea anotada el 2026-09-15** ("si la X de cada rango se calcula sola, el Excel
+> termina conteniendo la tabla de síntesis completa"). Se implementó **la mitad determinística**, pero
+> **no** la hoja `TABLA INFORME` separada ni el copy/paste directo Excel→Word.
 
-**El planteo es correcto y es mejor arquitectura que la actual.** Parte el pipeline en dos mitades
-limpias:
+**Lo que se hizo, sobre la propia hoja `TABLA DE FORMULAS` (no en una hoja aparte):**
 
-| Determinístico → Excel | Redacción → IA |
+| Cambio | Cómo quedó |
 |---|---|
-| Tabla de síntesis completa | Anamnesis |
-| Los 14 valores del gráfico 1 | Párrafo de screening |
-| Los 10 del gráfico 2 *(ya está)* | Los 4 párrafos por área |
-| Tabla de datos personales | Recap y frase de cierre |
-| | Categoría diagnóstica + sugerencias |
+| 8 columnas de rango | `E:L`, con la `X` por fórmula en las 15 filas con Z |
+| Encabezado agrupado | fila 11, con celdas combinadas y los 4 rótulos cubriendo sus 8 tramos |
+| Cap de ±3 | **formato de número** `[<=-3]"≤-3";[>=3]"≥3";0.00` en `D19:D46` |
+| AS1/AS2/AS3 | pasaron de `P35:P37` a ser filas del cuadro (`C34:C36`) |
+| Media/Desvío | bloque contiguo `Q31:R46`, sin filas vacías |
+| `C18` (total K-10) | `=B63`, dejó de estar tipeado |
+| Validaciones | `B5`, `B6` (con formas femeninas), `B10`, `C14:C15` |
 
-La IA deja de transcribir números. Eso vuelve innecesario todo el aparato de autochequeos de
-`informe-neurocognitivo/SKILL.md` (36 filas, 5 celdas ÁREA, 187 celdas grises, 15 X), que existe
-**sólo** porque hoy las 36 filas se escriben a mano — el riesgo principal del pipeline según los
-propios docs.
+**Decisión sobre el alcance:** la **skill sigue armando el cuadro para el Word** con la info del
+Excel. Lo único que cambia es de dónde sale la X: antes la derivaba, ahora la **lee** de `E:L`. Los
+autochequeos del bloque 3 no se eliminan — pasan de verificar un cálculo propio a **cruzar contra el
+Excel**, que es más fuerte.
 
-#### 🚩 Hacerlo en una hoja nueva, NO reordenando `TABLA DE FORMULAS`
+#### 🚩 Dos cosas que conviene no perder
 
-Es la decisión de diseño importante y conviene no perderla. Intentarlo sobre la hoja de trabajo
-obliga a un refactor feo, por tres choques:
+**1. El cap es formato, no valor.** `D19:D46` se ve capado en pantalla, pero una lectura por código
+devuelve el Z crudo (`-3.1067…`). **El cap lo sigue aplicando la skill**, para la tabla y para el
+gráfico 1. Se evaluó hacerlo por fórmula en una columna de texto y se descartó: rompería el gráfico,
+que necesita que `D` siga siendo numérica.
 
-1. **Las filas no coinciden.** El bloque del Excel (filas 13–47, 35 filas) tiene dos filas que **no**
-   van a la tabla (`C14`/`C15`, orientación) y le faltan tres que **sí** van (AS1/AS2/AS3, que viven
-   en `P35:P37`). 35 − 2 + 3 = 36, los números cierran, pero no en el orden ni en el lugar donde
-   están. Un copy/paste del bloque sale con dos filas de más en screening y sin los ensayos en
-   memoria.
-2. **La columna 12 choca con las normas.** La tabla necesita 12 columnas contiguas
-   (`A`=Área · `B`=Prueba · `C`=PB · `D`=Z · 8 de rango) = `A:L`, y `L29:M43` es el bloque
-   Media/Desvío de los `VLOOKUP`.
-3. **La columna `D` tiene dos usos incompatibles.** Para pegar hace falta el Z **formateado como
-   texto** (`-1,14`, `≤-3`, `≥3`), pero el Z **numérico crudo** es el que alimenta el gráfico 1.
+**2. Mover filas rompe fórmulas en silencio.** Durante la construcción de V5, al reacomodar filas se
+perdió el vínculo de `C18` con el total del K-10: quedó tipeado en `30` mientras los 10 ítems sumaban
+`24`. La tabla decía `Malestar severo` y correspondía `Normal` — cruzaba el corte ≥ 25 que **decide la
+categoría diagnóstica**. Se detectó leyendo el archivo por código, no a ojo.
+→ Si hay que mover algo, **cortar-pegar** (Excel reapunta las referencias solo) y **releer el archivo
+por código** después.
 
-**Solución: una hoja aparte, p. ej. `TABLA INFORME`, puramente derivada.** Cada una de las 36 filas
-referencia por fórmula la celda que le toca de `TABLA DE FORMULAS` (`='TABLA DE FORMULAS'!P35` para
-AS1, etc.). Con eso los tres choques desaparecen de una: no se toca la hoja de trabajo, el orden de
-las 36 filas se define en la hoja nueva, y las orientaciones simplemente no se referencian. El
-formato (encabezados con celdas combinadas, sombreados, ÁREA combinada verticalmente) se arma una
-vez y queda. La profesional **nunca edita esa hoja**: carga PB en la de siempre y copia de la nueva.
+#### Lo que quedó pendiente de esta línea de trabajo
 
-#### Las fórmulas, ya resueltas
-
-Con el Z crudo en `D` de la hoja de trabajo (fila 19 de ejemplo):
-
-**Z formateado** — redondeo a 2 decimales con coma, cero final, y los topes:
-
-```excel
-=SI(NO(ESNUMERO(D19));"";SI(D19<=-3;"≤-3";SI(D19>=3;"≥3";TEXTO(D19;"0,00"))))
-```
-
-**Las 8 columnas de rango** — una por tramo, con el límite de abajo incluido y el de arriba no (la
-convención que la profesional aprobó). El `ESNUMERO` es lo que implementa *"la X se pone si y sólo si
-Z es numérico"*: blanquea solo las filas cualitativas y las de AVD/KPDS-10, así que se puede arrastrar
-por todo el bloque sin seleccionar rangos salteados.
-
-| Columna | Fórmula |
-|---|---|
-| `< -3` | `=SI(ESNUMERO($D19);SI($D19<-3;"X";"");"")` |
-| `-3 a -2` | `=SI(ESNUMERO($D19);SI(Y($D19>=-3;$D19<-2);"X";"");"")` |
-| `-2 a -1` | `=SI(ESNUMERO($D19);SI(Y($D19>=-2;$D19<-1);"X";"");"")` |
-| `-1 a 0` | `=SI(ESNUMERO($D19);SI(Y($D19>=-1;$D19<0);"X";"");"")` |
-| `0 a +1` | `=SI(ESNUMERO($D19);SI(Y($D19>=0;$D19<1);"X";"");"")` |
-| `+1 a +2` | `=SI(ESNUMERO($D19);SI(Y($D19>=1;$D19<2);"X";"");"")` |
-| `+2 a +3` | `=SI(ESNUMERO($D19);SI(Y($D19>=2;$D19<3);"X";"");"")` |
-| `> +3` | `=SI(ESNUMERO($D19);SI($D19>=3;"X";"");"")` |
-
-*(Variante compacta, si en vez de las 8 columnas se prefiere **una** que devuelva el nombre del tramo
-— sirve para que la IA lo lea, no para pegar la tabla:)*
-
-```excel
-=SI(NO(ESNUMERO(D19));"";SI(D19<-3;"< -3";SI(D19<-2;"-3 a -2";SI(D19<-1;"-2 a -1";SI(D19<0;"-1 a 0";SI(D19<1;"0 a +1";SI(D19<2;"+1 a +2";SI(D19<3;"+2 a +3";"> +3"))))))))
-```
-
-#### ⚠️ Probar esto ANTES de rehacer nada
-
-**Que el pegado Excel → Word conserve sombreados y celdas combinadas.** En principio sí (entra como
-tabla de Word real, y es un camino más directo que el HTML→navegador→Word ya verificado), pero **acá
-nadie lo probó**. El antecedente del proyecto es que los dos bugs de pegado aparecieron recién al
-mirar la tabla ya armada en Word.
-
-→ **Prueba chica primero:** cuatro o cinco filas con el formato final en una hoja suelta, pegadas en
-el Word. Si sobreviven el gris y las combinaciones, se hace la hoja entera.
-
-#### Pendientes que esto cambia
-
-- `informe-neurocognitivo/excel-unificado-spec.md` §B.4 dice hoy *"no agregar las 8 columnas de rango
-  al Excel"*. Ese argumento era contra **cargarlas a mano**; con fórmula no aplica. Actualizar si se
-  avanza.
-- `informe-neurocognitivo/orden-filas-sintesis.md` y el bloque 3 de `SKILL.md` habría que reescribirlos:
-  la skill pasaría de **generar** la tabla a **no tocarla**.
-- Queda pendiente igual el ajuste de ancho post-pegado (Autoajustar + 130 %) y la fila de leyenda, que
-  la profesional conserva de su plantilla.
+- **Probar el pegado Excel→Word** con sombreado y celdas combinadas — nunca se hizo. Al pegar directo
+  desde Excel aparecieron "dos tablas separadas": el diagnóstico es tipo de pegado (usar
+  `Pegado especial → Texto HTML/RTF`, no el objeto embebido) y/o el ancho, **no** un salto de página
+  (V5 no tiene ninguno ni área de impresión definida).
+- El ajuste de ancho post-pegado (Autoajustar + 130 %) y la fila de leyenda, que la profesional
+  conserva de su plantilla.
+- **Las dos filas de orientación se quedan dentro del cuadro** (decisión 2026-09-16). Por eso el
+  cuadro tiene 38 filas y el informe 36. Si alguna vez se pasa al copy/paste directo, hay que sacarlas
+  del bloque: el merge de ÁREA de Screening (`A13:A18`) las cruza, así que una selección múltiple no
+  funciona limpia. Para el camino de screenshot, alcanza con ocultarlas.
 
 
 ---
@@ -304,7 +260,7 @@ informe `"poco estrés"`, dentro de una comilla presentada como textual del paci
 
 ## 7. Datos sensibles
 
-`ejemplos/excelEvaluacionCompletoV4.xlsx` (y sus versiones anteriores) e `ejemplos/informeFinal2.docx`
+`ejemplos/excelEvaluacionCompletoV5.xlsx` (y sus versiones anteriores) e `ejemplos/informeFinal2.docx`
 son de **pacientes reales**
 (nombre, fecha de nacimiento, antecedente familiar, notas de ánimo/sueño, citas de la entrevista).
 `informeFinal.docx` es ficticio.
@@ -329,7 +285,7 @@ Dos perfiles de riesgo:
 | `clinicTransformationGuide.md` | **Este documento** — hub interno del proyecto. |
 | `informe-neurocognitivo/` | **La skill** (se zippea y sube). Fuente de verdad operativa. |
 | `preguntasParaLaProfesional.md` | Preguntas pendientes, versión detallada (interno). |
-| `ejemplos/` | Informes modelo y Excel de ejemplo. **Vigente: `excelEvaluacionCompletoV4.xlsx`**; `excelEvaluacionCompleto.xlsx` (V1) y `…V2.xlsx` quedan como histórico y **tienen otro layout de celdas**. |
+| `ejemplos/` | Informes modelo y Excel de ejemplo. **Vigente: `excelEvaluacionCompletoV5.xlsx`**; V1–V4 quedan como histórico y **todos tienen otro layout de celdas** (V5 corrió filas y agregó una columna). |
 | `evaluacion.pdf` | Batería de tests en papel (fuente). |
 | `formulasExcelEvaluacion.xlsx` | Excel de fórmulas original (predecesor del unificado). |
 | `excelPrimerGrafico.xlsx` / `excelSegundoGrafico.xlsx` | Plantillas de los dos gráficos. |

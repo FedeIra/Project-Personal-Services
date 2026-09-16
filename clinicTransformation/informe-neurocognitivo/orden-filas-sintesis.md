@@ -14,14 +14,18 @@ esta tabla (Excel unificado incluido) debe ser **posicional (índice de fila), n
 
 ## Las 36 filas, con su celda de origen en el Excel
 
-Celdas de `excelEvaluacionCompletoV4.xlsx`, hoja `TABLA DE FORMULAS` (esquema completo y **única
+Celdas de `excelEvaluacionCompletoV5.xlsx`, hoja `TABLA DE FORMULAS` (esquema completo y **única
 fuente de direcciones** en `mapeo-excel-a-word.md` §1).
 
-> 🚩 **La tabla tiene 36 filas y V3 no las cambia.** V3 agregó al Excel `Orientación temporal`
-> (`C14`) y `Orientación espacial` (`C15`) dentro del cuadro de pruebas, y campos nuevos en el bloque
-> demográfico (`B8`, `B9`, `B10`). **Ninguno es fila de esta tabla** — los dos informes reales tienen
-> exactamente estas 36 filas. La orientación alimenta la frase 3 del screening; el resto, la anamnesis
-> y la categoría diagnóstica. **No agregar filas para "que coincida con el Excel".**
+> 🚩 **Las direcciones cambiaron en V5.** Los ensayos AS1/AS2/AS3 pasaron de vivir sueltos en
+> `P35:P37` a ser filas propias del cuadro (`C34:C36`), y todo lo que venía después **se corrió 3
+> filas**. Si una referencia de este paquete dice `C34` para AST o `D43` para TBA, es de V3/V4.
+
+> 🚩 **La tabla del informe tiene 36 filas; el cuadro del Excel tiene 38.** La diferencia son las dos
+> de orientación (`C14`/`C15`), que **no son filas de esta tabla** — los dos informes reales tienen
+> exactamente estas 36. La orientación alimenta la frase 3 del screening; `B8`/`B9`/`B10`, la
+> anamnesis y la categoría diagnóstica. **No agregar filas para "que coincida con el Excel"**, y
+> ojo con la numeración: en este archivo `#` es la fila **del informe**, no la del Excel.
 
 | # | Área | Prueba | Tipo | PB desde | Z desde |
 |---|------|--------|------|----------|---------|
@@ -44,25 +48,45 @@ fuente de direcciones** en `mapeo-excel-a-word.md` §1).
 | 17 | | IFS MTV | Cualitativa | `C31` | — |
 | 18 | | IFS R | Cualitativa | `C32` | — |
 | 19 | | IFS CIV | Cualitativa | `C33` | — |
-| 20 | Memoria episódica | BEM–MS AS1 | Cualitativa (PB por ensayo) | `P35` | — |
-| 21 | | BEM–MS AS2 | Cualitativa (PB por ensayo) | `P36` | — |
-| 22 | | BEM–MS AS3 | Cualitativa (PB por ensayo) | `P37` | — |
-| 23 | | BEM–MS AST | Con Z | `C34` | `D34` |
-| 24 | | BEM–MS RSE | Con Z | `C35` | `D35` |
-| 25 | | BEM–MS Sem | Con Z | `C36` | `D36` |
-| 26 | | BEM–MS Rec | Con Z | `C37` | `D37` |
-| 27 | | BEM–MS CE | Con Z | `C38` | `D38` |
-| 28 | | BEM–ML Inm | Con Z | `C39` | `D39` |
-| 29 | | BEM–ML Dif | Con Z | `C40` | `D40` |
-| 30 | Lenguaje | FF | Con Z | `C41` | `D41` |
-| 31 | | FS | Con Z | `C42` | `D42` |
-| 32 | | TBA | Con Z | `C43` | `D43` |
-| 33 | | Comprensión | Cualitativa | `C44` | — |
-| 34 | | Expresión | Cualitativa | `C45` | — |
-| 35 | Visoconstrucción | TRO | Cualitativa | `C46` | — |
-| 36 | | MMSE copia | Cualitativa | `C47` | — |
+| 20 | Memoria episódica | BEM–MS AS1 | Cualitativa (PB por ensayo) | `C34` | — |
+| 21 | | BEM–MS AS2 | Cualitativa (PB por ensayo) | `C35` | — |
+| 22 | | BEM–MS AS3 | Cualitativa (PB por ensayo) | `C36` | — |
+| 23 | | BEM–MS AST | Con Z | `C37` | `D37` |
+| 24 | | BEM–MS RSE | Con Z | `C38` | `D38` |
+| 25 | | BEM–MS Sem | Con Z | `C39` | `D39` |
+| 26 | | BEM–MS Rec | Con Z | `C40` | `D40` |
+| 27 | | BEM–MS CE | Con Z | `C41` | `D41` |
+| 28 | | BEM–ML Inm | Con Z | `C42` | `D42` |
+| 29 | | BEM–ML Dif | Con Z | `C43` | `D43` |
+| 30 | Lenguaje | FF | Con Z | `C44` | `D44` |
+| 31 | | FS | Con Z | `C45` | `D45` |
+| 32 | | TBA | Con Z | `C46` | `D46` |
+| 33 | | Comprensión | Cualitativa | `C47` | — |
+| 34 | | Expresión | Cualitativa | `C48` | — |
+| 35 | Visoconstrucción | TRO | Cualitativa | `C49` | — |
+| 36 | | MMSE copia | Cualitativa | `C50` | — |
 
-✅ **`C25` (IFS Índice MT) ya no se corrompe.** En V1 se autoconvertía a serial de fecha; **en V3 es
+### 🆕 La X de cada tramo ya viene calculada en el Excel (V5)
+
+Las 15 filas con Z tienen, además, las **8 columnas de rango en `E:L`** resueltas por fórmula
+(`mapeo-excel-a-word.md` §1). La correspondencia es directa:
+
+| Columna del Excel | Tramo |
+|---|---|
+| `E` · `F` | `< -3` · `-3 a -2` |
+| `G` | `-2 a -1` |
+| `H` · `I` | `-1 a 0` · `0 a +1` |
+| `J` · `K` · `L` | `+1 a +2` · `+2 a +3` · `> +3` |
+
+➡️ **La skill lee la `X` de ahí en vez de decidir el tramo.** Las asignaciones de la tabla de abajo
+siguen siendo la referencia de *qué tiene que dar*, y los autochequeos siguen corriendo — pero pasan
+de verificar un cálculo propio a **cruzar contra el Excel**.
+
+⚠️ **El cap de ±3 NO viene resuelto.** En el Excel es un **formato de número**
+(`[<=-3]"≤-3";[>=3]"≥3";0.00`): se ve capado en pantalla, pero una lectura por código devuelve el Z
+crudo (`-3.1067…`). **La skill sigue aplicando el cap** al escribir la columna Z.
+
+✅ **`C25` (IFS Índice MT) ya no se corrompe.** En V1 se autoconvertía a serial de fecha; **desde V3 es
 texto** (`7/10`) y se copia tal cual. El valor deriva de Dígitos Atrás + Memoria de Trabajo Visual.
 
 Si alguna vez vuelve a llegar como número (~45000–48000), la conversión **es reversible**: formatear
@@ -70,8 +94,8 @@ el serial como `d/m` devuelve lo tipeado. Chequear que el denominador coincida c
 subtest (`/10`), usar el valor en esta fila y anotarlo en el bloque 11 como recuperado a confirmar.
 **Nunca** dejar `[PENDIENTE …]` escrito dentro de la celda — celda sin dato = celda vacía.
 
-⚠️ **Fila 2 vs fila 35 (TRO):** en V3 `C16` y `C46` traen valores distintos. **Copiar cada celda en
-su fila**, no reconciliarlas, y anotar la diferencia en el bloque 11 (`mapeo-excel-a-word.md` §5.f).
+⚠️ **Fila 2 vs fila 35 (TRO):** `C16` y `C49` traen valores distintos. **Copiar cada celda en su
+fila**, no reconciliarlas, y anotar la diferencia en el bloque 11 (`mapeo-excel-a-word.md` §5.f).
 
 ## Cómo se completa cada fila: PB, Z y la X de rango
 
@@ -174,11 +198,12 @@ gris claro = bajo pero sin déficit significativo (así lo explica la leyenda).
 > `#D9D9D9` — mismo criterio que las filas cualitativas simples, para marcar "no aplica" de forma
 > consistente en todas las filas sin Z. No afecta lo que se informa (esas filas nunca llevan `X`).
 
-> 🔜 **Propuesta abierta (2026-09-15):** que la tabla la arme el **Excel** en una hoja derivada
-> (`TABLA INFORME`), con la X y el Z formateado por fórmula, y que el paso al Word sea un copy/paste.
-> Si prospera, la skill **deja de generar esta tabla** y todo lo que sigue en este archivo pasa a ser
-> la referencia de qué tiene que contener, no de qué tiene que emitir. Ver
-> `../clinicTransformationGuide.md` §5, "Para retomar". **Mientras tanto, vale lo de abajo.**
+> ✅ **Decisión (2026-09-16): la skill sigue armando la tabla.** V5 implementó la mitad
+> determinística de la propuesta —las 8 columnas de rango con la X por fórmula y el cap de ±3 como
+> formato de número— pero **no** se creó una hoja `TABLA INFORME` aparte ni se pasó al copy/paste
+> directo Excel→Word. Todo lo que sigue en este archivo **sigue siendo instrucción de salida**, con un
+> solo cambio: la X se **lee** del Excel (`E:L`) en vez de derivarse. Ver
+> `../clinicTransformationGuide.md` §5.
 
 ## 🟢 Entrega: la skill genera la **tabla completa**, no valores sueltos
 

@@ -18,19 +18,22 @@
 | 2 | DI | `D20` |
 | 3 | TMT A | `D21` |
 | 4 | TMT B | `D22` |
-| 5 | BEM–MS AST | `D34` |
-| 6 | BEM–MS RSE | `D35` |
-| 7 | BEM–MS Sem | `D36` |
-| 8 | BEM–MS Rec | `D37` |
-| 9 | BEM–MS CE | `D38` |
-| 10 | BEM–ML Inm | `D39` |
-| 11 | BEM–ML Dif | `D40` |
-| 12 | FF | `D41` |
-| 13 | FS | `D42` |
-| 14 | TBA | `D43` |
+| 5 | BEM–MS AST | `D37` |
+| 6 | BEM–MS RSE | `D38` |
+| 7 | BEM–MS Sem | `D39` |
+| 8 | BEM–MS Rec | `D40` |
+| 9 | BEM–MS CE | `D41` |
+| 10 | BEM–ML Inm | `D42` |
+| 11 | BEM–ML Dif | `D43` |
+| 12 | FF | `D44` |
+| 13 | FS | `D45` |
+| 14 | TBA | `D46` |
 
-(Celdas de `excelEvaluacionCompletoV4.xlsx`, hoja `TABLA DE FORMULAS` — direcciones definidas en
+(Celdas de `excelEvaluacionCompletoV5.xlsx`, hoja `TABLA DE FORMULAS` — direcciones definidas en
 `mapeo-excel-a-word.md` §1.)
+
+> 🚩 **Ojo con las versiones:** en V3/V4 las 10 pruebas de memoria y lenguaje estaban 3 filas más
+> arriba (`D34`–`D43`). V5 las corrió al convertir AS1/AS2/AS3 en filas propias.
 
 No todas las pruebas de la batería se grafican: MMSE, Stroop, Test del Reloj e IFS no aparecen acá.
 Devolver valores **sólo para estas 14, en este orden**.
@@ -53,6 +56,10 @@ síntesis**, no los crudos del Excel:
 Regla: **redondear a 2 decimales y capar en ±3**, igual que en la tabla de síntesis. Única diferencia
 de formato: acá es un número, así que el cero final se cae (`-0.3`, no `-0,30`) y el cap es el número
 `-3` / `3`, no el texto `≤-3` / `≥3`.
+
+> ⚠️ **El cap lo aplica la skill, no el Excel.** V5 muestra la columna `D` capada, pero eso es un
+> **formato de número** (`[<=-3]"≤-3";[>=3]"≥3";0.00`): al leer el archivo por código sale el Z crudo.
+> Vale para el gráfico igual que para la tabla — ver `mapeo-excel-a-word.md` §1.
 
 Las 14 categorías son exactamente las mismas 14 filas con Z de la tabla de síntesis (filas 5–9 y
 23–32 de `orden-filas-sintesis.md`), salvo FF, que en la tabla aparece dos veces y acá una sola.
@@ -99,30 +106,34 @@ Son enteros (1 a 5 por ítem), sin decimales ni cap.
 > (con espacio final). Están así en los dos archivos. Sólo importa si algún día se hace lookup por
 > nombre; para el paste de valores es irrelevante, porque es posicional.
 
-### ✅ Los 10 valores ya salen del Excel (desde V3, 2026-09-15)
+### ✅ Los 10 valores salen del Excel
 
 | # | Síntoma | Celda |
 |---|---|---|
-| 1 | Cansancio | `B50` |
-| 2 | Nervios | `B51` |
-| 3 | Nervios + | `B52` |
-| 4 | Desesperanza | `B53` |
-| 5 | Inquietud | `B54` |
-| 6 | Inquietud + | `B55` |
-| 7 | Depresión | `B56` |
-| 8 | Esfuerzo | `B57` |
-| 9 | Tristeza | `B58` |
-| 10 | Inutilidad | `B59` |
+| 1 | Cansancio | `B53` |
+| 2 | Nervios | `B54` |
+| 3 | Nervios + | `B55` |
+| 4 | Desesperanza | `B56` |
+| 5 | Inquietud | `B57` |
+| 6 | Inquietud + | `B58` |
+| 7 | Depresión | `B59` |
+| 8 | Esfuerzo | `B60` |
+| 9 | Tristeza | `B61` |
+| 10 | Inutilidad | `B62` |
 
-Los rótulos están en `A50:A59` **en este mismo orden**, así que el paste es posicional y directo.
-`B60` = `=SUMA(B50:B59)` es el total.
+Los rótulos están en `A53:A62` **en este mismo orden**, así que el paste es posicional y directo.
+`B63` = `=SUMA(B53:B62)` es el total. *(En V3/V4 este bloque estaba 3 filas más arriba: `B50:B59` con
+total en `B60`.)*
 
 **Dos chequeos antes de emitir el bloque:**
 
-1. La suma de los 10 valores tiene que dar `B60`.
-2. `B60` tiene que coincidir con `C18`, el PB del K-10 de la tabla de síntesis. Desde 2026-09-15
-   `C18` es `=B60`, así que coinciden por construcción; en archivos anteriores `C18` estaba tipeado.
-   Si difieren, **decirlo en el bloque 11 y no elegir por cuenta propia**.
+1. La suma de los 10 valores tiene que dar `B63`.
+2. `B63` tiene que coincidir con `C18`, el PB del K-10 de la tabla de síntesis. En V5 `C18` es `=B63`,
+   así que coinciden por construcción; en archivos anteriores `C18` estaba tipeado. Si difieren,
+   **decirlo en el bloque 11 y no elegir por cuenta propia**.
+
+   ⚠️ **No es hipotético:** en una versión intermedia de V5 `C18` decía `30` con los ítems sumando
+   `24` — cruzaba el corte ≥ 25 y cambiaba la categoría diagnóstica. Este chequeo lo detecta.
 
 Versiones anteriores del Excel guardaban **sólo el total**, así que este gráfico se transcribía del
 papel; era el faltante §A.2 de `excel-unificado-spec.md`. **Ya no aplica.** Si llegara un archivo
