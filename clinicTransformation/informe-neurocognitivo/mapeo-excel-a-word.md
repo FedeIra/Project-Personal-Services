@@ -120,7 +120,7 @@ Lenguaje · `A49:A50` Visoconstrucción.
 | 14 | Orientación temporal | `C14` | — | `Si`/`No` — **no es fila de la tabla de síntesis**, ver §2.2 |
 | 15 | Orientación espacial | `C15` | — | ídem |
 | 16 | TRO | `C16` | — | texto `10/10` |
-| 17 | AVD | `C17` | `D17` | `D17` = interpretación (`Autónomo`), **no** un número |
+| 17 | AVD | `C17` | `D17` | `D17` = interpretación (`Autónomo`, `Dependencia leve`…), **no** un número. Por fórmula desde el 2026-09-17 — ver `regla-diagnostica.md` |
 | 18 | KPDS-10 | `C18` | `D18` | `C18` = `=B63`; `D18` = fórmula de interpretación (`Normal`) |
 | 19 | DD | `C19` | `D19` | `=(C19-Q32)/R32` |
 | 20 | DI | `C20` | `D20` | `=(C20-Q33)/R33` |
@@ -335,14 +335,16 @@ Convenciones observadas en los dos informes:
 - En general: **la skill incluye todo y marca lo dudoso**, sin decidir sola qué dejar afuera. No se
   redactan dos cosas, y sólo dos: las notas internas de protocolo, y las notas **truncadas o
   ininteligibles** (ver abajo).
-- 🚩 **Nota truncada o ininteligible → se omite entera del párrafo** (decisión del 2026-09-17), y va
-  literal al bloque 12. Antes la regla era transcribirla cortada y señalarla; **eso quedó sin efecto**:
-  *"esta frase así cortada no tiene sentido ni da evidencia de que haya problemas de memoria"*. Se
-  omite **por estar inutilizable, nunca por su contenido** — una nota completa se incluye siempre,
-  aunque sea incómoda o ambigua. Si era el único dato sobre un tema, decirlo en el bloque 12.
+- 🚩 **Nota truncada → se conserva la afirmación y se descarta sólo el fragmento cortado** (regla
+  afinada el 2026-09-17). Lo habitual es que lo truncado sea el **ejemplo**, no el hecho: en `A70`,
+  `olvida cosas puntuales` está completo y va al informe; `(fue a un partido y por ahi ` se descarta.
+  **Nunca completar ni adivinar** el fragmento. Si al sacarlo lo que queda no se entiende solo, ahí sí
+  se omite la viñeta entera. En los dos casos la nota cruda va al bloque 12. Se descarta **por estar
+  inutilizable, nunca por su contenido**. ⚠️ Si se rescata una queja de memoria, **recortar la frase 5
+  del screening** (§4.1) — si no, el informe se contradice.
 - `A70` está **truncada dentro del propio Excel** — ver §5.g. ✅ Aclarado: son notas en vivo con el
   paciente enfrente y a veces quedan a medias; es error de tipeo de la profesional, no un problema de
-  lectura. **Irrecuperable** — no se redacta; va al bloque 12.
+  lectura. **Irrecuperable el ejemplo** — se conserva la afirmación (`olvida cosas puntuales`) y se descarta el fragmento; la nota cruda va igual al bloque 12.
 
 ---
 
@@ -637,11 +639,20 @@ El texto termina en `QSM: olvida cosas puntuales (fue a un partido y por ahi ` �
 cerrar, frase cortada. **La celda está así en el archivo**, no es un problema de lectura: son notas
 tomadas en vivo y a veces quedan a medias. Irrecuperable.
 
-🚩 **Tratamiento (decisión del 2026-09-17): NO se redacta.** La viñeta se omite entera del párrafo —
-nada de transcribir el fragmento ni de introducirlo con una frase sobre quejas mnésicas — y la nota
-cruda va al bloque 12. Antes acá decía que la skill "la deja como está y lo señala": **eso ya no
-vale**. Como `A70` es la única referencia a quejas subjetivas de memoria, el bloque 12 tiene que
-avisar que el informe queda sin ese tema.
+🚩 **Tratamiento (regla afinada el 2026-09-17).** Se parte la nota en dos: **la afirmación se conserva,
+el ejemplo cortado se descarta.**
+
+| | |
+|---|---|
+| ✅ al informe | `olvida cosas puntuales` → `Refiere quejas subjetivas de memoria, con olvidos puntuales.` |
+| ❌ se descarta | `(fue a un partido y por ahi ` |
+
+No transcribir el fragmento ni intentar completarlo. La nota cruda va igual al bloque 12.
+
+⚠️ **Como `A70` es la única referencia a quejas subjetivas de memoria, define la frase 5 del
+screening:** con la queja rescatada, esa frase se recorta a `…no reporta sintomatología vinculada al
+malestar psicológico.` Antes acá decía que la viñeta se omitía entera y que el bloque 12 avisara que
+el informe quedaba sin el tema; **eso quedó sin efecto**.
 
 #### 5.h Separador decimal mixto en los textos `X/Y`
 

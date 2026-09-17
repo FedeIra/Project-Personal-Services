@@ -1,0 +1,271 @@
+{
+  "personales": [
+    "Bunader, José Alberto",
+    "61 años",
+    "08/03/1964",
+    "Terciario",
+    "Diestro",
+    "31/08/2026"
+  ],
+  "anamnesis": [
+    "El Sr. Bunader asiste solo a la consulta para la realización de una evaluación neurocognitiva por control.",
+    "Refiere antecedentes familiares de enfermedad de Alzheimer: su madre presentó un inicio temprano, alrededor de los 65 años.",
+    "Relata que maneja una empresa, con una modalidad de trabajo a veces presencial y a veces no, y menciona estar “siempre con el bendito teléfono siempre conectado”. Algunos días se toma un descanso para pescar, aunque señala que vuelve a casa “liquidado”.",
+    "Menciona una vida social y familiar presente.",
+    "En lo que concierne a la actividad física, realiza yoga dos veces por semana y gimnasio tres veces por semana: “no lo negocio, lo hago con ganas”.",
+    "Reporta que “duermo bien pero duermo poco”, con despertares para ir al baño; a veces se despierta entre las 4 y las 5 de la mañana y le cuesta volver a dormirse, durmiendo en ocasiones menos de cinco o seis horas.",
+    "Anímicamente refiere encontrarse “bárbaro”, aunque menciona “cierto estrés cerebral y financiero”.",
+    "Vive en pareja y, según autoreporte, es autónomo en las actividades de la vida diaria."
+  ],
+  "pruebas": [
+    "Actividades instrumentales de la vida diaria (AIVD de Lawton y Brody)",
+    "Mini mental state examination (MMSE)",
+    "Batería de eficiencia mnésica de Signoret – subtest memoria seriada (BEM-MS)",
+    "Batería de eficiencia mnésica de Signoret – subtest memoria lógica (BEM-ML)",
+    "Trail making test A (TMT A) y B (TMT B)",
+    "Fluencia verbal fonológica (FF) y semántica (FS)",
+    "Test de denominación de Boston abreviado (TBA)",
+    "Span de dígitos directos (DD) e inversos (DI)",
+    "Test del reloj a la orden (TRO)",
+    "Ineco frontal screening (IFS)",
+    "Escala de malestar psicológico (K-10)",
+    "Cuestionario de quejas subjetivas de memoria (C-QSM)"
+  ],
+  "sintesis": [
+    {
+      "pb": "30/30",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "9,5/10",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "8",
+      "z": "Autónomo",
+      "x": 0
+    },
+    {
+      "pb": "10",
+      "z": "Normal",
+      "x": 0
+    },
+    {
+      "pb": "7",
+      "z": "0,45",
+      "x": 5
+    },
+    {
+      "pb": "4",
+      "z": "-0,35",
+      "x": 4
+    },
+    {
+      "pb": "38",
+      "z": "-0,18",
+      "x": 4
+    },
+    {
+      "pb": "42",
+      "z": "1,02",
+      "x": 6
+    },
+    {
+      "pb": "24",
+      "z": "2,31",
+      "x": 7
+    },
+    {
+      "pb": "26,5/30",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "7/10",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "3 normal",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "3 normal",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "3 normal",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "4 normal",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "2 normal",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "3 normal",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "2,5 normal",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "6 normal",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "5",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "8",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "10",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "7,66",
+      "z": "-0,90",
+      "x": 4
+    },
+    {
+      "pb": "8",
+      "z": "-0,13",
+      "x": 4
+    },
+    {
+      "pb": "8",
+      "z": "≤-3",
+      "x": 1
+    },
+    {
+      "pb": "12",
+      "z": "0,57",
+      "x": 5
+    },
+    {
+      "pb": "10",
+      "z": "-2,01",
+      "x": 2
+    },
+    {
+      "pb": "7",
+      "z": "-1,24",
+      "x": 3
+    },
+    {
+      "pb": "8",
+      "z": "-0,51",
+      "x": 4
+    },
+    {
+      "pb": "24",
+      "z": "2,31",
+      "x": 7
+    },
+    {
+      "pb": "20",
+      "z": "-0,30",
+      "x": 4
+    },
+    {
+      "pb": "10",
+      "z": "-0,86",
+      "x": 4
+    },
+    {
+      "pb": "Normal",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "Normal",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "9,5/10",
+      "z": "",
+      "x": 0
+    },
+    {
+      "pb": "Normal",
+      "z": "",
+      "x": 0
+    }
+  ],
+  "grafico1": [
+    0.45,
+    -0.35,
+    -0.18,
+    1.02,
+    -0.9,
+    -0.13,
+    -3,
+    0.57,
+    -2.01,
+    -1.24,
+    -0.51,
+    2.31,
+    -0.3,
+    -0.86
+  ],
+  "grafico2": [
+    5,
+    3,
+    1,
+    1,
+    2,
+    1,
+    2,
+    5,
+    3,
+    1
+  ],
+  "screening": "Discurso fluido y organizado, con conservada capacidad de comprensión y expresión. Nivel de alerta conservado a lo largo de toda la consulta, sin presencia de fatiga que pudo haber interferido negativamente. Orientación temporal y espacial conservadas. Rendimiento cognitivo general inicial (evaluado a partir de pruebas de screening) con puntajes conservados (MMSE=30/30; TRO= 9,5/10; INECO=26,5/30) para su edad y nivel educativo. El paciente no reporta sintomatología vinculada al malestar psicológico ni quejas subjetivas de memoria significativas. Según autoreporte sobre funcionalidad e independencia, la autonomía en las actividades básicas de la vida diaria está conservada.",
+  "areas": {
+    "atencion": [
+      "Impresión diagnóstica del área: rendimiento cognitivo conservado-alto",
+      "Nivel de alerta conservado a lo largo de toda la consulta. Puntaje normal en span atencional, logrando retener 7 dígitos de manera directa. En retrogresión, logra retener 4 dígitos, evidenciando un rendimiento conservado en memoria de trabajo. Habilidad de rastreo visual y velocidad de procesamiento conservadas. Rendimiento alto en flexibilidad cognitiva. Rendimiento alto en fluencia fonológica. Puntaje conservado en la prueba ejecutiva."
+    ],
+    "memoria": [
+      "Impresión diagnóstica del área: rendimiento cognitivo conservado",
+      "Puntaje conservado en la capacidad de aprendizaje y codificación de material episódico verbal seriado, con una curva de aprendizaje ascendente y productiva en el recuerdo de un listado de 12 palabras sin relación lógica entre sí, evidenciando beneficio en la repetición de información a recordar no contextualizada. Puntaje conservado en recuperación diferida libre, con bajo beneficio de la facilitación de claves semánticas y mejorando cuando se le dan de opción múltiple; dejando en evidencia una capacidad de reconocimiento conservada. En relación al material contextualizado, obtiene puntajes conservados en recuperación inmediata y en diferida (de la prueba de memoria lógica)."
+    ],
+    "lenguaje": [
+      "Impresión diagnóstica por área: rendimiento cognitivo conservado",
+      "Capacidad de comprensión y expresión conservadas. La entonación y articulación del lenguaje impresionaron conservadas a lo largo de toda la entrevista. Rendimiento alto en fluencia fonológica y conservado en fluencia semántica. Adecuada capacidad de denominación de imágenes."
+    ],
+    "visoconstruccion": [
+      "Impresión diagnóstica por área: rendimiento cognitivo conservado",
+      "La capacidad de visoconstrucción se encuentra conservada: el paciente logra copiar una figura simple (MMSE) y dibujar un reloj de memoria (TRO) adecuadamente."
+    ]
+  },
+  "recap": "El Sr. Bunader presentó un rendimiento conservado en la orientación y en la visoconstrucción. A su vez, en lo que refiere al lenguaje, presentó un rendimiento alto en la fluencia fonológica y conservado en la semántica, además de una adecuada capacidad de denominación. En adición, el rendimiento en atención, velocidad de procesamiento y funciones ejecutivas resultó conservado-alto, con un span atencional normal, memoria de trabajo conservada y una alta flexibilidad cognitiva. Por último, en memoria episódica presentó una capacidad de aprendizaje y codificación conservada, con una curva ascendente y productiva, y una recuperación diferida libre normal, con bajo beneficio de la facilitación de claves semánticas y mejorando ante la opción múltiple; el material contextualizado se recuperó de manera conservada tanto de forma inmediata como diferida.",
+  "cierre": "En conclusión, el Sr. Bunader presentó un rendimiento cognitivo normal con leves fallas aisladas en la facilitación semántica del recuerdo, que a la fecha no impresionarían configurar un perfil cognitivo significativo.",
+  "sugerencias": [
+    "Interpretar estos resultados considerando la clínica del paciente y el resultado en estudios complementarios que se consideren pertinentes",
+    "Seguimiento clínico según evolución",
+    "Promover hábitos de vida saludables (mejorar calidad del sueño, manejo del estrés)",
+    "Reevaluación en caso de cambios clínicos o persistencia de quejas"
+  ]
+}

@@ -8,12 +8,14 @@
 
 ## 0. Qué es y qué no es
 
-La skill es un **paquete de contexto** (7 archivos `.md`) que le enseña a Claude a leer el Excel
-unificado de la evaluación y devolver **12 bloques listos para copy/paste** en la plantilla Word del
-informe.
+La skill es un **paquete** (7 archivos `.md` + la plantilla del Word + un script) que le enseña a
+Claude a leer el Excel unificado de la evaluación y **devolver el informe completo en Word**, listo
+para revisar y firmar.
 
 - **Todo lo que devuelve es borrador para revisión de la profesional.**
-- **No** genera el `.docx` final (los gráficos son objetos OLE, se pegan a mano).
+- **Sí** genera el `.docx`, desde el 2026-09-17. Antes no: se creía que los gráficos eran objetos OLE
+  imposibles de tocar por código, y resultó falso. Clona la plantilla y reemplaza sólo lo variable.
+- Si la cuenta no puede crear archivos, cae al modo viejo de **12 bloques para copy/paste** y lo avisa.
 - **No** recalcula PB ni Z: el Excel ya los trae calculados; la skill transcribe.
 - **No** envía nada al paciente ni decide sola el diagnóstico: propone categoría, el médico decide.
 
@@ -74,22 +76,22 @@ Además:
 Conversación nueva, adjuntar el Excel y escribir algo así:
 
 ```
-Adjunto el Excel V5 de la evaluación. Generá los 12 bloques del informe neurocognitivo.
+Adjunto el Excel V5 de la evaluación. Generá el informe neurocognitivo.
 ```
 
 Claude detecta la skill sola al ver el Excel. Si no la levanta, forzarla nombrándola:
 
 ```
-Usá la skill informe-neurocognitivo con este Excel y devolveme los 12 bloques.
+Usá la skill informe-neurocognitivo con este Excel y generá el informe en Word.
 ```
 
 Variantes útiles:
 
 | Quiero… | Pedir |
 |---|---|
-| Sólo la tabla de síntesis | `Del Excel adjunto, generá sólo el bloque 4 (tabla de síntesis) en HTML.` |
+| Cambiar un párrafo y rehacer el Word | `Rehacé el bloque 8 y regenerá el informe.` |
+| Los bloques sueltos, sin Word | `Dame los 12 bloques para copy/paste en vez del .docx.` |
 | Sólo los gráficos | `Dame los bloques 5 y 6 (valores de los dos gráficos).` |
-| Rehacer un bloque | `Rehacé el bloque 8 siguiendo el fraseo de ejemplo-informe.md.` |
 | Ver qué quedó dudoso | `Mostrame el bloque 12 otra vez, con las oraciones exactas a revisar.` |
 
 ---
@@ -150,21 +152,23 @@ columna destino cambia según el archivo). Los gráficos se actualizan a mano.
 
 ---
 
-## 7. Actualizar el paquete cuando se editan los `.md`
+## 7. Actualizar el paquete cuando se edita algo
 
 El zip es una **copia congelada** de la carpeta: editar los archivos no lo actualiza. Después de
-tocar cualquier `.md`, regenerarlo y volver a subirlo a claude.ai (Settings → Capabilities → Skills →
+tocar cualquier archivo, regenerarlo y volver a subirlo a claude.ai (Settings → Capabilities → Skills →
 reemplazar la skill existente).
 
 PowerShell, desde `clinicTransformation/`:
 
 ```powershell
-Compress-Archive -Path .\informe-neurocognitivo\*.md `
+Compress-Archive -Path .\informe-neurocognitivo\* `
                  -DestinationPath .\informe-neurocognitivo.zip `
                  -CompressionLevel Optimal -Force
 ```
 
-Verificar que quedaron los 7 archivos **en la raíz** del zip (sin prefijo de carpeta):
+⚠️ Es `\*` y **no** `\*.md`: el paquete también lleva la plantilla `.docx` y el script `.py`.
+
+Verificar que quedaron los 9 archivos **en la raíz** del zip (sin prefijo de carpeta):
 
 ```powershell
 Add-Type -AssemblyName System.IO.Compression.FileSystem

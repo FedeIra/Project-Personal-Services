@@ -60,8 +60,11 @@ envía por email.
 - **Nivel 2 — necesita LLM, con revisión humana obligatoria:** párrafos por función cognitiva,
   completar los "(…)" de conclusiones. Siempre borrador para revisión, nunca auto-envío.
 - **Nivel 3 — fuera de alcance:** toma de la evaluación en vivo, carga en la historia clínica de
-  terceros, juicio clínico final, y **generación automática del `.docx`** (los gráficos embebidos son
-  objetos OLE — riesgo de corromperlos generando el archivo por código).
+  terceros y juicio clínico final.
+  ⛔ **Corrección (2026-09-17):** acá figuraba también la **generación automática del `.docx`**, con el
+  argumento de que los gráficos embebidos eran objetos OLE. **Era falso:** se verificó en
+  `informeFinal.docx` que hay **cero** objetos OLE y dos gráficos nativos, cuyos valores viven en el
+  caché del propio gráfico (`autoUpdate=0`). Generar el Word es hoy el comportamiento por default.
 
 ---
 
@@ -75,9 +78,13 @@ genera el `.docx` final ni envía nada: es siempre borrador para revisión del p
   vigente, 2026-09-16), hoja `TABLA DE FORMULAS`. Esquema celda por celda →
   `informe-neurocognitivo/mapeo-excel-a-word.md` §1, que es la **única fuente de direcciones** del
   paquete. 🚩 **V5 movió filas y columnas**: las direcciones de V3/V4 ya no sirven.
-- **Qué devuelve:** 12 bloques (datos personales, anamnesis, tabla de síntesis, los 2 gráficos,
-  screening, párrafos por área, conclusiones, categoría + sugerencias, y un reporte de faltantes).
-  Detalle → `informe-neurocognitivo/SKILL.md`.
+- **Qué devuelve (desde 2026-09-17):** **el informe completo en Word**, clonando
+  `plantilla-informe.docx` y reemplazando sólo lo variable — tablas, los 2 gráficos, anamnesis,
+  screening, párrafos por área, conclusiones y sugerencias. El reporte de faltantes sale aparte, como
+  texto en el chat. Si la cuenta no puede crear archivos, cae al modo anterior de 12 bloques para
+  copy/paste. Detalle → `informe-neurocognitivo/SKILL.md`.
+  🚩 **Queda sin efecto el «Nivel 3 — fuera de alcance» de §2** en lo relativo al `.docx`: se verificó
+  que los gráficos **no son objetos OLE** sino nativos, y que reescribirlos por código es seguro.
 - **Cómo se arma y sube:** comprimir la carpeta `informe-neurocognitivo/` en `.zip` (con el `SKILL.md`
   adentro) → en claude.ai **Settings → Capabilities → Skills**, habilitar *code execution* y subir el
   zip. Requiere plan **Pro/Max/Team/Enterprise**. Claude la detecta sola al adjuntar el Excel.
@@ -99,6 +106,8 @@ historial ni persistencia, calidad dependiente del prompt.
 | `informe-neurocognitivo/orden-categorias-graficos.md` | Los 2 gráficos: orden, redondeo/cap, celdas destino. |
 | `informe-neurocognitivo/regla-diagnostica.md` | Las 6 categorías + sugerencias + cortes K-10/AVD. |
 | `informe-neurocognitivo/excel-unificado-spec.md` | Estado del Excel V5 y los ajustes que quedan. |
+| `informe-neurocognitivo/plantilla-informe.docx` | **La plantilla del Word** que se clona (87 KB, sin fuentes embebidas). |
+| `informe-neurocognitivo/generar_informe.py` | **El generador**: clona la plantilla y reemplaza lo variable. |
 
 ---
 

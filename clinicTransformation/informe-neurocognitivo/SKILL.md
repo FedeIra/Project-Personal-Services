@@ -1,16 +1,97 @@
 ---
 name: informe-neurocognitivo
 description: >
-  Genera los bloques de texto/datos para completar un informe neurocognitivo a partir de un Excel
-  unificado con los puntajes ya calculados de un paciente. Usar cuando se adjunte un Excel de
-  evaluación neurocognitiva (hoja TABLA DE FORMULAS o equivalente) y se pida armar/completar un
-  informe.
+  Genera el informe neurocognitivo completo en Word a partir de un Excel unificado con los puntajes
+  ya calculados de un paciente. Ejecuta el script generar_informe.py incluido, que clona la plantilla
+  plantilla-informe.docx y reemplaza sólo los datos variables. Usar cuando se adjunte un Excel de
+  evaluación neurocognitiva (hoja TABLA DE FORMULAS o equivalente) y se pida armar un informe.
 ---
 
-# Informe neurocognitivo — generación de bloques para copy/paste
+# Informe neurocognitivo — genera el informe completo en Word
 
-Todo el output es **borrador para revisión del profesional**. Nunca se genera el `.docx` final ni se
-envía nada al paciente.
+Todo el output es **borrador para revisión del profesional**: nunca se envía nada al paciente y la
+categoría diagnóstica es una propuesta, no un diagnóstico.
+
+---
+
+# ⛔ LO PRIMERO, ANTES DE CUALQUIER OTRA COSA
+
+**El informe NO se escribe: se genera ejecutando el script de este paquete.**
+
+```bash
+python generar_informe.py datos.json informe.docx
+```
+
+Los dos archivos están **en esta misma carpeta**, junto a este `SKILL.md`. Localizarlos antes de
+empezar (`ls` sobre el directorio de la skill) y usar la ruta absoluta que corresponda.
+
+## 🚫 Prohibido construir el documento
+
+**Está terminantemente prohibido crear el `.docx` con `python-docx`, `docx.Document()`,
+`Document()`, o armando el XML a mano.** No importa lo razonable que parezca: el formato del informe
+es irreproducible desde cero y el resultado va a estar mal aunque se vea prolijo.
+
+⚠️ **Fallo real observado (2026-09-17, primera corrida en claude.ai).** La skill ignoró el script y
+escribió el documento con `python-docx`. Salió un archivo que *parecía* un informe y estaba mal en
+todo: sin el encabezado institucional, sin los dos gráficos, con títulos inventados
+(`I. Datos de identificación`, `IV. Resultados de la evaluación`, `V. Síntesis`), con el cuadro de
+síntesis partido en seis tablas distintas, con una tabla de sintomatología que nadie pidió, sin la
+leyenda al pie y con la anamnesis en viñetas en vez de prosa.
+
+**Cómo darse cuenta de que se cayó en este error:** si el documento generado no tiene
+`word/charts/chart1.xml`, o no tiene `word/header1.xml`, o los títulos no son exactamente los de la
+plantilla, entonces **no se usó la plantilla** y hay que rehacerlo con el script.
+
+## Lo que aporta cada parte
+
+| Viene de la plantilla (no se toca) | Lo produce la skill (va en `datos.json`) |
+|---|---|
+| encabezado institucional con el logo | los 6 datos personales |
+| títulos de todas las secciones | los párrafos de anamnesis |
+| estructura de la tabla de síntesis (12 columnas, grises, celdas combinadas) | PB, Z y la X de cada una de las 36 filas |
+| los dos gráficos | los 14 + 10 valores |
+| la leyenda al pie | el screening y los 4 párrafos por área |
+| la firma y el cierre | recap, frase de cierre y viñetas |
+
+Si una de esas cosas falta o cambió de nombre en el resultado, **es que no se clonó la plantilla**.
+
+## 🚩 Antes de escribir `datos.json` — leer las reglas de contenido
+
+Que el formato lo resuelva el script **no cambia una sola regla de qué dice el informe**. El JSON no
+es un volcado del Excel: cada clave tiene reglas propias, y son las mismas que en el modo de bloques.
+**Leerlas antes de redactar, no después:**
+
+| Antes de escribir… | Leer |
+|---|---|
+| `anamnesis` | `mapeo-excel-a-word.md` §3 + la sección `MOTIVO DE CONSULTA` de `ejemplo-informe.md`. **Prosa, nunca viñetas rotuladas.** Las notas de protocolo no se redactan; de una nota truncada se conserva la afirmación y se descarta sólo el fragmento cortado. |
+| `screening` | `mapeo-excel-a-word.md` §4.1 — el esqueleto de 6 frases está transcrito **literal**. Copiarlo, no reescribirlo. |
+| `areas` | `mapeo-excel-a-word.md` §4.2 — léxico Z→palabra, sigla→función, y las dos prohibiciones duras: **ni siglas ni valores Z en la prosa**. `CE` no se narra nunca; `Sem` se dice como *bajo beneficio de la facilitación de claves semánticas*. |
+| `sintesis` | `orden-filas-sintesis.md` — las 36 filas en orden posicional, el cap de ±3, y el **autochequeo obligatorio** contra las columnas `E:L` del Excel. |
+| `grafico1` / `grafico2` | `orden-categorias-graficos.md` — orden de las categorías, redondeo y cap. |
+| `recap`, `cierre`, `sugerencias` | `regla-diagnostica.md` — la categoría se **propone**, la decide el médico; el orden del recap; el paréntesis de hábitos se deriva de la anamnesis. |
+
+⚠️ El detalle de cada clave está en **«Contenido de los 12 bloques»**, más abajo en este archivo. Ese
+apartado sigue vigente tal cual: lo único que cambió es cómo se entrega, no qué se escribe.
+
+## Al terminar
+
+1. Ofrecer el `.docx` para descargar.
+2. **Pegar en el chat el resumen que imprime el script**, literal. Es la evidencia de que la corrida
+   fue completa:
+   ```
+   datos personales: 6 filas, 2 sobrantes eliminadas
+   anamnesis: N párrafos (la plantilla traía 6)
+   pruebas administradas: 12 ítems (la plantilla traía 11)
+   tabla de síntesis: 36 filas, N celdas escritas
+   screening + 4 secciones por área: 9 párrafos
+   conclusiones: recap + cierre · N viñetas (la plantilla traía 4)
+   gráfico 1: 14 puntos + 14 celdas del libro embebido
+   gráfico 2: 10 puntos + 10 celdas del libro embebido
+   ```
+3. Escribir el **bloque 12 (faltantes y dudas)** como texto en el chat.
+
+Si el script **aborta**, no entregar nada: reportar el error tal cual y, si corresponde, caer al modo
+de bloques de respaldo diciéndolo explícitamente.
 
 ## Qué recibe esta skill
 
@@ -27,7 +108,7 @@ Esquema de la hoja (detalle completo, con las fórmulas, en `mapeo-excel-a-word.
 | `A11:L50` | Cuadro de pruebas: `A`=Área `B`=Prueba `C`=PB `D`=Z `E:L`=los 8 tramos de rango. Filas 11 y 12 = encabezados. |
 | `A13`, `A19`, `A34`, `A44`, `A49` | Rótulos de las 5 áreas, en celdas **combinadas** (`A13:A18`, `A19:A33`, `A34:A43`, `A44:A48`, `A49:A50`). |
 | `C14`, `C15` | Orientación temporal / espacial (`Si`/`No`/`Medio`). **No son filas de la tabla de síntesis** — alimentan la frase 3 del screening. |
-| `D17`, `D18` | Interpretación de AVD y de KPDS-10 (texto, pass-through). Ojo: van en la columna `Z`. |
+| `D17`, `D18` | Interpretación de AVD y de KPDS-10 (texto, pass-through). Ojo: van en la columna `Z`. **Las dos por fórmula** desde el 2026-09-17. |
 | `C34`, `C35`, `C36` | Ensayos BEM–MS AS1 / AS2 / AS3 — **son filas del cuadro desde V5** (antes vivían en `P35:P37`). |
 | `E:L` | Las 8 columnas de rango, **con la X ya calculada por fórmula** en las 15 filas con Z. |
 | `Q32:R46` | Media y desvío por prueba (`VLOOKUP`). Sólo backend: no se lee para el informe. |
@@ -84,17 +165,22 @@ Lo que sí hay que chequear en cada archivo que llegue:
    puede ser un override deliberado del corte anímico. **Caso real:** una versión intermedia de V5
    traía `C18`=`30` con los ítems sumando `24` — la tabla decía `Malestar severo` y correspondía
    `Normal`, cruzando el corte que decide la categoría diagnóstica.
-4. **`B8` (`Asiste acompañado con`) tiene rótulo y dominio ambiguos.** Leerlo así: `No` o vacío ⇒
+4. 🚩 **`D17` (interpretación de AVD) tiene que venir por fórmula.** Desde el 2026-09-17 se calcula
+   con `=SI(C17>=8;"Autónomo";…)` (ver `regla-diagnostica.md`). Si llega **tipeada a mano**, el valor
+   igual se usa tal cual —es pass-through— pero **avisarlo en el bloque 12**: significa que ese archivo
+   quedó con la versión vieja y la palabra puede no corresponder al puntaje. Chequeo barato: contrastar
+   `D17` contra `C17` usando la tabla de tramos.
+5. **`B8` (`Asiste acompañado con`) tiene rótulo y dominio ambiguos.** Leerlo así: `No` o vacío ⇒
    `asiste solo/a`; cualquier otro texto ⇒ `asiste acompañado/a por <texto>`. Anotarlo en el bloque 12.
-5. **Campos Sí/No.** V5 tiene validación de lista en `B5`, `B6`, `B10` y `C14:C15`. Igual normalizar
+6. **Campos Sí/No.** V5 tiene validación de lista en `B5`, `B6`, `B10` y `C14:C15`. Igual normalizar
    tolerantemente (`Sí`/`si`/`SI`/`No`/`no`) por si llega un archivo viejo. **`C14`/`C15` admiten un
    tercer valor, `Medio`**: no colapsarlo a `Si` — redactar la frase 3 en consecuencia o señalarlo. Si
    un valor no es interpretable, **señalarlo** en vez de asumir. **Nunca inferir el riesgo de
    evolución de los puntajes.**
-6. **Las dos filas de TRO pueden traer valores distintos** (`C16` screening vs `C49`
+7. **Las dos filas de TRO pueden traer valores distintos** (`C16` screening vs `C49`
    visoconstrucción). **Copiar cada celda en su fila, no reconciliarlas**, y anotar la diferencia en
    el bloque 12 si existe.
-7. **Celdas `X/Y` con pinta de fecha.** V3 las guarda como texto, pero si alguna vez llega un número
+8. **Celdas `X/Y` con pinta de fecha.** V3 las guarda como texto, pero si alguna vez llega un número
    entre ~45000 y ~48000 en una celda que debería decir `7/10`, es una autoconversión de Excel y **es
    reversible**: formatear el serial como `d/m` devuelve lo tipeado. Chequeo obligatorio: el
    denominador recuperado tiene que ser el máximo del subtest. Si pasa → usar el valor y anotarlo en
@@ -108,14 +194,18 @@ Lo que sí hay que chequear en cada archivo que llegue:
 - **No inventar recomendaciones clínicas.** Partir del template de `regla-diagnostica.md`, con las
   mismas viñetas y en el mismo orden (ver ahí qué sí se localiza).
 - **No reinterpretar la anamnesis.** Ver el bloque 4 abajo — es el bloque de mayor riesgo.
-- **No generar el `.docx` final** (los gráficos son objetos OLE) ni auto-enviar nada.
+- **No auto-enviar nada.** El informe se entrega a la profesional para que lo revise y lo firme.
+  ⚠️ La versión anterior de esta línea decía *"no generar el `.docx` final porque los gráficos son
+  objetos OLE"*. **Eso era falso y quedó sin efecto (2026-09-17):** se verificó en `informeFinal.docx`
+  que no hay ningún objeto OLE — son gráficos nativos cuyos valores se reescriben en el caché del
+  propio gráfico. Generar el `.docx` es ahora el comportamiento por default.
 - **No "corregir" las inconsistencias de la plantilla.** La leyenda que menciona trazado diagonal, y
   el `del área` / `por área` de las secciones, se reproducen tal cual.
 
 ## Gotcha técnico — guardar el Excel antes de subirlo
 
 El Excel se lee con código, y las celdas con fórmula (la columna `D` de las filas con Z, **las 8
-columnas `E:L`**, `Q32:R46`, `V38`, `U43`, `B63`, `C18`, `C37`, `C41`) sólo tienen el
+columnas `E:L`**, `Q32:R46`, `V38`, `U43`, `B63`, `C18`, **`D17`**, `D18`, `C37`, `C41`) sólo tienen el
 valor calculado cacheado si el archivo fue **guardado en Excel**. Si se sube sin guardar, o fue
 editado con otro programa, pueden leerse vacías. Avisar al usuario si se detecta ese patrón.
 
@@ -134,9 +224,8 @@ una oración ni dentro de una celda de tabla.
 > `[PENDIENTE]` explícito, aunque no use esa palabra.
 >
 > ❌ `En cuanto a las quejas subjetivas de memoria, menciona que olvida cosas puntuales: "fue a un
-> partido y por ahí…"` — **tampoco alcanza con sacar la aclaración**. La cita sigue cortada, no
-> significa nada, y la frase que la introduce le hace decir al informe que hay quejas mnésicas que ese
-> dato no sostiene. Una nota truncada **se omite entera** (ver bloque 2).
+> partido y por ahí…"` — el problema es **arrastrar la cita cortada**, que no significa nada. La
+> afirmación sí va: `Refiere quejas subjetivas de memoria, con olvidos puntuales.` (ver bloque 2).
 >
 > ✅ prosa completa y gramatical, sin el fragmento inutilizable + **el pendiente enumerado en el
 > bloque 12**, citando la nota cruda completa que hay que revisar.
@@ -153,12 +242,84 @@ En los dos casos, el bloque 12 lo repite con el detalle. ⚠️ Fallo observado 
 
 ---
 
-## Formato de salida — 12 bloques
+## 🚩 Cómo se entrega: **un `.docx` completo** (desde el 2026-09-17)
 
-En bloques separados y etiquetados, listos para copy/paste. El mapeo completo de qué sale de dónde
-está en `mapeo-excel-a-word.md` §2, y las direcciones de celda en §1 (**única fuente**; este archivo
-las repite). Para el **tono y el fraseo** de los bloques narrativos (2, 6, 7,
-8, 9), seguir el registro de `ejemplo-informe.md` (informe modelo completo, ficticio).
+La skill **no devuelve 12 bloques para pegar a mano**. Genera **el informe entero en Word**, listo
+para que la profesional lo revise, edite y firme.
+
+El procedimiento es siempre el mismo y **no admite improvisar**:
+
+1. Leer el Excel y **producir un `datos.json`** con las partes variables (esquema abajo).
+2. Ejecutar `python generar_informe.py datos.json informe.docx` — el script está en este paquete.
+3. **Ofrecer el `.docx` para descargar** + pegar en el chat el resumen que imprime el script.
+4. Escribir el **bloque 12 (faltantes y dudas) como texto en el chat**. Ése es el único que no va al
+   documento.
+
+⚠️ **No construir el documento con `python-docx` ni armar el XML a mano.** El script **clona
+`plantilla-informe.docx`** y reemplaza sólo lo variable; todo el formato —tabla de 12 columnas con
+sus grises y celdas combinadas, los dos gráficos, el encabezado, la leyenda, la firma— viene de la
+plantilla. Reconstruirlo es exactamente lo que no hay que hacer.
+
+⚠️ **Si el script aborta, NO entregar un informe parcial.** Aborta a propósito cuando no encuentra una
+sección o cuando un conteo no cierra (36 filas, 14 y 10 valores de gráfico). Reportar el error en el
+bloque 12 y, si hace falta, caer al modo de bloques.
+
+### Esquema de `datos.json`
+
+| Clave | Contenido | Bloque |
+|---|---|---|
+| `personales` | 6 strings: paciente, edad (`61 años`), nacimiento, nivel educativo, lateralidad, evaluación | 1 |
+| `anamnesis` | lista de párrafos (cantidad variable) | 2 |
+| `pruebas` | los 12 ítems de la lista canónica | 3 |
+| `sintesis` | **36** objetos `{"pb":…, "z":…, "x": 0-8}` en el orden de `orden-filas-sintesis.md` (`x` = en qué tramo va la X, `0` = ninguno) | 4 |
+| `grafico1` | **14** números | 5 |
+| `grafico2` | **10** enteros | 6 |
+| `screening` | un párrafo | 7 |
+| `areas` | `atencion`/`memoria`/`lenguaje`/`visoconstruccion`, cada una `[impresión, párrafo]` | 8 |
+| `recap`, `cierre` | un párrafo y una oración | 9 y 10 |
+| `sugerencias` | lista de viñetas (cantidad variable) | 11 |
+
+Ejemplo completo: `../pruebas/ejemplo-datos.json` (fuera del paquete).
+
+🚩 **En el JSON los números van con punto** (`-0.9`) — es formato de archivo. La **coma** es para los
+valores que se pegan a mano en el Excel de un gráfico, que es otra cosa. No confundirlos.
+
+### Lo que el `.docx` resuelve solo
+
+- La fila `Deriva:` de la plantilla **se borra**, no se deja vacía.
+- La leyenda al pie y la firma **ya vienen**: no hay nada que copiar de un informe anterior.
+- La tabla entra en la página sin el viejo ajuste de ancho al 130 %.
+- La cantidad de párrafos de anamnesis, de ítems de pruebas y de viñetas de sugerencias **se adapta**
+  a cada paciente, aunque difiera de la plantilla.
+
+### Modo de respaldo: los 12 bloques para copy/paste
+
+Si no está disponible la creación de archivos de claude.ai (ver el requisito de plan en el bloque 1),
+o si la profesional pide los bloques sueltos, emitirlos como antes — con los formatos que describe cada
+bloque abajo — y **decirlo en el bloque 12**. Las reglas de contenido son las mismas en los dos modos.
+
+---
+
+## Contenido de los 12 bloques
+
+> Esto define **qué dice** cada parte. En el modo `.docx` cada bloque es una clave de `datos.json`;
+> los títulos de sección los pone la plantilla y **no se inventan ni se renumeran**.
+
+Lo de abajo define **qué dice cada parte del informe**, y vale igual para el `.docx` y para el modo de
+respaldo. En el modo `.docx`, cada bloque es una clave del JSON; los formatos de pegado que se
+mencionan (`.docx` suelto, HTML, tabla en el chat) **sólo aplican al modo de respaldo**.
+
+El mapeo completo de qué sale de dónde está en `mapeo-excel-a-word.md` §2, y las direcciones de celda
+en §1 (**única fuente**; este archivo las repite). Para el **tono y el fraseo** de los bloques
+narrativos (2, 7, 8, 9, 10), seguir el registro de `ejemplo-informe.md` (informe modelo completo,
+ficticio).
+
+🚩 **La anamnesis (bloque 2) va en PROSA, nunca en viñetas.** Cada nota del Excel se expande a un
+párrafo corrido en tercera persona, con los verbos de reporte rotados (`Refiere` · `Relata` ·
+`Menciona` · `Reporta` · `En lo que concierne a`). **Prohibido el formato `Rótulo: contenido`**
+(`Sueño: …`, `Rutina: …`, `Actividad física: …`): eso es el punteo crudo del Excel, no el informe.
+⚠️ Fallo observado (2026-09-17): la salida vino como lista de viñetas rotuladas. Comparar contra la
+sección `MOTIVO DE CONSULTA Y ANTECEDENTES` de `ejemplo-informe.md` antes de redactar.
 
 > ⚠️ **Los bloques narrativos son texto de plantilla con huecos, no redacción libre.** El fallo
 > repetido de la primera corrida real fue que la skill emitió **sólo las partes variables** que estos
@@ -188,7 +349,10 @@ escribir nada del tipo *"confirmar si la plantilla tiene la fila `Deriva:`"*: la
 confirmó los 6 campos el 2026-09-17 y no quiere que se le vuelva a preguntar. `B9` cargado **no es**
 un faltante ni una duda — es un dato del Excel que este informe no usa.
 
-### Formato: **`.docx` descargable — verificado en Word real (2026-09-17)**
+### Formato — **sólo para el modo de respaldo**: `.docx` descargable
+
+> En el modo normal esta tabla va dentro del informe completo y no se entrega suelta. Lo de abajo
+> aplica únicamente si se cayó al modo de bloques.
 
 ✅ **Éste es el default.** Generar con code execution (`python-docx`) un `.docx` que contenga **sólo
 esta tabla**, y ofrecerlo para descargar. La profesional lo abre, `Ctrl+A`, `Ctrl+C`, y pega en su
@@ -241,24 +405,36 @@ comillas. Formas fijas del primer y último párrafo, verbos de reporte y concor
 > paciente puede leer este texto. Señalarlo **sólo en el bloque 12**. Incluir todo y **marcar lo
 > dudoso ahí** en vez de decidir sola qué omitir.
 
-> 🚩 **Excepción: nota truncada o ininteligible → NO se redacta** (decisión del 2026-09-17).
+> 🚩 **Nota truncada → se conserva lo completo y se descarta sólo lo cortado**
+> (regla afinada el 2026-09-17, **reemplaza a la primera versión de ese mismo día**).
 >
-> Si la viñeta está cortada a mitad de frase, o no se entiende qué afirma, **se omite del párrafo por
-> completo**: no se transcribe el fragmento, no se la parafrasea, no se la completa. Va **entera y
-> literal al bloque 12**, para que la profesional la complete o la descarte.
+> Una nota truncada casi nunca lo está entera: lo habitual es que **la afirmación esté completa y lo
+> que se corte sea el ejemplo**. En ese caso **el hecho clínico SÍ va al informe** y lo único que se
+> omite es el fragmento inutilizable.
 >
-> Motivo (dicho por la profesional el 2026-09-17, sobre `A70`): *"Esta frase así cortada no tiene
-> sentido ni da evidencia de que haya problemas de memoria"*. Un fragmento sin sentido en el informe
-> es peor que su ausencia — y si además da a entender un hallazgo clínico que el dato no sostiene, es
-> directamente dañino.
+> **Caso de referencia, `A70`:** `QSM: olvida cosas puntuales (fue a un partido y por ahi `
 >
-> **Alcance estricto — se omite sólo por estar incompleta o ser ilegible, nunca por su contenido.**
-> Una nota completa y entendible se incluye siempre, aunque sea incómoda, negativa, breve o ambigua en
-> su interpretación. La skill **no decide qué es relevante**; sólo detecta qué es inutilizable.
+> | | |
+> |---|---|
+> | ✅ se conserva | `olvida cosas puntuales` — afirmación completa, es el dato clínico |
+> | ❌ se descarta | `(fue a un partido y por ahi ` — ejemplo cortado, no significa nada |
 >
-> ⚠️ **Si la nota omitida era el único dato sobre un tema** (p. ej. la única mención de quejas
-> mnésicas), decirlo explícitamente en el bloque 12: *"se omitió X, que era la única referencia a
-> Y — el informe queda sin ese tema"*. Una omisión silenciosa cambia el cuadro clínico.
+> ✅ `Refiere quejas subjetivas de memoria, con olvidos puntuales.`
+> ❌ `...olvida cosas puntuales: "fue a un partido y por ahí…"` (arrastra el fragmento)
+> ❌ omitir la viñeta entera (pierde el hallazgo)
+>
+> **Nunca completar ni adivinar** lo que decía el ejemplo. Si lo que queda al sacar el fragmento no se
+> entiende por sí solo, ahí sí se omite la viñeta entera. En los dos casos, **la nota cruda completa va
+> al bloque 12** para que la profesional la complete o la descarte.
+>
+> 🚩 **Cascada obligatoria al screening.** Si de una nota truncada se rescata una queja de memoria, el
+> paciente **sí reporta quejas subjetivas**: la frase 5 del bloque 7 se recorta a
+> `…no reporta sintomatología vinculada al malestar psicológico.` (ver `mapeo-excel-a-word.md` §4.1).
+> Dejar la forma larga afirmaría lo contrario de lo que dice la anamnesis, **en el mismo informe**.
+>
+> **Alcance estricto — se descarta sólo por estar incompleto o ser ilegible, nunca por su contenido.**
+> Una nota completa y entendible se incluye siempre, aunque sea incómoda, negativa o breve. La skill
+> **no decide qué es relevante**; sólo detecta qué es inutilizable.
 >
 > **Confirmado (2026-09-07):**
 > - **No matizar** — poner el contenido tal cual está tipeado (la profesional escribe notas más
@@ -275,25 +451,29 @@ en `mapeo-excel-a-word.md` §2). La skill lo reproduce literal, en este orden:
 
 ```
 Actividades instrumentales de la vida diaria (AIVD de Lawton y Brody)
-Mini Mental State Examination (MMSE)
+Mini mental state examination (MMSE)
 Batería de eficiencia mnésica de Signoret – subtest memoria seriada (BEM-MS)
 Batería de eficiencia mnésica de Signoret – subtest memoria lógica (BEM-ML)
-Trail Making Test A (TMT A) y B (TMT B)
+Trail making test A (TMT A) y B (TMT B)
 Fluencia verbal fonológica (FF) y semántica (FS)
+Test de denominación de Boston abreviado (TBA)
 Span de dígitos directos (DD) e inversos (DI)
 Test del reloj a la orden (TRO)
-Test de Denominación de Boston Abreviado (TBA)
-Ineco Frontal Screening (IFS)
+Ineco frontal screening (IFS)
 Escala de malestar psicológico (K-10)
 Cuestionario de quejas subjetivas de memoria (C-QSM)
 ```
 
-**Lo único que decide el Excel es la última línea:**
+🚩 **Lista canónica indicada por el usuario el 2026-09-17: siempre estos 12 ítems, en este orden y con
+estas mayúsculas.** Copiar literal, sin \"corregir\" la capitalización (va `Mini mental state
+examination`, `Trail making test`, `Ineco frontal screening`, `Test de denominación de Boston
+abreviado` — en minúsculas después de la primera palabra).
 
-| `B65` (C-QSM) | Salida |
-|---|---|
-| tiene puntaje | **12 ítems** — va la línea del C-QSM |
-| vacía | **11 ítems** — se borra esa línea, y se avisa en el bloque 12 (`informeFinal.docx` es así) |
+⚠️ **Difiere de `informeFinal.docx`** en el orden (ahí `TBA` va después de `TRO`) y en las mayúsculas.
+**Manda esta lista, no la de la plantilla.**
+
+⚠️ **El C-QSM va siempre, aunque `B65` esté vacía** — esto reemplaza la regla anterior, que lo hacía
+condicional y mandaba borrar la línea cuando el cuestionario no se había tomado.
 
 🚩 **Límite conocido, decirlo en el bloque 12 en cada informe:** si alguna de las otras 11 pruebas no
 se tomó, **la skill igual la va a listar** — el Excel no registra qué batería se administró, sólo los
@@ -309,7 +489,10 @@ No lleva `.docx`: son 11–12 líneas de texto plano que se pegan directo.
 Word.** La skill entrega una **tabla nueva y completa** que la reemplaza. No tiene que ser
 visualmente idéntica; tiene que **cumplir con lo que informa** la original.
 
-### Formato: **`.docx` descargable, clonando la tabla real — verificado en Word (2026-09-17)**
+### Formato — **sólo para el modo de respaldo**: `.docx` clonando la tabla real
+
+> En el modo normal el script ya arma esta tabla dentro del informe. Lo de abajo aplica únicamente si
+> se cayó al modo de bloques.
 
 ✅ **Éste es el default.** Generar con code execution un `.docx` que contenga **sólo esta tabla**, con
 el formato exacto de la que ya está en el informe. Ella lo abre, `Ctrl+A`, `Ctrl+C`, y reemplaza la
@@ -588,11 +771,18 @@ de eso parece mal para un caso puntual, decirlo **una vez** y en una línea, no 
 - BEM–MS AST: el PB es el **promedio de los 3 trials truncado a 2 decimales** (idealmente ya sale por
   fórmula del Excel). La skill lo usa tal como viene en `C37`, no lo recalcula.
 - IFS Índice MT (`C25`): deriva de **Dígitos Atrás + Memoria de Trabajo Visual**. Desde V3 es **texto**
-  (`7/10`) y se copia tal cual; sólo aplica el rescate del chequeo 7 si alguna vez vuelve como número.
+  (`7/10`) y se copia tal cual; sólo aplica el rescate del chequeo 8 si alguna vez vuelve como número.
 - Orientación (`C14`/`C15`) y riesgo de evolución (`B10`) **no** son filas de la tabla de síntesis:
   la tabla tiene 36 filas aunque el cuadro del Excel tenga 38.
 
 ## Archivos de esta skill
+
+- `plantilla-informe.docx` — **la plantilla del Word.** Se clona y se le reemplaza lo variable. Trae el
+  encabezado vigente (el de `informeFinal2.docx`), los dos gráficos, la leyenda y la firma. 87 KB: se le
+  quitaron las fuentes embebidas, que pesaban 6,5 MB y no hacen falta (la fuente es Arial).
+- `generar_informe.py` — **el generador.** Sólo biblioteca estándar. Ubica las secciones por el texto
+  de sus encabezados, no por posición, así sobrevive a que se edite la plantilla. Aborta si falta un
+  ancla o si un conteo no cierra.
 
 - `mapeo-excel-a-word.md` — **esquema del Excel + de dónde sale cada bloque del Word.** El mapa
   principal.

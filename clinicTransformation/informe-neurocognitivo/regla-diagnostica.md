@@ -107,9 +107,28 @@ Reglas:
   original no distingue conservadas/comprometidas), ya confirmado.
 
   ⚠️ **Esta tabla clasifica; no dicta el texto del informe.** La palabra que va en la columna Z de la
-  tabla de síntesis la escribe el profesional en el Excel (`D17`, columna `Z` de la fila 17) y **se copia tal cual**. Los dos
-  informes usan `Autónomo` / `Autónoma` (según el género del paciente) donde esta tabla dice
-  `Independencia`. No "corregir" el Excel contra esta tabla: `D17` es pass-through.
+  tabla de síntesis sale de `D17` y **se copia tal cual**. No "corregir" el Excel contra esta tabla:
+  `D17` es pass-through, esté tipeado o salga por fórmula.
+
+  🚩 **Acordado el 2026-09-17: `D17` pasa a calcularse por fórmula**, como ya lo hace `D18` (K-10):
+
+  ```excel
+  =SI(C17="";"";SI(C17>=8;"Autónomo";SI(C17>=6;"Dependencia leve";SI(C17>=4;"Dependencia moderada";SI(C17>=2;"Dependencia severa";"Dependencia total")))))
+  ```
+
+  | `C17` | `D17` |
+  |---|---|
+  | 8 | `Autónomo` |
+  | 6–7 | `Dependencia leve` |
+  | 4–5 | `Dependencia moderada` |
+  | 2–3 | `Dependencia severa` |
+  | 0–1 | `Dependencia total` |
+
+  Los cortes coinciden con el 0–5 / 6–8 de arriba, así que la palabra y la categoría no pueden
+  desincronizarse.
+
+  `Autónomo` va así para cualquier paciente: es la forma que usa la profesional. **No corregirlo por
+  género ni señalarlo como pendiente.**
 - **K-10:** la interpretación que va al Word sale de `D18` del Excel (columna `Z` de la fila 18) (`Normal` en `informeFinal2`,
   con total 15). El corte ≥ 25 se usa para **elegir categoría diagnóstica**, no para redactar esa
   celda.

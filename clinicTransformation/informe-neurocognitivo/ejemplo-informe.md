@@ -68,7 +68,7 @@ Vive con su esposo y, según autoreporte, es autónoma en las actividades de la 
 |---|---|---|---|---|
 | Screening cognitivo y psiquiátrico | MMSE | 29/30 | — | — |
 | | TRO | 10/10 | — | — |
-| | AVD | 8 | Autónoma | — |
+| | AVD | 8 | Autónomo | — |
 | | KPDS-10 | 21 | Normal | — |
 | Atención y funciones ejecutivas | DD | 8 | 1,14 | +1 a +2 |
 | | DI | 4 | -0,35 | -1 a 0 |
