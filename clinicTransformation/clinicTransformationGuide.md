@@ -75,12 +75,13 @@ genera el `.docx` final ni envía nada: es siempre borrador para revisión del p
   vigente, 2026-09-16), hoja `TABLA DE FORMULAS`. Esquema celda por celda →
   `informe-neurocognitivo/mapeo-excel-a-word.md` §1, que es la **única fuente de direcciones** del
   paquete. 🚩 **V5 movió filas y columnas**: las direcciones de V3/V4 ya no sirven.
-- **Qué devuelve:** 11 bloques (datos personales, anamnesis, tabla de síntesis, los 2 gráficos,
+- **Qué devuelve:** 12 bloques (datos personales, anamnesis, tabla de síntesis, los 2 gráficos,
   screening, párrafos por área, conclusiones, categoría + sugerencias, y un reporte de faltantes).
   Detalle → `informe-neurocognitivo/SKILL.md`.
 - **Cómo se arma y sube:** comprimir la carpeta `informe-neurocognitivo/` en `.zip` (con el `SKILL.md`
   adentro) → en claude.ai **Settings → Capabilities → Skills**, habilitar *code execution* y subir el
   zip. Requiere plan **Pro/Max/Team/Enterprise**. Claude la detecta sola al adjuntar el Excel.
+  Paso a paso, prompts y troubleshooting → `informe-neurocognitivo-tutorial.md`.
 - **Gotcha:** guardar el Excel **en Excel** antes de subirlo, para que las fórmulas (VLOOKUP) queden
   cacheadas; si no, esas celdas pueden leerse vacías.
 
@@ -92,7 +93,7 @@ historial ni persistencia, calidad dependiente del prompt.
 
 | Archivo | Contenido |
 |---|---|
-| `informe-neurocognitivo/SKILL.md` | Instrucciones: qué recibe, los 11 bloques de salida, prohibiciones. |
+| `informe-neurocognitivo/SKILL.md` | Instrucciones: qué recibe, los 12 bloques de salida, prohibiciones. |
 | `informe-neurocognitivo/mapeo-excel-a-word.md` | Esquema del Excel + de dónde sale cada bloque del Word (FIJO/PASS/DERIV/LLM). |
 | `informe-neurocognitivo/orden-filas-sintesis.md` | Las 36 filas de la tabla de síntesis, celda de origen, patrones de llenado, paste. |
 | `informe-neurocognitivo/orden-categorias-graficos.md` | Los 2 gráficos: orden, redondeo/cap, celdas destino. |
@@ -284,6 +285,8 @@ Dos perfiles de riesgo:
 |---|---|
 | `clinicTransformationGuide.md` | **Este documento** — hub interno del proyecto. |
 | `informe-neurocognitivo/` | **La skill** (se zippea y sube). Fuente de verdad operativa. |
+| `informe-neurocognitivo.zip` | El paquete listo para subir a claude.ai. **Copia congelada**: regenerarlo tras editar la carpeta. |
+| `informe-neurocognitivo-tutorial.md` | **Manual de uso de la skill**: subida, prompts, qué revisar, cómo regenerar el zip. |
 | `preguntasParaLaProfesional.md` | Preguntas pendientes, versión detallada (interno). |
 | `ejemplos/` | Informes modelo y Excel de ejemplo. **Vigente: `excelEvaluacionCompletoV5.xlsx`**; V1–V4 quedan como histórico y **todos tienen otro layout de celdas** (V5 corrió filas y agregó una columna). |
 | `evaluacion.pdf` | Batería de tests en papel (fuente). |

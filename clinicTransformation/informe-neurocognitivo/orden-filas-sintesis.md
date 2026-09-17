@@ -91,11 +91,11 @@ texto** (`7/10`) y se copia tal cual. El valor deriva de Dígitos Atrás + Memor
 
 Si alguna vez vuelve a llegar como número (~45000–48000), la conversión **es reversible**: formatear
 el serial como `d/m` devuelve lo tipeado. Chequear que el denominador coincida con el máximo del
-subtest (`/10`), usar el valor en esta fila y anotarlo en el bloque 11 como recuperado a confirmar.
+subtest (`/10`), usar el valor en esta fila y anotarlo en el bloque 12 como recuperado a confirmar.
 **Nunca** dejar `[PENDIENTE …]` escrito dentro de la celda — celda sin dato = celda vacía.
 
 ⚠️ **Fila 2 vs fila 35 (TRO):** `C16` y `C49` traen valores distintos. **Copiar cada celda en su
-fila**, no reconciliarlas, y anotar la diferencia en el bloque 11 (`mapeo-excel-a-word.md` §5.f).
+fila**, no reconciliarlas, y anotar la diferencia en el bloque 12 (`mapeo-excel-a-word.md` §5.f).
 
 ## Cómo se completa cada fila: PB, Z y la X de rango
 
@@ -148,8 +148,9 @@ El Z capado **sigue siendo numérico**, así que igual lleva X en la columna del
 
 El Z va **siempre a 2 decimales, con coma**, incluyendo el cero final: Z crudo `-0.29629…` se escribe
 **`-0,30`** (no `-0,3`), y `-0.8994…` se escribe **`-0,90`**. En una celda de Word el separador
-decimal no importa para el parseo — se usa **coma** por estilo. (En los gráficos es distinto: ver
-`orden-categorias-graficos.md`.)
+decimal no importa para el parseo — se usa **coma** por estilo. En los gráficos también va coma desde
+el 2026-09-17; la única diferencia es que ahí **se cae el cero final** (`-0,3` en vez de `-0,30`) — ver
+`orden-categorias-graficos.md`.
 
 ## Estructura de celdas de la tabla — lo que decide la mecánica del paste
 
@@ -305,13 +306,17 @@ Al sacar el texto `N/A`, desaparece también el compromiso que antes ensanchaba 
 una celda vacía no ocupa más lugar que una `X`, así que ya no hace falta la alternativa liviana de
 poner el marcador sólo en `Z`.
 
-### 🚫 La leyenda al pie — **NO se genera**
+### ✅ La leyenda al pie — **SÍ se genera** (desde el 2026-09-17)
 
-✅ **Decisión de la profesional (2026-09-08):** la leyenda es **idéntica en todos los informes**, así
-que no hace falta devolverla ni pegarla encima de la que ya tiene su plantilla. **La skill no la
-emite.**
+🚩 **Cambio del 2026-09-17.** Antes acá decía que la skill **no** emitía la leyenda, porque es idéntica
+en todos los informes. **Eso quedó sin efecto:** desde que el bloque 4 se entrega como `.docx` clonado
+de la tabla real, la leyenda **viene incluida como fila 39** y no hay nada que volver a pegar. Sigue
+siendo idéntica en todos los informes — la diferencia es que ahora llega sola.
 
-> ⚠️ **Consecuencia práctica, avisarla en el bloque 11.** En el Word la leyenda **no es un párrafo
+⚠️ Sólo si se cae al camino HTML vuelve a aplicar lo viejo: ahí la leyenda **no** va en el bloque y hay
+que conservarla del informe anterior. Lo de abajo describe ese caso.
+
+> ⚠️ **Consecuencia práctica, avisarla en el bloque 12.** En el Word la leyenda **no es un párrafo
 > suelto: es la última fila de la propia tabla.** La tabla de `informeFinal2` tiene **39 filas** = 2
 > de encabezado + 36 de datos + **1 de leyenda** (`gridSpan=12`). Verificado en el XML: el texto de la
 > leyenda no aparece en ningún lugar del documento fuera de la tabla.
@@ -333,7 +338,7 @@ está, así que reproducirla verbatim pasaba de ser "conservar una rareza de la 
 algo que no se ve.
 
 **Por default: reproducir la leyenda original tal cual** (es la plantilla de la profesional) **y
-señalarlo en el bloque 11** ofreciendo la variante adaptada.
+señalarlo en el bloque 12** ofreciendo la variante adaptada.
 
 > 🚩 **La tabla generada lleva la leyenda ORIGINAL, palabra por palabra**, incluido
 > `Las áreas con trazado diagonal indican que el puntaje no lleva puntaje Z sino interpretación
@@ -386,16 +391,19 @@ plantilla**, no a la salida de la skill — que ya no emite la leyenda.
 
 ### Dos formatos de salida
 
-| | **Markdown** (alternativa rápida, sin probar) | **HTML** ✅ **default, verificado en Word** |
-|---|---|---|
-| Cómo lo ve | como tabla ya renderizada en el chat | como bloque de código |
-| Cómo se pega | seleccionar la tabla renderizada → copiar → pegar en Word | guardar como `.html`, abrir en el navegador, seleccionar todo, copiar, pegar en Word |
-| Conserva | estructura, filas, columnas, valores | además: **sombreado gris real**, `colspan` de la fila de agrupación, negritas, bordes |
-| Cuándo usarlo | sólo si lo pide (ahorra pasos, pierde el gris) | **por default** |
+🚩 **Desde el 2026-09-17 el default es `.docx`** — ver la especificación completa en `SKILL.md`,
+bloque 4. Se clona la tabla real y se reemplazan sólo PB, Z y la posición de la X. Esta tabla comparaba
+Markdown contra HTML cuando ésas eran las dos únicas opciones; **las dos quedaron como fallback**.
 
-**Default: HTML** — es el camino verificado en Word y el que la profesional aprobó. El gris va como
-`style="background-color:#D9D9D9"` en las celdas no aplicables y `#A6A6A6` en las columnas de
-deterioro significativo — Word respeta esos atributos al pegar desde el navegador.
+| | **Markdown** (descartado) | **HTML** (fallback) | **`.docx`** ✅ **default** |
+|---|---|---|---|
+| Cómo se pega | seleccionar la tabla renderizada → copiar | guardar `.html`, navegador, seleccionar, copiar | abrir el archivo, `Ctrl+A`, `Ctrl+C` |
+| Conserva | estructura y valores; pierde el gris | + sombreado, `colspan`, negritas | **el formato exacto de la plantilla**, leyenda incluida |
+| Ajuste post-paste | sí | sí (ancho 130 %) | **ninguno** |
+
+En el camino HTML, el gris va como `style="background-color:#D9D9D9"` en las celdas no aplicables y
+`#A6A6A6` en las columnas de deterioro significativo — Word respeta esos atributos al pegar desde el
+navegador.
 
 En los dos casos, la tabla se entrega en **un solo bloque** y **entera**, título y leyenda incluidos.
 
@@ -492,22 +500,22 @@ se desfasa a partir de la segunda fila y arrastra el error por las 32.
 
 **Reglas, entonces:**
 
-1. **Toda** fila del bloque 3 emite **exactamente 10 campos** (9 tabs). Toda fila del bloque 1,
+1. **Toda** fila del bloque 4 emite **exactamente 10 campos** (9 tabs). Toda fila del bloque 1,
    10 campos. Toda fila del bloque 2, **9** campos (8 tabs). Los vacíos del final **cuentan**: una
    fila cualitativa es `3 normal` + **9 tabs**, no `3 normal` + 6.
 2. **Autochequeo antes de emitir.** Contar los tabs de cada fila y **decir el conteo en la salida**
-   (p. ej. `bloque 3: 32 filas × 10 campos ✓`). Si una fila no da, corregirla antes de entregar.
+   (p. ej. `bloque 4: 32 filas × 10 campos ✓`). Si una fila no da, corregirla antes de entregar.
 3. **Los tabs del final se pierden en el texto plano del chat** — así se rompió la primera corrida.
    Si la superficie permite adjuntar un archivo, entregar los 3 bloques como **`.txt` con tabs
    reales**. Si no (chat plano), **decirlo** y avisar al profesional que verifique el conteo antes de
    pegar, o usar la ruta alternativa de abajo.
 4. **Nunca escribir un marcador de pendiente dentro de una celda** (`[PENDIENTE - dato corrupto]` se
-   pegaría literal al Word). Celda sin dato = celda vacía, y el pendiente va al bloque 11.
+   pegaría literal al Word). Celda sin dato = celda vacía, y el pendiente va al bloque 12.
 
 > ⚠️ **Esto especifica el arreglo; no lo prueba.** Que los tabs sobrevivan el viaje chat → Word sigue
 > **sin verificarse**, y la corrida real de 2026-09-08 volvió como texto de chat, no como archivo. Con
 > lo medido, el test de Word (abajo, "Pendiente") pasa de *nice-to-have* a **bloqueante**: hasta que
-> alguien pegue 2 filas del bloque 3 en un Word real, la ruta de copy/paste es una hipótesis.
+> alguien pegue 2 filas del bloque 4 en un Word real, la ruta de copy/paste es una hipótesis.
 >
 > **Ruta alternativa sin riesgo de alineación**, si los tabs no sobreviven: pegar **por columna** en
 > vez de por fila — la columna PB completa (36 valores, uno por línea), después la columna Z (15
@@ -515,7 +523,7 @@ se desfasa a partir de la segunda fila y arrastra el error por las 32.
 > una sola columna no depende de ningún conteo de campos. La otra opción ya anotada es completar el
 > `.docx` con `python-docx`, dejando los gráficos OLE intactos.
 
-El bloque 3 cubre de un saque las 15 filas con Z y las 17 cualitativas intercaladas, porque todas
+El bloque 4 cubre de un saque las 15 filas con Z y las 17 cualitativas intercaladas, porque todas
 tienen 12 celdas. Las filas 3 y 4 son las únicas que necesitan trato aparte — o se pegan como bloque
 de 9 columnas, o se completan a mano (son 4 celdas en total).
 
@@ -525,8 +533,8 @@ de 9 columnas, o se completan a mano (son 4 celdas en total).
 >
 > **Supuesto crítico a verificar primero:** que al terminar los 10 valores de una fila, Word baje a la
 > celda **PB** de la fila siguiente (la columna donde arrancó el paste) y **no** a la primera columna
-> de la tabla (Área). Si baja a la columna 1, el bloque 3 **sobreescribe Área y Prueba en 32 filas** y
-> el camino de copy/paste queda descartado, no sólo desalineado. → **Probar el bloque 3 con 2 filas
+> de la tabla (Área). Si baja a la columna 1, el bloque 4 **sobreescribe Área y Prueba en 32 filas** y
+> el camino de copy/paste queda descartado, no sólo desalineado. → **Probar el bloque 4 con 2 filas
 > antes de las 32.**
 >
 > Riesgo secundario conocido: que los tabs no sobrevivan al copiar desde el chat; si pasa, escribir

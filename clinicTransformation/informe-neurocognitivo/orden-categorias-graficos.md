@@ -5,8 +5,11 @@
 > (`word/embeddings/Microsoft_Excel_Worksheet*.xlsx` + `word/charts/chart1.xml`, `chart2.xml`).
 >
 > La skill devuelve los valores en este orden exacto para que el copy/paste calce sin reordenar.
-> **Formato numérico: punto decimal** (`-1.32`, no `-1,32`) — a diferencia de la tabla de síntesis
-> (que usa coma), acá Excel necesita reconocer el valor como número.
+> 🚩 **Formato numérico: COMA decimal** (`-1,32`) — **igual que la tabla de síntesis** (decisión del
+> 2026-09-17). Antes acá decía punto, con el argumento de que "Excel necesita reconocer el valor como
+> número": **es al revés**. El Excel de los gráficos está en configuración regional española, donde el
+> separador decimal **es la coma**; pegarle `0.45` no le entra como número — lo toma como texto o lo
+> malinterpreta, y el gráfico se arma mal. El separador correcto es el del Excel que recibe el pegado.
 
 ---
 
@@ -46,16 +49,16 @@ síntesis**, no los crudos del Excel:
 
 | Prueba | Z crudo en el Excel | En el gráfico | Regla |
 |---|---|---|---|
-| DD | `0.4482758620689658` | `0.45` | redondeo a 2 decimales |
-| BEM–MS AST | `-0.89944134078212257` | `-0.9` | redondeo (sin cero final) |
-| FS | `-0.29629629629629656` | `-0.3` | redondeo |
-| BEM–MS CE | `-2.013888888888888` | `-2.01` | redondeo |
+| DD | `0.4482758620689658` | `0,45` | redondeo a 2 decimales |
+| BEM–MS AST | `-0.89944134078212257` | `-0,9` | redondeo (sin cero final) |
+| FS | `-0.29629629629629656` | `-0,3` | redondeo |
+| BEM–MS CE | `-2.013888888888888` | `-2,01` | redondeo |
 | **BEM–MS Sem** | `-3.1067961165048534` | **`-3`** | **cap en −3** |
 | FF (en `informeFinal.docx`) | > +3 | **`3`** | **cap en +3** |
 
-Regla: **redondear a 2 decimales y capar en ±3**, igual que en la tabla de síntesis. Única diferencia
-de formato: acá es un número, así que el cero final se cae (`-0.3`, no `-0,30`) y el cap es el número
-`-3` / `3`, no el texto `≤-3` / `≥3`.
+Regla: **redondear a 2 decimales y capar en ±3**, igual que en la tabla de síntesis, y **con coma**
+también. Única diferencia de formato: acá es un número, así que **el cero final se cae** (`-0,3`, no
+`-0,30`) y el cap es el número `-3` / `3`, no el texto `≤-3` / `≥3`.
 
 > ⚠️ **El cap lo aplica la skill, no el Excel.** V5 muestra la columna `D` capada, pero eso es un
 > **formato de número** (`[<=-3]"≤-3";[>=3]"≥3";0.00`): al leer el archivo por código sale el Z crudo.
@@ -130,7 +133,7 @@ total en `B60`.)*
 1. La suma de los 10 valores tiene que dar `B63`.
 2. `B63` tiene que coincidir con `C18`, el PB del K-10 de la tabla de síntesis. En V5 `C18` es `=B63`,
    así que coinciden por construcción; en archivos anteriores `C18` estaba tipeado. Si difieren,
-   **decirlo en el bloque 11 y no elegir por cuenta propia**.
+   **decirlo en el bloque 12 y no elegir por cuenta propia**.
 
    ⚠️ **No es hipotético:** en una versión intermedia de V5 `C18` decía `30` con los ítems sumando
    `24` — cruzaba el corte ≥ 25 y cambiaba la categoría diagnóstica. Este chequeo lo detecta.

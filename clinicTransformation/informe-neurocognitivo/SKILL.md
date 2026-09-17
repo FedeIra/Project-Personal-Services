@@ -53,9 +53,9 @@ Y, sobre todo, **hay tres formas distintas de leer el cuadro**:
 | `D19:D46` (el Z) | el Z **crudo** (`-3.1067…`) | **aplica el cap** de ±3 ella misma (en el Excel el cap es sólo formato de número) |
 | todo lo demás | valor normal | pass-through |
 
-➡️ Esto **no elimina los autochequeos** del bloque 3: los vuelve más fuertes, porque pasan de
+➡️ Esto **no elimina los autochequeos** del bloque 4: los vuelve más fuertes, porque pasan de
 verificar un cálculo propio a **cruzar contra lo que ya calculó el Excel**. Si una X propia no coincide
-con la del Excel, eso es un hallazgo: decirlo en el bloque 11.
+con la del Excel, eso es un hallazgo: decirlo en el bloque 12.
 
 ### Chequeos de entrada — qué verificar y avisar, sin rellenar
 
@@ -71,12 +71,12 @@ Lo que sí hay que chequear en cada archivo que llegue:
    (`informeFinal.docx` no lo lista; `informeFinal2.docx` sí) y **su puntaje nunca aparece en el
    informe**: no es fila de la tabla, no está en los gráficos y no se cita en la prosa. Lo único que
    decide es media frase del screening. Sin puntaje, la observación de quejas subjetivas **se deriva
-   de la anamnesis** y **hay que avisar en el bloque 11 que la línea del C-QSM se borra de
+   de la anamnesis** y **hay que avisar en el bloque 12 que la línea del C-QSM se borra de
    `PRUEBAS ADMINISTRADAS`** del Word. Si hay puntaje, quejas presentes = **> 3**. Nunca inventar uno,
    y **nunca escribirlo en el informe** aunque exista.
 2. **PB derivados: `C37` (AST) y `C41` (CE).** Salen por fórmula — `C37`=`=TRUNCAR(V38;2)` (promedio
    de los 3 ensayos) y `C41`=`=TRUNCAR(U43;2)` (promedio de Sem y Rec). En archivos anteriores están
-   tipeados a mano: comparar cada uno con su fórmula y, si no coinciden, decirlo en el bloque 11.
+   tipeados a mano: comparar cada uno con su fórmula y, si no coinciden, decirlo en el bloque 12.
    **Nunca recalcular el Z** — viene del Excel, incluso si el PB no cierra.
 3. 🚩 **Total del K-10 — el chequeo de mayor impacto clínico.** `C18` tiene que ser `=B63`
    (`=SUMA(B53:B62)`), así que el PB de la tabla de síntesis, el gráfico 2 y el corte ≥ 25 salen del
@@ -85,7 +85,7 @@ Lo que sí hay que chequear en cada archivo que llegue:
    traía `C18`=`30` con los ítems sumando `24` — la tabla decía `Malestar severo` y correspondía
    `Normal`, cruzando el corte que decide la categoría diagnóstica.
 4. **`B8` (`Asiste acompañado con`) tiene rótulo y dominio ambiguos.** Leerlo así: `No` o vacío ⇒
-   `asiste solo/a`; cualquier otro texto ⇒ `asiste acompañado/a por <texto>`. Anotarlo en el bloque 11.
+   `asiste solo/a`; cualquier otro texto ⇒ `asiste acompañado/a por <texto>`. Anotarlo en el bloque 12.
 5. **Campos Sí/No.** V5 tiene validación de lista en `B5`, `B6`, `B10` y `C14:C15`. Igual normalizar
    tolerantemente (`Sí`/`si`/`SI`/`No`/`no`) por si llega un archivo viejo. **`C14`/`C15` admiten un
    tercer valor, `Medio`**: no colapsarlo a `Si` — redactar la frase 3 en consecuencia o señalarlo. Si
@@ -93,12 +93,12 @@ Lo que sí hay que chequear en cada archivo que llegue:
    evolución de los puntajes.**
 6. **Las dos filas de TRO pueden traer valores distintos** (`C16` screening vs `C49`
    visoconstrucción). **Copiar cada celda en su fila, no reconciliarlas**, y anotar la diferencia en
-   el bloque 11 si existe.
+   el bloque 12 si existe.
 7. **Celdas `X/Y` con pinta de fecha.** V3 las guarda como texto, pero si alguna vez llega un número
    entre ~45000 y ~48000 en una celda que debería decir `7/10`, es una autoconversión de Excel y **es
    reversible**: formatear el serial como `d/m` devuelve lo tipeado. Chequeo obligatorio: el
    denominador recuperado tiene que ser el máximo del subtest. Si pasa → usar el valor y anotarlo en
-   el bloque 11 como recuperado a confirmar; si no pasa → celda vacía y pedir el valor. Nunca escribir
+   el bloque 12 como recuperado a confirmar; si no pasa → celda vacía y pedir el valor. Nunca escribir
    un marcador de pendiente dentro de una celda.
 
 ## Qué NO debe hacer esta skill
@@ -107,7 +107,7 @@ Lo que sí hay que chequear en cada archivo que llegue:
 - **No inferir "riesgo de evolución".** Es un flag manual que llega decidido.
 - **No inventar recomendaciones clínicas.** Partir del template de `regla-diagnostica.md`, con las
   mismas viñetas y en el mismo orden (ver ahí qué sí se localiza).
-- **No reinterpretar la anamnesis.** Ver el bloque 3 abajo — es el bloque de mayor riesgo.
+- **No reinterpretar la anamnesis.** Ver el bloque 4 abajo — es el bloque de mayor riesgo.
 - **No generar el `.docx` final** (los gráficos son objetos OLE) ni auto-enviar nada.
 - **No "corregir" las inconsistencias de la plantilla.** La leyenda que menciona trazado diagonal, y
   el `del área` / `por área` de las secciones, se reproducen tal cual.
@@ -133,8 +133,13 @@ una oración ni dentro de una celda de tabla.
 > del dato de origen (que la nota esté truncada, mal tipeada, etc.) es tan inapropiado ahí como un
 > `[PENDIENTE]` explícito, aunque no use esa palabra.
 >
-> ✅ prosa completa y gramatical + **el pendiente enumerado en el bloque 11**, citando la oración
-> exacta que hay que revisar.
+> ❌ `En cuanto a las quejas subjetivas de memoria, menciona que olvida cosas puntuales: "fue a un
+> partido y por ahí…"` — **tampoco alcanza con sacar la aclaración**. La cita sigue cortada, no
+> significa nada, y la frase que la introduce le hace decir al informe que hay quejas mnésicas que ese
+> dato no sostiene. Una nota truncada **se omite entera** (ver bloque 2).
+>
+> ✅ prosa completa y gramatical, sin el fragmento inutilizable + **el pendiente enumerado en el
+> bloque 12**, citando la nota cruda completa que hay que revisar.
 
 Dos excepciones acotadas, y sólo esas:
 
@@ -143,12 +148,12 @@ Dos excepciones acotadas, y sólo esas:
   adentro.
 - **Celda de tabla sin dato → celda vacía.** Nunca texto.
 
-En los dos casos, el bloque 11 lo repite con el detalle. ⚠️ Fallo observado en la revisión
+En los dos casos, el bloque 12 lo repite con el detalle. ⚠️ Fallo observado en la revisión
 2026-09-08 (`../ejemplos/revision-salida-ia-vs-informeFinal2.md` §B9).
 
 ---
 
-## Formato de salida — 11 bloques
+## Formato de salida — 12 bloques
 
 En bloques separados y etiquetados, listos para copy/paste. El mapeo completo de qué sale de dónde
 está en `mapeo-excel-a-word.md` §2, y las direcciones de celda en §1 (**única fuente**; este archivo
@@ -159,23 +164,71 @@ las repite). Para el **tono y el fraseo** de los bloques narrativos (2, 6, 7,
 > repetido de la primera corrida real fue que la skill emitió **sólo las partes variables** que estos
 > bloques enumeran y descartó el boilerplate clínico que las rodea. Las frases invariantes están
 > transcritas literalmente en `mapeo-excel-a-word.md` §4.1 (screening) y §4.2 (secciones por área):
-> **leerlas antes de redactar los bloques 6 y 7**, no después.
+> **leerlas antes de redactar los bloques 7 y 8**, no después.
 
-**1. Tabla de datos personales** — pass-through de `B2:B7`, con las fechas (`B4`, `B7`) ya en
-`dd/mm/aaaa` y la edad como `<B3> años`. La fila `Deriva:` sale de `B9` **tal cual** (incluido el
-`-`) si la plantilla del profesional la tiene — `informeFinal.docx` sí, `informeFinal2.docx` no.
-**No agregar ni quitar filas respecto de esa plantilla**; si `B9` nombra un derivante y la plantilla
-no trae la fila, señalarlo en el bloque 11. No hay DNI ni ocupación, y `B8`/`B10` **no** van acá.
+**1. Tabla de datos personales** — **exactamente 6 filas, siempre las mismas, en este orden:**
 
-### Formato: **HTML por default**
+| Fila | Celda | Formato |
+|---|---|---|
+| `Paciente` | `B2` | tal cual |
+| `Edad` | `B3` | `<B3> años` |
+| `Fecha de nacimiento` | `B4` | `dd/mm/aaaa` (es un serial de Excel) |
+| `Nivel educativo alcanzado` | `B5` | tal cual |
+| `Lateralidad` | `B6` | tal cual |
+| `Fecha de evaluación` | `B7` | `dd/mm/aaaa` (es un serial de Excel) |
 
-⚠️ **Mismo problema que motivó el cambio a HTML en el bloque 3** (fallo observado en prueba real,
-2026-09-08): una tabla en Markdown, copiada tal cual desde el chat, se pega en Word **corrida en un
-solo párrafo** (`PacienteBunader, José AlbertoEdad61 años…`), sin separación entre campo y valor ni
-salto de línea entre filas. Entregar este bloque también como **HTML**: tabla simple de 2 columnas
-(`Campo` / `Valor`), 6 filas (7 si aplica `Deriva:`). No hace falta sombreado ni bordes marcados —
-alcanza con que cada campo quede en su propia fila al pegar. Mismo mecanismo de paste que el bloque 3:
-guardar como `.html`, abrir en el navegador, seleccionar todo, copiar a Word.
+🚩 **Ninguna fila más, nunca** (decisión del 2026-09-17). `B8` (acompañamiento), `B9` (derivante) y
+`B10` (riesgo de evolución) **no van en esta tabla**, aunque el Excel los traiga cargados y aunque la
+plantilla de Word tenga una fila `Deriva:` — esa fila se deja vacía o la borra la profesional; la
+skill no la completa. Tampoco se inventan DNI ni ocupación. El dato de `B8` no se pierde: alimenta la
+frase de acompañamiento del bloque 7.
+
+⛔ **Y tampoco se pregunta por ella en el bloque 12.** Aunque `B9` traiga un derivante cargado, **no**
+escribir nada del tipo *"confirmar si la plantilla tiene la fila `Deriva:`"*: la profesional ya
+confirmó los 6 campos el 2026-09-17 y no quiere que se le vuelva a preguntar. `B9` cargado **no es**
+un faltante ni una duda — es un dato del Excel que este informe no usa.
+
+### Formato: **`.docx` descargable — verificado en Word real (2026-09-17)**
+
+✅ **Éste es el default.** Generar con code execution (`python-docx`) un `.docx` que contenga **sólo
+esta tabla**, y ofrecerlo para descargar. La profesional lo abre, `Ctrl+A`, `Ctrl+C`, y pega en su
+informe. Word contra Word: el pegado es fiel siempre, sin depender de cómo renderice el chat.
+
+**No es el informe final** — es sólo este bloque. La prohibición de generar el `.docx` completo sigue
+en pie (ver "Qué NO debe hacer esta skill").
+
+Receta exacta del archivo, aprobada por el usuario en la prueba del 2026-09-17:
+
+| Parámetro | Valor |
+|---|---|
+| Tabla | 6 filas × 2 columnas, sin fila de encabezado |
+| Anchos | col. 1 = 3600 twips · col. 2 = 5000 twips |
+| Bordes | `single`, `sz=4`, negro, incluidos los interiores |
+| Fuente | Arial 10 pt |
+| Columna 1 | **negrita** (las etiquetas) |
+| Columna 2 | normal (los valores) |
+| Interlineado | simple, sin espacio posterior |
+
+⚠️ **Requiere la creación de archivos de claude.ai** (preview en Max/Team/Enterprise; Pro se fue
+incorporando después). **Si no está disponible**, caer a la alternativa de abajo y **decirlo en el
+bloque 12** — no fallar en silencio.
+
+### Alternativa: tabla Markdown en el chat
+
+Sólo si no se puede generar el `.docx`. Emitirla **suelta en el mensaje, NUNCA dentro de un bloque de
+código**, con encabezado vacío para que no aparezca una fila de títulos:
+
+```
+|   |   |
+|---|---|
+| Paciente | … |
+```
+
+Se selecciona con el mouse sobre la tabla ya dibujada y se pega. ⚠️ **Advertirle que este camino
+depende del cliente:** copiar el código fuente en vez de la tabla renderizada produce el fallo
+`PacienteBunader, José AlbertoEdad61 años…` (observado el 2026-09-08 y de nuevo el 2026-09-17), con
+los `|` a la vista y las líneas `|---|` convertidas en rayas por el autoformato de Word. Si pasa, se
+corrige con **Pegar → Mantener formato de origen**.
 
 **2. `MOTIVO DE CONSULTA Y ANTECEDENTES`** — redacción de las viñetas de `A68:A76` a prosa en tercera
 persona y presente, una viñeta ≈ un párrafo, mismo orden, conservando las citas textuales entre
@@ -183,10 +236,29 @@ comillas. Formas fijas del primer y último párrafo, verbos de reporte y concor
 `mapeo-excel-a-word.md` §3.
 
 > ⚠️ **Bloque de mayor riesgo del pipeline.** No suavizar, reinterpretar ni reencuadrar el contenido
-> anímico: transcribir lo que dice la nota. Si una nota es ambigua o está truncada, dejarla ambigua en
-> la prosa **tal cual llega, sin agregar ninguna aclaración sobre el estado del dato** — el paciente
-> puede leer este texto. Señalarlo **sólo en el bloque 11** (ver la convención de marcado de
-> pendientes más arriba). Incluir todo y **marcar lo dudoso ahí** en vez de decidir sola qué omitir.
+> anímico: transcribir lo que dice la nota. Si una nota es **ambigua pero está completa**, dejarla
+> ambigua en la prosa tal cual llega, **sin agregar ninguna aclaración sobre el estado del dato** — el
+> paciente puede leer este texto. Señalarlo **sólo en el bloque 12**. Incluir todo y **marcar lo
+> dudoso ahí** en vez de decidir sola qué omitir.
+
+> 🚩 **Excepción: nota truncada o ininteligible → NO se redacta** (decisión del 2026-09-17).
+>
+> Si la viñeta está cortada a mitad de frase, o no se entiende qué afirma, **se omite del párrafo por
+> completo**: no se transcribe el fragmento, no se la parafrasea, no se la completa. Va **entera y
+> literal al bloque 12**, para que la profesional la complete o la descarte.
+>
+> Motivo (dicho por la profesional el 2026-09-17, sobre `A70`): *"Esta frase así cortada no tiene
+> sentido ni da evidencia de que haya problemas de memoria"*. Un fragmento sin sentido en el informe
+> es peor que su ausencia — y si además da a entender un hallazgo clínico que el dato no sostiene, es
+> directamente dañino.
+>
+> **Alcance estricto — se omite sólo por estar incompleta o ser ilegible, nunca por su contenido.**
+> Una nota completa y entendible se incluye siempre, aunque sea incómoda, negativa, breve o ambigua en
+> su interpretación. La skill **no decide qué es relevante**; sólo detecta qué es inutilizable.
+>
+> ⚠️ **Si la nota omitida era el único dato sobre un tema** (p. ej. la única mención de quejas
+> mnésicas), decirlo explícitamente en el bloque 12: *"se omitió X, que era la única referencia a
+> Y — el informe queda sin ese tema"*. Una omisión silenciosa cambia el cuadro clínico.
 >
 > **Confirmado (2026-09-07):**
 > - **No matizar** — poner el contenido tal cual está tipeado (la profesional escribe notas más
@@ -196,27 +268,96 @@ comillas. Formas fijas del primer y último párrafo, verbos de reporte y concor
 > - **Incluir los antecedentes familiares** (p. ej. `mamá con EA`). No se omiten.
 > - Lo único que **no** se redacta son las notas internas de protocolo (p. ej. `PROTOCOLO XTEND`).
 
-**3. Tabla `SÍNTESIS DEL RENDIMIENTO` — se genera ENTERA, no como valores sueltos.**
+**3. `PRUEBAS ADMINISTRADAS`** — la lista de la batería tomada.
+
+⚠️ **Este bloque NO se deriva del Excel.** Es el boilerplate de la plantilla (clasificado `FIJO/FUERA`
+en `mapeo-excel-a-word.md` §2). La skill lo reproduce literal, en este orden:
+
+```
+Actividades instrumentales de la vida diaria (AIVD de Lawton y Brody)
+Mini Mental State Examination (MMSE)
+Batería de eficiencia mnésica de Signoret – subtest memoria seriada (BEM-MS)
+Batería de eficiencia mnésica de Signoret – subtest memoria lógica (BEM-ML)
+Trail Making Test A (TMT A) y B (TMT B)
+Fluencia verbal fonológica (FF) y semántica (FS)
+Span de dígitos directos (DD) e inversos (DI)
+Test del reloj a la orden (TRO)
+Test de Denominación de Boston Abreviado (TBA)
+Ineco Frontal Screening (IFS)
+Escala de malestar psicológico (K-10)
+Cuestionario de quejas subjetivas de memoria (C-QSM)
+```
+
+**Lo único que decide el Excel es la última línea:**
+
+| `B65` (C-QSM) | Salida |
+|---|---|
+| tiene puntaje | **12 ítems** — va la línea del C-QSM |
+| vacía | **11 ítems** — se borra esa línea, y se avisa en el bloque 12 (`informeFinal.docx` es así) |
+
+🚩 **Límite conocido, decirlo en el bloque 12 en cada informe:** si alguna de las otras 11 pruebas no
+se tomó, **la skill igual la va a listar** — el Excel no registra qué batería se administró, sólo los
+puntajes. Que una celda de PB esté vacía no es evidencia suficiente de que la prueba no se tomó.
+**La profesional tiene que cotejar esta lista contra lo que realmente administró.** Hacerlo derivable
+requiere un campo por prueba en el Excel → pendiente en `../preguntasParaLaProfesional.md`.
+
+No lleva `.docx`: son 11–12 líneas de texto plano que se pegan directo.
+
+**4. Tabla `SÍNTESIS DEL RENDIMIENTO` — se genera ENTERA, no como valores sueltos.**
 
 ✅ **Decisión de la profesional (2026-09-08): no hace falta conservar la tabla que ya está en el
 Word.** La skill entrega una **tabla nueva y completa** que la reemplaza. No tiene que ser
 visualmente idéntica; tiene que **cumplir con lo que informa** la original.
 
-### Formato: **HTML por default**
+### Formato: **`.docx` descargable, clonando la tabla real — verificado en Word (2026-09-17)**
 
-✅ **HTML es el camino verificado en Word real (2026-09-08)** y el que la profesional aprobó
-visualmente: entra como tabla de Word con el sombreado gris de su plantilla. Se entrega como bloque
-de código HTML, ella lo guarda como `.html`, lo abre en el navegador, selecciona y copia a Word.
+✅ **Éste es el default.** Generar con code execution un `.docx` que contenga **sólo esta tabla**, con
+el formato exacto de la que ya está en el informe. Ella lo abre, `Ctrl+A`, `Ctrl+C`, y reemplaza la
+tabla vieja. Nada de guardar `.html` ni pasar por el navegador.
 
-Markdown queda como alternativa rápida (2 pasos en vez de 5) **pero todavía sin probar en Word** y
-sin sombreado. Ofrecerlo si lo pide; no emitirlo por default.
+🚩 **Método recomendado: clonar, no reconstruir.** El formato de esta tabla es demasiado específico
+para rehacerlo de memoria (12 columnas, sin bordes verticales, sangría negativa, dos niveles de
+sombreado, celdas verticalmente combinadas por área). Si se dispone del XML de una tabla previa,
+**copiarla y reemplazar sólo tres cosas por fila**: el texto de `PB`, el texto de `Z`, y en qué celda
+va la `X`. Nunca tocar `tcPr` (anchos, sombreados, `vMerge`, `gridSpan`): ahí vive el formato.
 
-> ✅ **Ajuste de ancho post-paste, verificado (2026-09-08).** Con 12 columnas es esperable que la tabla
-> quede apretada por los márgenes de la página al pegarla. Solución probada por el usuario: clic
-> derecho dentro de la tabla ya pegada → **Autoajustar → "Autoajustar al contenido"** → de nuevo clic
-> derecho → **Propiedades de tabla → pestaña Tabla → Ancho preferido → 130 %**. Sin tocar márgenes del
-> documento ni el HTML. **Incluir este paso en el bloque 11** (o junto al bloque de la tabla) para que
-> el profesional lo aplique al pegar.
+Especificación, extraída de `../ejemplos/informeFinal.docx` el 2026-09-17:
+
+| Parámetro | Valor |
+|---|---|
+| Filas | **39**: 1 de agrupación + 1 de encabezados + **36 de datos** + 1 de leyenda |
+| Columnas | 13 en la grilla: `1727` `1701` `1034` `708` `581` `684` `941` `667` `677` `650` `645` `572` `64` twips |
+| Ancho / sangría | `tblW` = `10651` dxa · `tblInd` = **`-714`** · layout `fixed` |
+| Bordes | todos `nil` **salvo `insideH` = `single sz=4` negro**. Sin líneas verticales ni marco exterior. |
+| Fuente | Arial en todo |
+| Fila de agrupación | 7 pt (`sz=14`) negrita, centrada |
+| Encabezados `ÁREA`/`PRUEBA`/`PB`/`Z` y rótulos de área | 9 pt (`sz=18`) negrita, centrados |
+| Nombre de prueba | 9 pt regular, **alineado a la derecha** |
+| `PB` y `Z` | 8 pt (`sz=16`) centrados |
+| Sombreado de tramos (filas con Z) | cols 1–2 = `A6A6A6` (gris oscuro) · col 3 = `D9D9D9` (gris claro) · cols 4–8 sin sombrear |
+| Filas sin Z (cualitativas) | las 9 celdas (`Z` + los 8 tramos) en `D9D9D9` |
+| Rótulo de área | celda con `vMerge restart` + `vMerge` en las filas siguientes del grupo |
+| Interlineado | `line=276 auto` |
+
+⚠️ **La sangría negativa `tblInd = -714` es lo que hace entrar las 12 columnas en la página.** Con
+ella, la tabla entra bien y **ya no hace falta el viejo ajuste de "Autoajustar al contenido + ancho
+130 %"** que se usaba con el paste desde HTML.
+
+✅ **La leyenda al pie es la fila 39 de la tabla**, no un párrafo aparte: viene incluida y no hay que
+copiarla de ningún lado. (Versiones anteriores de este archivo decían lo contrario.)
+
+⚠️ **No validar las X contra la tabla de un informe viejo:** `informeFinal.docx` tiene al menos una
+fila mal (Lenguaje `FF`, sin X). La referencia son **las columnas `E:L` del Excel**, como dice el
+autochequeo de abajo.
+
+### Alternativa: HTML
+
+Sólo si no se puede generar el `.docx` (ver el requisito de plan en el bloque 1). Bloque de código
+HTML, que ella guarda como `.html`, abre en el navegador, selecciona y copia a Word — camino
+verificado el 2026-09-08, pero con 5 pasos manuales. En ese caso **sí** hace falta el ajuste de ancho
+post-paste (clic derecho → **Autoajustar → Autoajustar al contenido** → **Propiedades de tabla →
+Tabla → Ancho preferido → 130 %**) y la leyenda hay que copiarla de un informe anterior. Si se cae a
+este camino, **decirlo en el bloque 12**.
 
 ### Partes de la tabla
 
@@ -232,7 +373,7 @@ Un solo bloque, con:
 **La leyenda al pie NO se genera.** ✅ Decisión de la profesional (2026-09-08): es **idéntica en todos
 los informes**, así que se conserva la de su plantilla y la skill no la emite.
 
-> ⚠️ **Avisar esto en el bloque 11:** en el Word, la leyenda es la **última fila de la propia tabla**
+> ⚠️ **Avisar esto en el bloque 12:** en el Word, la leyenda es la **última fila de la propia tabla**
 > (39 filas = 2 de encabezado + 36 de datos + 1 de leyenda), no un párrafo suelto. Si se borra la
 > tabla vieja entera para pegar la nueva, **la leyenda se va con ella**. Hay que volver a ponerla —
 > como nunca cambia, alcanza con copiarla de cualquier informe anterior.
@@ -300,7 +441,7 @@ números son verificables antes de entregar**. Contarlos y decir el resultado:
 
 | Chequeo | Valor esperado |
 |---|---|
-| **X contra el Excel** | cada `X` emitida coincide con la de `E:L` de esa fila. **Si alguna no coincide, es un hallazgo: no "corregir" el Excel en silencio — decirlo en el bloque 11.** |
+| **X contra el Excel** | cada `X` emitida coincide con la de `E:L` de esa fila. **Si alguna no coincide, es un hallazgo: no "corregir" el Excel en silencio — decirlo en el bloque 12.** |
 | Filas de datos | **36**, en el orden de `orden-filas-sintesis.md` |
 | Celdas por fila | **12** en las **5** filas que abren grupo de área (llevan el `rowspan`) · **11** en las **31** filas restantes (sin celda `ÁREA`, fusionada hacia arriba) |
 | Celdas `ÁREA` emitidas | **5** (una por grupo, no 36) — suma de sus `rowspan` = **36** (4+15+10+5+2) |
@@ -328,17 +469,19 @@ cambiando los datos — no reinventar el markup en cada corrida.
 > generar la tabla entera, **los dos riesgos desaparecen**. El enfoque viejo queda documentado como
 > alternativa en `orden-filas-sintesis.md`.
 
-**4. Valores del gráfico 1** (14 valores Z) — `orden-categorias-graficos.md`. **Punto decimal.**
+**5. Valores del gráfico 1** (14 valores Z) — `orden-categorias-graficos.md`. 🚩 **Coma decimal**
+(`0,45`), igual que la tabla de síntesis — el Excel de los gráficos está en configuración regional
+española. **Sin** el cero final, eso sí (`-0,9`, no `-0,90`).
 Mismos valores redondeados y capados que la columna Z de la tabla (el cap va como número `-3`/`3`, no
 como texto). Instrucción de pegado **posicional**: empezar en la celda inmediatamente debajo del
 encabezado con el año, porque la columna destino cambia según el archivo.
 
-**5. Valores del gráfico 2** (10 ítems del K-10) — ✅ **sale del Excel**: `B53:B62`, en ese orden,
+**6. Valores del gráfico 2** (10 ítems del K-10) — ✅ **sale del Excel**: `B53:B62`, en ese orden,
 enteros sin decimales ni cap. Etiquetas y celdas destino en `orden-categorias-graficos.md`. Chequeo:
 la suma de los 10 tiene que dar `B63`, y `B63` debería coincidir con `C18` (el PB de la tabla de
 síntesis); si no coincide, decirlo.
 
-**6. Sección de screening** — **esqueleto de 6 frases, transcrito literal en
+**7. Sección de screening** — **esqueleto de 6 frases, transcrito literal en
 `mapeo-excel-a-word.md` §4.1: copiarlo de ahí.** Sólo una de las seis lleva puntajes
 (`(MMSE=29/30; TRO= 10/10; INECO=27,5/30)`, de `C13`, `C16` y `C24`); las otras cinco son
 observación conductual invariante y **van siempre** — discurso, nivel de alerta y fatiga,
@@ -349,13 +492,13 @@ Excel, IFS Total.** Va como un solo párrafo corrido, sin puntajes entre parént
 - **Orientación temporal/espacial:** sale de `C14` y `C15` (`Si`/`No`). Con las dos en `Si` va el
   boilerplate `Orientación temporal y espacial conservadas.`; si alguna dice `No`, **invertir la
   frase para esa orientación** en vez de emitir el boilerplate. Si las celdas están vacías, va la
-  forma afirmativa y el pendiente se lista en el bloque 11, nunca dentro de la oración.
+  forma afirmativa y el pendiente se lista en el bloque 12, nunca dentro de la oración.
 - **Quejas subjetivas de memoria (C-QSM):** sale de `B65`. Con puntaje, quejas presentes = **> 3**.
   Si la celda está **vacía** (no se tomó), la observación deriva de la anamnesis / motivo de consulta
-  y hay que avisar en el bloque 11 que se borra esa línea de `PRUEBAS ADMINISTRADAS`. No inventar un
+  y hay que avisar en el bloque 12 que se borra esa línea de `PRUEBAS ADMINISTRADAS`. No inventar un
   puntaje ni escribirlo en el informe.
 
-**7. Cuatro secciones por área cognitiva** — cada una con título, la línea
+**8. Cuatro secciones por área cognitiva** — cada una con título, la línea
 `Impresión diagnóstica del área: rendimiento cognitivo <calificación>` y un párrafo. Reproducir la
 inconsistencia `del área` (secciones 1 y 2) / `por área` (secciones 3 y 4). Léxico Z → palabra
 **confirmado** (2026-09-07): `alto` Z > 1 · `conservado`/`normal` (son lo mismo) −1,49 a 1 · `bajo`
@@ -375,16 +518,16 @@ Lo esencial:
 - Cada sección tiene **frases fijas de apertura** (nivel de alerta, comprensión/expresión, entonación
   y articulación, el párrafo entero de visoconstrucción): están literales en §4.2.
 
-**8. Párrafo de recap de conclusiones** — área por área con los conectores del ejemplo, en este
+**9. Párrafo de recap de conclusiones** — área por área con los conectores del ejemplo, en este
 orden: **visoconstrucción (+ orientación) → lenguaje → atención/ejecutivas → memoria (seriada, luego
 lógica)**. Es el inverso de la tabla **salvo memoria, que va última** — observado en los dos informes
 reales (`mapeo-excel-a-word.md` §4.3).
 
-**9. Frase de cierre** — **una sola oración**, que arranca con `En conclusión,`. Del template de la
+**10. Frase de cierre** — **una sola oración**, que arranca con `En conclusión,`. Del template de la
 categoría elegida, adaptada al perfil real del paciente, nombrando la función afectada en palabras
 clínicas (`recuperación de la memoria`) y **sin siglas ni índices**.
 
-**10. Categoría diagnóstica + viñetas de `Se sugiere:`** — aplicar `regla-diagnostica.md`.
+**11. Categoría diagnóstica + viñetas de `Se sugiere:`** — aplicar `regla-diagnostica.md`.
 ⚠️ **Nunca elegir categoría en silencio.** No basta el umbral de Z (ver el recuadro al inicio de
 `regla-diagnostica.md`):
 - **No tratar las submedidas derivadas como disparador de DCL.** En especial **CE** (= promedio de
@@ -397,11 +540,11 @@ clínicas (`recuperación de la memoria`) y **sin siglas ni índices**.
   el paciente ya usa estrategias de compensación o ya hace actividad física, no sugerirlas).
   El paréntesis es un **sintagma nominal de 3 a 8 palabras** con lo que **sí** se sugiere
   (`(mejorar calidad del sueño, técnicas de manejo del estrés)`). Nada de metacomentario del tipo
-  `ya realiza actividad física, por lo que no se sugiere incorporarla`: eso va al bloque 11.
+  `ya realiza actividad física, por lo que no se sugiere incorporarla`: eso va al bloque 12.
 - Si Z < -1,5 + AVD conservadas y aplican simultáneamente compromiso anímico Y riesgo de evolución,
   **señalarlo explícitamente** — la prioridad entre esas dos categorías todavía no está confirmada.
 
-**11. Reporte de faltantes y dudas** — bloque final con los faltantes detectados (ver arriba), las
+**12. Reporte de faltantes y dudas** — bloque final con los faltantes detectados (ver arriba), las
 celdas sospechosas y todo lo que quedó marcado como dudoso. Este bloque no se pega en el Word: es
 para el profesional. Incluye además:
 
@@ -409,12 +552,29 @@ para el profesional. Incluye además:
 - **Las oraciones con ranura** (`[solo / acompañado por …]`), citadas textualmente.
 - **El razonamiento del paréntesis de hábitos**: qué se descartó de la anamnesis y por qué.
 - **Los conteos de campos** de los 3 bloques de pegado.
-- **Cómo ajustar el ancho de la tabla de síntesis después de pegarla** (ver §Formato del bloque 3):
-  Autoajustar al contenido + Ancho preferido 130 %.
+- **Sólo si el bloque 4 cayó al camino HTML**: avisar que hay que ajustar el ancho de la tabla después
+  de pegarla (Autoajustar al contenido + Ancho preferido 130 %) y recuperar la leyenda al pie de un
+  informe anterior. Con el `.docx` **no hace falta ninguna de las dos cosas** — no mencionarlas.
 - **Ediciones a hacer sobre la plantilla del Word**, no sólo datos faltantes. La más frecuente:
   **`PRUEBAS ADMINISTRADAS` es una lista fija que incluye `Cuestionario de quejas subjetivas de
   memoria (C-QSM)`, y el C-QSM a veces no se toma** — si no se tomó, avisar que **hay que borrar esa
   línea** del informe. Mismo criterio para cualquier prueba de la lista sin dato en el Excel.
+
+#### ⛔ Qué NO va nunca en el bloque 12
+
+Este bloque es para **faltantes y dudas reales**, no para reconfirmar decisiones ya tomadas. No
+reabrir nada de esto, aunque el Excel traiga el dato cargado:
+
+| No preguntar por… | Porque… |
+|---|---|
+| la fila `Deriva:` / `B9` | los 6 campos del bloque 1 quedaron fijos el 2026-09-17 |
+| `B8` (acompañamiento) o `B10` (riesgo) como filas de la tabla | ídem — `B8` va a la prosa, `B10` a la categoría |
+| `de control` vs `por control` | fijado en `por control` el 2026-09-17 |
+| el ajuste de ancho al 130 % o la leyenda al pie | ya no aplican con el `.docx` |
+| el separador decimal de los gráficos | fijado en **coma** el 2026-09-17 |
+
+Regla general: **si una decisión está marcada con 🚩 y fecha en este paquete, está cerrada.** Si algo
+de eso parece mal para un caso puntual, decirlo **una vez** y en una línea, no como pregunta abierta.
 
 ## Reglas de negocio a aplicar
 

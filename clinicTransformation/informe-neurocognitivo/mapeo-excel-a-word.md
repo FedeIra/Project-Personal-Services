@@ -89,7 +89,7 @@ no puede desincronizarse.
 | `B6` | Lateralidad | → tabla |
 | `B7` | Fecha de evaluación (**serial de fecha**) | → tabla |
 | `B8` | `Asiste acompañado con` | → primera frase de la anamnesis (`asiste solo/acompañado por …`) |
-| `B9` | `Derivado por` | → fila `Deriva:` de la tabla de datos personales (ver §2.1) |
+| `B9` | `Derivado por` | **no se usa** — no va a la tabla de datos personales (ver §2.1) |
 | `B10` | `Riesgo de evolución` (`Sí`/`No`) | → habilita la categoría 5 de `regla-diagnostica.md` |
 
 `B3` es **número**, no texto: en el Word va como `<B3> años`. `B4` y `B7` son seriales de fecha.
@@ -168,7 +168,7 @@ L19  =SI(ESNUMERO($D19);SI($D19>=3;"X";"");"")
 Los 8 tramos son **mutuamente excluyentes y exhaustivos**: ningún Z puede quedar sin X ni con dos.
 El `ESNUMERO` implementa *"la X se pone si y sólo si Z es numérico"*.
 
-➡️ **La skill lee la X de acá en vez de derivar el tramo.** Los autochequeos del bloque 3 de
+➡️ **La skill lee la X de acá en vez de derivar el tramo.** Los autochequeos del bloque 4 de
 `SKILL.md` siguen valiendo, pero pasan de *verificar mi propio cálculo* a **cruzar contra el Excel**,
 que es más fuerte.
 
@@ -205,7 +205,7 @@ sus puntajes, **en el orden del cuestionario en papel y del gráfico** (`orden-c
 
 ✅ `C18` (el PB del K-10 de la tabla de síntesis) es `=B63`, así que el total de la tabla, el del
 gráfico y el que dispara el corte ≥ 25 salen del mismo lugar. En archivos anteriores estaba tipeado:
-si `C18` ≠ `B63`, **señalarlo en el bloque 11 y no elegir por cuenta propia** — puede ser un override
+si `C18` ≠ `B63`, **señalarlo en el bloque 12 y no elegir por cuenta propia** — puede ser un override
 deliberado del corte anímico. Ver `excel-unificado-spec.md` §A.8.
 
 > ⚠️ **Este desfasaje ya ocurrió de verdad.** En una versión intermedia de V5 `C18` había quedado
@@ -231,14 +231,19 @@ guion inicial** que tenían en V1 (`- PROTOCOLO XTEND` → `PROTOCOLO XTEND`); e
 
 ## 2. Estructura del Word y de dónde viene cada parte
 
-En orden de aparición en `informeFinal2.docx`. ⚠️ **Esta numeración es el orden del documento Word y
-no coincide con la de los bloques de salida de `SKILL.md`**, que agrupa distinto (11 bloques de
-output, no 12 partes del documento). Cuando importe, referirse a los bloques por nombre.
+En orden de aparición en `informeFinal2.docx`. ⚠️ **Esta numeración es el orden del documento Word,
+no la de los bloques de salida de `SKILL.md`.** Para no confundirlas, en este archivo lo del Word se
+llama **`parte N del Word`** y lo de la skill, **`bloque N`**.
+
+Desde el renumerado del 2026-09-17 los **bloques 1–4 sí coinciden** con las partes 2–5 del Word
+(datos personales, anamnesis, pruebas administradas, tabla de síntesis). La numeración se separa de
+ahí en adelante, porque el Word incluye dos partes que nunca son bloques de salida (el título y la
+firma) y la skill parte en dos lo que el Word junta. Cuando importe, referirse por nombre.
 
 | # | Bloque del Word | Tipo | Origen |
 |---|---|---|---|
 | 1 | Título `EVALUACIÓN NEUROCOGNITIVA` | FIJO | plantilla |
-| 2 | `DATOS PERSONALES` + tabla de 6–7 filas | PASS | `B2:B7` (+ `B9` si hay derivante) |
+| 2 | `DATOS PERSONALES` + tabla de **6 filas fijas** | PASS | `B2:B7` |
 | 3 | `MOTIVO DE CONSULTA Y ANTECEDENTES` (7–9 párrafos) | **LLM** | `A68:A76` + `B8` — ver §3 |
 | 4 | `PRUEBAS ADMINISTRADAS` (lista de 11–12 ítems) | FIJO/FUERA | plantilla; depende de la batería tomada |
 | 5 | Tabla `SÍNTESIS DEL RENDIMIENTO` (36 filas) | PASS + DERIV | ver `orden-filas-sintesis.md` |
@@ -250,23 +255,19 @@ output, no 12 partes del documento). Cuando importe, referirse a los bloques por
 | 11 | `Se sugiere:` (4–6 viñetas) | template + LLM | `regla-diagnostica.md` — ver §4.3 |
 | 12 | `Quedo a disposición…` + firma (`María Agustina Aceiro`, `Doctora en Psicología`, `M.N:67158`) | FIJO | plantilla |
 
-### 2.1 Tabla de datos personales (bloque 2)
+### 2.1 Tabla de datos personales (parte 2 del Word)
 
 Pass-through directo, con tres detalles:
 
 - `B4` y `B7` son **seriales de fecha** de Excel. En el Word van como **`dd/mm/aaaa`** — ejemplo
   ficticio: `25642` → `15/03/1970`; `46162` → `20/05/2026`. Al leer el `.xlsx` por código hay que
   convertir, no imprimir el número.
-- El **juego de campos varía**: `informeFinal.docx` tiene una 7ª fila `Deriva:` que
-  `informeFinal2.docx` no tiene. ✅ **V3 da el dato en `B9` (`Derivado por`)**, que antes había que
-  buscar fuera del Excel. **`B9` llena la fila, no decide si existe:** `informeFinal.docx` la trae
-  con un guion (`Deriva: -`) aunque no haya derivante, e `informeFinal2.docx` no la trae. En V4 `B9`
-  trae por primera vez un derivante real, así que la fila sale con ese nombre en vez del guion. Regla:
-  **respetar la plantilla que traiga el profesional** y, si la fila está, volcar `B9` tal cual
-  (incluido el `-`). Si la plantilla no la tiene pero `B9` nombra a un derivante, señalarlo en el
-  bloque 11 en vez de agregar la fila por cuenta propia.
-- **No hay DNI ni ocupación** en la tabla del Word de ninguno de los dos informes. La lista de campos
-  reales es exactamente la de `B2:B7`, más `Deriva` (`B9`) opcional.
+- 🚩 **El juego de campos es fijo: exactamente `B2:B7`, seis filas, siempre** (decisión del
+  2026-09-17). Antes la regla era "respetar la plantilla" y llenar una fila `Deriva:` desde `B9`
+  cuando la plantilla la traía (`informeFinal.docx` sí, `informeFinal2.docx` no). **Eso quedó sin
+  efecto.** `B9` ya no va a esta tabla: si la plantilla trae la fila `Deriva:`, se deja vacía o la
+  borra la profesional, y la skill **no la reporta** en el bloque 12.
+- **No hay DNI ni ocupación**, ni ningún otro campo. La lista de campos reales es exactamente `B2:B7`.
 - `B10` (`Riesgo de evolución`) y `B8` (`Asiste acompañado con`) **no** van a esta tabla: el
   primero alimenta la categoría diagnóstica, el segundo la primera frase de la anamnesis.
 
@@ -285,7 +286,7 @@ problema: si **la IA arma la tabla** (el camino vigente) simplemente no las emit
 
 ---
 
-## 3. Bloque 3 — anamnesis: el bloque de mayor riesgo del pipeline
+## 3. Parte 3 del Word — anamnesis: el bloque de mayor riesgo del pipeline
 
 El Excel trae las notas crudas y el Word trae prosa en tercera persona, en presente, con las citas
 textuales conservadas entre comillas. La transformación es sistemática (una viñeta ≈ un párrafo,
@@ -316,7 +317,11 @@ verbatim** — expande la *forma*, nunca cambia el *fondo* ni suaviza una comill
 Convenciones observadas en los dos informes:
 
 - Primer párrafo, forma fija: `El Sr./La Sra. <Apellido> asiste solo/a a la consulta para la
-  realización de una evaluación (neuro)cognitiva (de control / por control).`
+  realización de una evaluación (neuro)cognitiva por control.`
+  🚩 **`por control`, literal y sin alternativa** (decisión del 2026-09-17). Antes acá figuraba
+  `(de control / por control)` y la skill lo emitía como ranura de opción `[de control / por control]`.
+  **Eso quedó sin efecto:** no es una ranura, es texto fijo. La única variable que queda en la frase es
+  `solo/a` vs `acompañado/a por …`, que sí sale de `B8`.
 - Último párrafo, forma fija: `Vive <situación> y, según autoreporte, es autónomo/a en las
   actividades de la vida diaria.`
 - Verbos de reporte rotados: `Refiere` · `Relata` · `Reporta` · `Menciona` · `En lo que concierne a`.
@@ -327,17 +332,23 @@ Convenciones observadas en los dos informes:
   (`mamá con EA`) en `informeFinal2` no es la regla — *"a veces se mencionan, a veces no, pero no
   estaría mal, más en este caso que hay antecedentes, mencionarlo"*. → La skill **incluye** el
   antecedente familiar en la anamnesis (antes este archivo decía que se omitía).
-- En general: **la skill incluye todo y marca lo dudoso**, sin decidir sola qué dejar afuera; lo único
-  que no se redacta son las notas internas de protocolo.
+- En general: **la skill incluye todo y marca lo dudoso**, sin decidir sola qué dejar afuera. No se
+  redactan dos cosas, y sólo dos: las notas internas de protocolo, y las notas **truncadas o
+  ininteligibles** (ver abajo).
+- 🚩 **Nota truncada o ininteligible → se omite entera del párrafo** (decisión del 2026-09-17), y va
+  literal al bloque 12. Antes la regla era transcribirla cortada y señalarla; **eso quedó sin efecto**:
+  *"esta frase así cortada no tiene sentido ni da evidencia de que haya problemas de memoria"*. Se
+  omite **por estar inutilizable, nunca por su contenido** — una nota completa se incluye siempre,
+  aunque sea incómoda o ambigua. Si era el único dato sobre un tema, decirlo en el bloque 12.
 - `A70` está **truncada dentro del propio Excel** — ver §5.g. ✅ Aclarado: son notas en vivo con el
   paciente enfrente y a veces quedan a medias; es error de tipeo de la profesional, no un problema de
-  lectura. **Irrecuperable** — la skill la deja como está y lo señala.
+  lectura. **Irrecuperable** — no se redacta; va al bloque 12.
 
 ---
 
-## 4. Bloques 8–11 — narrativa clínica
+## 4. Partes 8–11 del Word — narrativa clínica
 
-### 4.1 Sección de screening (bloque 8)
+### 4.1 Sección de screening (parte 8 del Word)
 
 Esqueleto casi fijo entre informes. **Lo único que se mueve son los puntajes intercalados** — el
 resto son frases invariantes que van tal cual.
@@ -370,7 +381,7 @@ INECO; el Excel y la tabla de síntesis lo llaman IFS Total**). Reproducir el es
 
 - **Frase 3** — se invierte si el subpuntaje de orientación del MMSE muestra alguna orientación no
   conservada (celdas nuevas del Excel, ver `excel-unificado-spec.md` §A.7). Si el dato falta, va la
-  forma afirmativa y **el pendiente se lista en el bloque 11**, no dentro de la oración.
+  forma afirmativa y **el pendiente se lista en el bloque 12**, no dentro de la oración.
 - **Frase 5** — la mitad de malestar psicológico sale de `C18`/`D18`; la de quejas subjetivas, de
   `B65` (C-QSM) si se tomó (corte `> 3`) o de la anamnesis si la celda está vacía. Si el paciente sí refiere quejas, la
   negación se recorta a `…no reporta sintomatología vinculada al malestar psicológico.` **Nunca poner
@@ -391,7 +402,7 @@ INECO; el Excel y la tabla de síntesis lo llaman IFS Total**). Reproducir el es
   presencia de quejas la determina un **corte > 3 puntos**; si no, la observación **deriva de la
   anamnesis / motivo de consulta** (§5.a).
 
-### 4.2 Secciones por área (bloque 9)
+### 4.2 Secciones por área (parte 9 del Word)
 
 Cuatro secciones, siempre en este orden y con esta forma de tres partes:
 
@@ -507,7 +518,7 @@ Igual que en screening (§4.1), cada sección tiene arranques y cierres invarian
 
 Si algo de eso **no** está conservado, la frase se invierte; no se omite.
 
-### 4.3 Conclusiones y sugerencias (bloques 10–11)
+### 4.3 Conclusiones y sugerencias (partes 10–11 del Word)
 
 - Párrafo de recap: enumera área por área con conectores (`A su vez` · `En adición` · `También` ·
   `Por último`). **Orden corregido — ver el recuadro de abajo.**
@@ -585,7 +596,7 @@ correspondiente de `PRUEBAS ADMINISTRADAS` se borra del Word** (en `informeFinal
 #### 5.b ✅ Los PB derivados pasaron a fórmula
 
 `C37` (AST) = `=TRUNCAR(V38;2)` y `C41` (CE) = `=TRUNCAR(U43;2)`. **Chequeo barato para archivos
-anteriores:** comparar cada PB contra su fórmula; si no coinciden, señalarlo en el bloque 11 — **sin
+anteriores:** comparar cada PB contra su fórmula; si no coinciden, señalarlo en el bloque 12 — **sin
 recalcular el Z**, que ya viene del Excel.
 
 #### 5.c ✅ El total del K-10 pasó a fórmula
@@ -600,7 +611,7 @@ Lo acordado era un campo con dominio `Solo` / `Pareja`. El rótulo de V3 (`… c
 vínculo, pero el valor cargado es `No`. Las dos lecturas son plausibles y la frase de apertura de la
 anamnesis depende de esto (`asiste solo/a` vs `asiste acompañado/a por su …`). **Tratarlo así:**
 `No` / vacío ⇒ `asiste solo/a`; cualquier otro texto ⇒ `asiste acompañado/a por <texto>`. Y dejarlo
-anotado en el bloque 11 hasta que la profesional confirme el formato.
+anotado en el bloque 12 hasta que la profesional confirme el formato.
 
 #### 5.e ✅ Los campos Sí/No ya tienen validación de lista
 
@@ -618,14 +629,19 @@ todo" y redactar la frase 3 en consecuencia, o señalarlo si el caso no es claro
 `C16` (screening) = `10/10` y `C49` (visoconstrucción) = `9.5/10`. En V1 y en los dos informes reales
 las dos apariciones de TRO llevan **el mismo** valor. Puede ser una distinción real (puntuación
 distinta para dos criterios) o una celda que quedó vieja. **La skill copia cada celda en su fila y no
-las reconcilia**; lo anota en el bloque 11 para que la profesional confirme.
+las reconcilia**; lo anota en el bloque 12 para que la profesional confirme.
 
 #### 5.g `A70` sigue truncada dentro del Excel
 
 El texto termina en `QSM: olvida cosas puntuales (fue a un partido y por ahi ` — paréntesis sin
 cerrar, frase cortada. **La celda está así en el archivo**, no es un problema de lectura: son notas
-tomadas en vivo y a veces quedan a medias. Irrecuperable; la skill la deja como está y lo señala
-**sólo en el bloque 11** — nunca comentando el estado del dato dentro del informe.
+tomadas en vivo y a veces quedan a medias. Irrecuperable.
+
+🚩 **Tratamiento (decisión del 2026-09-17): NO se redacta.** La viñeta se omite entera del párrafo —
+nada de transcribir el fragmento ni de introducirlo con una frase sobre quejas mnésicas — y la nota
+cruda va al bloque 12. Antes acá decía que la skill "la deja como está y lo señala": **eso ya no
+vale**. Como `A70` es la única referencia a quejas subjetivas de memoria, el bloque 12 tiene que
+avisar que el informe queda sin ese tema.
 
 #### 5.h Separador decimal mixto en los textos `X/Y`
 

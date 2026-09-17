@@ -13,23 +13,23 @@
 
 ## EVALUACIÓN NEUROCOGNITIVA
 
-**Datos personales** (bloque HTML — ver SKILL.md §1 sobre por qué no va en Markdown)
+**Datos personales** (se entrega como `.docx` descargable — ver SKILL.md §1)
 
-```html
-<table>
-<tr><td>Paciente</td><td>Bertagni, Paula</td></tr>
-<tr><td>Edad</td><td>62 años</td></tr>
-<tr><td>Fecha de nacimiento</td><td>02/04/1964</td></tr>
-<tr><td>Nivel educativo alcanzado</td><td>Universitario</td></tr>
-<tr><td>Lateralidad</td><td>Diestra</td></tr>
-<tr><td>Fecha de evaluación</td><td>14/08/2026</td></tr>
-<tr><td>Deriva</td><td>-</td></tr>
-</table>
-```
+|   |   |
+|---|---|
+| Paciente | Bertagni, Paula |
+| Edad | 62 años |
+| Fecha de nacimiento | 02/04/1964 |
+| Nivel educativo alcanzado | Universitario |
+| Lateralidad | Diestra |
+| Fecha de evaluación | 14/08/2026 |
+
+> Seis filas, siempre estas. Acá van en Markdown sólo para que se lean en este archivo de referencia;
+> lo que recibe la profesional es un `.docx` con esta misma tabla, listo para `Ctrl+A` / `Ctrl+C`.
 
 ## MOTIVO DE CONSULTA Y ANTECEDENTES
 
-La Sra. Bertagni asiste sola a la consulta para la realización de una evaluación neurocognitiva de
+La Sra. Bertagni asiste sola a la consulta para la realización de una evaluación neurocognitiva por
 control.
 
 Refiere bajas quejas mnésicas, nota que su atención ha bajado y siente que falla cuando tiene “la
@@ -191,7 +191,7 @@ M.N:67158
 - **Registro:** tercera persona, presente, clínico pero legible. Verbos de reporte rotados (`Refiere`,
   `Relata`, `Menciona`, `En lo que concierne a`).
 - **Anamnesis:** una viñeta del Excel ≈ un párrafo; primera línea fija (`asiste solo/a a la consulta
-  para la realización de una evaluación (neuro)cognitiva de/por control`), última línea fija (`Vive…
+  para la realización de una evaluación (neuro)cognitiva por control`), última línea fija (`Vive…
   y, según autoreporte, es autónomo/a en las actividades de la vida diaria`). Citas textuales del
   paciente entre comillas, **sin suavizar**.
 - **Secciones por área:** título en mayúsculas + línea `Impresión diagnóstica del/por área:

@@ -83,7 +83,7 @@ Reglas:
 - **Sólo lo que se sugiere.** Lo que el paciente ya hace no se nombra: se omite en silencio.
 - **Cero metacomentario.** `por lo que no se sugiere incorporarla` está dirigido al profesional, no
   al paciente, y la viñeta va al informe. El razonamiento —qué se descartó y por qué— va al
-  **bloque 11**, donde el profesional lo lee y decide.
+  **bloque 12**, donde el profesional lo lee y decide.
 - Referencia de largo: los dos informes reales usan `(estrategias de compensación, no multitarea)` y
   `(mejorar calidad del sueño y técnicas de relajación)`.
 

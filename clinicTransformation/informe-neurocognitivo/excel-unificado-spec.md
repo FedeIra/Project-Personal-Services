@@ -51,7 +51,7 @@ opción válida de lateralidad). Ninguna impide generar el informe.
 | **A.8** Total del K-10 por fórmula | que el total de la tabla no se desincronice de los 10 ítems | ✅ `C18` = `=B63`, verificado en V5. |
 | **A.9** Validación de lista | evitar valores fuera de dominio | ✅ `B5`, `B6` (con formas femeninas), `B10`, `C14:C15`. |
 | *(nuevo en V5)* La X del tramo por fórmula | que la elección de columna deje de ser trabajo de transcripción | ✅ 8 columnas `E:L` — ver §A.12. |
-| *(nuevo)* Campo de derivante | la fila `Deriva:` que tiene `informeFinal.docx` | ✅ `B9` (`Derivado por`). El **dato** ya no hay que buscarlo fuera del Excel; la **presencia** de la fila la sigue decidiendo la plantilla del profesional (`informeFinal.docx` la trae con `-`, `informeFinal2.docx` no la trae). |
+| *(nuevo)* Campo de derivante | la fila `Deriva:` que tiene `informeFinal.docx` | ⛔ **Descartado el 2026-09-17.** `B9` existe y se carga, pero **no va al informe**: la tabla de datos personales quedó fija en `B2:B7`. El campo puede seguir en el Excel como dato de gestión. |
 
 ⚠️ **Corrección a una afirmación repetida en versiones anteriores de este archivo:** la hoja **sí
 tiene celdas combinadas** desde V5 (los 5 rótulos de área, el encabezado agrupado de tramos, cada fila
@@ -167,7 +167,7 @@ cuadro, y `U38:U40` los referencia (`=C34`, `=C35`, `=C36`) para alimentar el pr
 
 **La skill sigue usando el PB tal como viene** y no recalcula el Z. Como guarda para archivos
 viejos, compara `C37` con `TRUNCAR(V38;2)` y `C41` con `TRUNCAR(U43;2)`; si no coinciden, lo señala
-en el bloque 11.
+en el bloque 12.
 
 ### A.8 ✅ Total del K-10 por fórmula (aplicado y verificado en V5)
 
@@ -210,8 +210,8 @@ concordar en género con el paciente (`informeFinal.docx`: `Diestra`; Excel V1: 
 V4 sólo tenía las formas masculinas y la celda incumplía su propia lista; **V5 lo corrigió.**
 
 ℹ️ Dos detalles menores de la lista actual, ninguno bloqueante:
-- Incluye un **`-`** como opción. Si se elige, va a parar tal cual a la tabla del Word — mismo criterio
-  que la fila `Deriva: -` de `informeFinal.docx`, así que es plausible que sea deliberado.
+- Incluye un **`-`** como opción. Ya no llega al Word: es la lista de `B9`, que desde el 2026-09-17 no
+  va a la tabla de datos personales.
 - **`C14`/`C15` admiten `Medio`**, un tercer valor que no es sí ni no. La skill no puede colapsarlo a
   `Si`: redacta la frase 3 del screening en consecuencia o lo señala.
 
@@ -248,7 +248,7 @@ Las dos lecturas son plausibles y la frase de apertura de la anamnesis depende d
 
 **Pregunta para la profesional:** ¿el campo es Sí/No, o es "con quién"? Mientras tanto la skill lee
 `No` o vacío ⇒ `asiste solo/a`; cualquier otro texto ⇒ `asiste acompañado/a por <texto>` — y lo deja
-anotado en el bloque 11.
+anotado en el bloque 12.
 
 ### A.11 Las dos filas de TRO traen valores distintos
 
@@ -257,7 +257,7 @@ informes reales, las dos apariciones de TRO llevan **el mismo** valor.
 
 Puede ser una distinción real (dos criterios de puntuación sobre la misma prueba) o una celda que
 quedó vieja. **La skill no las reconcilia**: copia cada celda en su fila y anota la diferencia en el
-bloque 11.
+bloque 12.
 
 **Pregunta para la profesional:** ¿son dos puntuaciones distintas a propósito?
 
@@ -302,7 +302,7 @@ una sola celda.
 `A70` termina en `QSM: olvida cosas puntuales (fue a un partido y por ahi ` — paréntesis sin cerrar,
 frase cortada. **La celda está así en el archivo**, no es un problema de lectura: son notas tomadas en
 vivo con el paciente enfrente y a veces quedan a medias. Irrecuperable; la skill la deja como está y
-lo señala **sólo en el bloque 11**, nunca comentando el estado del dato dentro del informe.
+lo señala **sólo en el bloque 12**, nunca comentando el estado del dato dentro del informe.
 
 ### B.3 Separador decimal en los textos `X/Y` — cosmético, prioridad baja
 
@@ -338,8 +338,9 @@ funcional** — no vale el riesgo de reformatear el bloque.
   volver a verificar las fórmulas. **Mover filas es exactamente lo que rompió `C18` durante la
   construcción de V5** (§A.8): si hay que moverlas, hacerlo con cortar-pegar (Excel reapunta las
   referencias solo) y después releer el archivo por código para confirmar.
-- **No agregar DNI ni ocupación.** La tabla de datos personales del Word no los tiene en ninguno de
-  los dos informes; los campos reales son `B2:B7` + `Deriva` (`B9`) opcional.
+- **No agregar DNI ni ocupación**, ni ningún otro campo. La tabla de datos personales del Word es
+  **exactamente `B2:B7`, seis filas fijas** (decisión del 2026-09-17). `B8`, `B9` y `B10` se cargan en
+  el Excel pero no salen en esa tabla.
 
 ---
 
