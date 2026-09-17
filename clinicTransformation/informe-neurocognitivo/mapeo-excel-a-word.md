@@ -317,7 +317,11 @@ verbatim** — expande la *forma*, nunca cambia el *fondo* ni suaviza una comill
 Convenciones observadas en los dos informes:
 
 - Primer párrafo, forma fija: `El Sr./La Sra. <Apellido> asiste solo/a a la consulta para la
-  realización de una evaluación (neuro)cognitiva por control.`
+  realización de una evaluación cognitiva por control.`
+  🚩 **`cognitiva`, no `neurocognitiva`** (verificado contra `informeFinal2.docx` el 2026-09-17). Acá
+  figuraba `(neuro)cognitiva`, que era ambiguo y la skill resolvía como `neurocognitiva`. El informe
+  real dice `evaluación cognitiva por control`. El título del documento sí es `EVALUACIÓN
+  NEUROCOGNITIVA`, pero esta frase no.
   🚩 **`por control`, literal y sin alternativa** (decisión del 2026-09-17). Antes acá figuraba
   `(de control / por control)` y la skill lo emitía como ranura de opción `[de control / por control]`.
   **Eso quedó sin efecto:** no es una ranura, es texto fijo. La única variable que queda en la frase es
@@ -325,6 +329,9 @@ Convenciones observadas en los dos informes:
 - Último párrafo, forma fija: `Vive <situación> y, según autoreporte, es autónomo/a en las
   actividades de la vida diaria.`
 - Verbos de reporte rotados: `Refiere` · `Relata` · `Reporta` · `Menciona` · `En lo que concierne a`.
+- 🚩 **Comillas tipográficas `“ ”`, no rectas `" "`** (verificado el 2026-09-17: `informeFinal2.docx`
+  usa 8 comillas curvas y ninguna recta). Las citas del paciente van entre `“ ”`. El Excel las trae
+  rectas — convertirlas al escribir el informe.
 - Género y concordancia salen del paciente (`autónomo`/`autónoma`, `solo`/`sola`).
 - Las **notas internas de protocolo no se redactan**: `A68` = `PROTOCOLO XTEND` no aparece en el
   Word (es nota de trabajo, no del informe).

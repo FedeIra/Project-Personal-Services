@@ -314,6 +314,9 @@ en §1 (**única fuente**; este archivo las repite). Para el **tono y el fraseo*
 narrativos (2, 7, 8, 9, 10), seguir el registro de `ejemplo-informe.md` (informe modelo completo,
 ficticio).
 
+🚩 **Comillas tipográficas.** Las citas textuales del paciente van entre `“ ”`, no entre `" "`. El
+Excel las trae rectas; el informe las lleva curvas. Vale para todos los bloques narrativos.
+
 🚩 **La anamnesis (bloque 2) va en PROSA, nunca en viñetas.** Cada nota del Excel se expande a un
 párrafo corrido en tercera persona, con los verbos de reporte rotados (`Refiere` · `Relata` ·
 `Menciona` · `Reporta` · `En lo que concierne a`). **Prohibido el formato `Rótulo: contenido`**

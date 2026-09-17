@@ -29,7 +29,7 @@
 
 ## MOTIVO DE CONSULTA Y ANTECEDENTES
 
-La Sra. Bertagni asiste sola a la consulta para la realización de una evaluación neurocognitiva por
+La Sra. Bertagni asiste sola a la consulta para la realización de una evaluación cognitiva por
 control.
 
 Refiere bajas quejas mnésicas, nota que su atención ha bajado y siente que falla cuando tiene “la
@@ -191,7 +191,7 @@ M.N:67158
 - **Registro:** tercera persona, presente, clínico pero legible. Verbos de reporte rotados (`Refiere`,
   `Relata`, `Menciona`, `En lo que concierne a`).
 - **Anamnesis:** una viñeta del Excel ≈ un párrafo; primera línea fija (`asiste solo/a a la consulta
-  para la realización de una evaluación (neuro)cognitiva por control`), última línea fija (`Vive…
+  para la realización de una evaluación cognitiva por control`), última línea fija (`Vive…
   y, según autoreporte, es autónomo/a en las actividades de la vida diaria`). Citas textuales del
   paciente entre comillas, **sin suavizar**.
 - **Secciones por área:** título en mayúsculas + línea `Impresión diagnóstica del/por área:
