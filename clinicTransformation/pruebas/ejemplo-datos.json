@@ -1,4 +1,6 @@
 {
+  "protocolo": "Breyna",
+  "evaluador": "Dra. María Agustina Aceiro",
   "personales": [
     "Bunader, José Alberto",
     "61 años",
@@ -29,190 +31,159 @@
     "Test del reloj a la orden (TRO)",
     "Ineco frontal screening (IFS)",
     "Escala de malestar psicológico (K-10)",
-    "Cuestionario de quejas subjetivas de memoria (C-QSM)"
+    "Figura de Rey"
   ],
-  "sintesis": [
-    {
-      "pb": "30/30",
-      "z": "",
-      "x": 0
+  "sintesis": {
+    "mmse": {
+      "pb": "30/30"
     },
-    {
-      "pb": "9,5/10",
-      "z": "",
-      "x": 0
+    "tro_screening": {
+      "pb": "9,5/10"
     },
-    {
+    "avd": {
       "pb": "8",
-      "z": "Autónomo",
-      "x": 0
+      "z": "Autónomo"
     },
-    {
+    "kpds10": {
       "pb": "10",
-      "z": "Normal",
-      "x": 0
+      "z": "Normal"
     },
-    {
+    "dd": {
       "pb": "7",
       "z": "0,45",
       "x": 5
     },
-    {
+    "di": {
       "pb": "4",
       "z": "-0,35",
       "x": 4
     },
-    {
+    "tmt_a": {
       "pb": "38",
       "z": "-0,18",
       "x": 4
     },
-    {
+    "tmt_b": {
       "pb": "42",
       "z": "1,02",
       "x": 6
     },
-    {
+    "ff_atencion": {
       "pb": "24",
       "z": "2,31",
       "x": 7
     },
-    {
-      "pb": "26,5/30",
-      "z": "",
-      "x": 0
+    "ifs_total": {
+      "pb": "26,5/30"
     },
-    {
-      "pb": "7/10",
-      "z": "",
-      "x": 0
+    "ifs_mt": {
+      "pb": "7/10"
     },
-    {
-      "pb": "3 normal",
-      "z": "",
-      "x": 0
+    "ifs_sm": {
+      "pb": "3 normal"
     },
-    {
-      "pb": "3 normal",
-      "z": "",
-      "x": 0
+    "ifs_ic": {
+      "pb": "3 normal"
     },
-    {
-      "pb": "3 normal",
-      "z": "",
-      "x": 0
+    "ifs_cim": {
+      "pb": "3 normal"
     },
-    {
-      "pb": "4 normal",
-      "z": "",
-      "x": 0
+    "ifs_da": {
+      "pb": "4 normal"
     },
-    {
-      "pb": "2 normal",
-      "z": "",
-      "x": 0
+    "ifs_ma": {
+      "pb": "2 normal"
     },
-    {
-      "pb": "3 normal",
-      "z": "",
-      "x": 0
+    "ifs_mtv": {
+      "pb": "3 normal"
     },
-    {
-      "pb": "2,5 normal",
-      "z": "",
-      "x": 0
+    "ifs_r": {
+      "pb": "2,5 normal"
     },
-    {
-      "pb": "6 normal",
-      "z": "",
-      "x": 0
+    "ifs_civ": {
+      "pb": "6 normal"
     },
-    {
-      "pb": "5",
-      "z": "",
-      "x": 0
+    "recuperacion": {
+      "pb": "No"
     },
-    {
-      "pb": "8",
-      "z": "",
-      "x": 0
+    "roc_estrategia": {
+      "pb": "Normal"
     },
-    {
-      "pb": "10",
-      "z": "",
-      "x": 0
+    "bem_as1": {
+      "pb": "5"
     },
-    {
+    "bem_as2": {
+      "pb": "8"
+    },
+    "bem_as3": {
+      "pb": "10"
+    },
+    "bem_ast": {
       "pb": "7,66",
       "z": "-0,90",
       "x": 4
     },
-    {
+    "bem_rse": {
       "pb": "8",
       "z": "-0,13",
       "x": 4
     },
-    {
+    "bem_sem": {
       "pb": "8",
       "z": "≤-3",
       "x": 1
     },
-    {
+    "bem_rec": {
       "pb": "12",
       "z": "0,57",
       "x": 5
     },
-    {
+    "bem_ce": {
       "pb": "10",
       "z": "-2,01",
       "x": 2
     },
-    {
+    "bem_inm": {
       "pb": "7",
       "z": "-1,24",
       "x": 3
     },
-    {
+    "bem_dif": {
       "pb": "8",
       "z": "-0,51",
       "x": 4
     },
-    {
+    "ff_lenguaje": {
       "pb": "24",
       "z": "2,31",
       "x": 7
     },
-    {
+    "fs": {
       "pb": "20",
       "z": "-0,30",
       "x": 4
     },
-    {
+    "tba": {
       "pb": "10",
       "z": "-0,86",
       "x": 4
     },
-    {
-      "pb": "Normal",
-      "z": "",
-      "x": 0
+    "comprension": {
+      "pb": "Normal"
     },
-    {
-      "pb": "Normal",
-      "z": "",
-      "x": 0
+    "expresion": {
+      "pb": "Normal"
     },
-    {
-      "pb": "9,5/10",
-      "z": "",
-      "x": 0
+    "tro_viso": {
+      "pb": "9,5/10"
     },
-    {
-      "pb": "Normal",
-      "z": "",
-      "x": 0
+    "mmse_copia": {
+      "pb": "Normal"
+    },
+    "roc_copia": {
+      "pb": "36/36"
     }
-  ],
+  },
   "grafico1": [
     0.45,
     -0.35,

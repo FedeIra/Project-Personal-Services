@@ -22,14 +22,19 @@ categoría diagnóstica es una propuesta, no un diagnóstico.
 python generar_informe.py datos.json informe.docx
 ```
 
-Los dos archivos están **en esta misma carpeta**, junto a este `SKILL.md`. Localizarlos antes de
-empezar (`ls` sobre el directorio de la skill) y usar la ruta absoluta que corresponda.
+El script, la plantilla (`plantilla-informe.docx`) y la carpeta **`recursos/`** (logos y firmas)
+están **en esta misma carpeta**, junto a este `SKILL.md`. Localizarlos antes de empezar (`ls` sobre el
+directorio de la skill) y **ejecutar el script en su lugar, por ruta absoluta, sin copiarlo**: el
+script busca la plantilla y `recursos/` al lado suyo, y si se lo copia solo a otra carpeta aborta con
+`Falta el recurso …`. El `datos.json` y el `.docx` de salida sí pueden ir en cualquier carpeta de
+trabajo.
 
 ## 🚫 Prohibido construir el documento
 
 **Está terminantemente prohibido crear el `.docx` con `python-docx`, `docx.Document()`,
 `Document()`, o armando el XML a mano.** No importa lo razonable que parezca: el formato del informe
-es irreproducible desde cero y el resultado va a estar mal aunque se vea prolijo.
+es irreproducible desde cero y el resultado va a estar mal aunque se vea prolijo. (Las únicas
+excepciones son las tablas sueltas de los bloques 1 y 4, y sólo en el modo de respaldo.)
 
 ⚠️ **Fallo real observado (2026-09-17, primera corrida en claude.ai).** La skill ignoró el script y
 escribió el documento con `python-docx`. Salió un archivo que *parecía* un informe y estaba mal en
@@ -44,16 +49,40 @@ plantilla, entonces **no se usó la plantilla** y hay que rehacerlo con el scrip
 
 ## Lo que aporta cada parte
 
-| Viene de la plantilla (no se toca) | Lo produce la skill (va en `datos.json`) |
+| Viene de la plantilla o de `recursos/` (no se toca) | Lo produce la skill (va en `datos.json`) |
 |---|---|
-| encabezado institucional con el logo | los 6 datos personales |
-| títulos de todas las secciones | los párrafos de anamnesis |
-| estructura de la tabla de síntesis (12 columnas, grises, celdas combinadas) | PB, Z y la X de cada una de las 36 filas |
-| los dos gráficos | los 14 + 10 valores |
-| la leyenda al pie | el screening y los 4 párrafos por área |
-| la firma y el cierre | recap, frase de cierre y viñetas |
+| encabezado institucional: logo de **Breyna** o de **Xtend** | `protocolo` (de `B9`) — el script elige el logo |
+| la firma: **Agustina** o **Josefina** | `evaluador` (de `B10`) — el script elige la firma |
+| títulos de todas las secciones | los 6 datos personales y los párrafos de anamnesis |
+| estructura de la tabla de síntesis (12 columnas, grises, celdas combinadas, 39 filas posibles) | PB, Z y la X **de cada fila con dato** (las demás las borra el script) |
+| los dos gráficos | los 14 + 10 valores (`null` = prueba no tomada) |
+| la leyenda al pie | la lista de pruebas administradas, el screening y los párrafos por área |
+| el cierre | recap, frase de cierre y viñetas |
 
 Si una de esas cosas falta o cambió de nombre en el resultado, **es que no se clonó la plantilla**.
+
+## Excel V6 (2026-09-28) — lo que cambió, en una pantalla
+
+1. **Protocolo (`B9`: `Breyna` / `Xtend`) → logo del encabezado.** Va en `datos.json` como
+   `protocolo`, copiado tal cual. El script pone el logo de Breyna o el banner de Xtend.
+2. **Evaluado por (`B10`) → firma.** Va como `evaluador`, tal cual. `Dra. María Agustina Aceiro` ⇒ la
+   firma de siempre (imagen + nombre, título y M.N:67158). `Dra. Josefina González Aguilar` ⇒ su
+   imagen, que ya trae nombre y M.N. 56.942 (el script borra las tres líneas de texto).
+3. **`PRUEBAS ADMINISTRADAS` sale del listado `A73:B86`**: sólo los ítems con `Si`, texto literal de la
+   columna `A`, en ese orden. Ya no hay lista fija.
+4. **La tabla de síntesis muestra sólo las filas con dato.** Fila con PB vacío ⇒ no va (se omite su
+   clave en `sintesis`). Tres filas nuevas, **sin Z ni X**, que van sólo si tienen valor:
+   `Recuperación disejecutiva` (`C36`: `Sí`/`No`/`Parcial`) y `ROC estrategia` (`C37`: `Normal`/
+   `Cuestionable`/`Inadecuada`) al final de Atención; `ROC copia` (`C55`: número o texto) al final de
+   Visoconstrucción. Estas tres **no se narran** en la prosa: van sólo en la tabla.
+5. 🚩 **El listado y el cuadro no se cruzan** (decisión del usuario, 2026-09-28). El listado decide la
+   lista; el dato decide la tabla y los gráficos. Si `Figura de Rey` dice `No` pero ROC copia tiene
+   valor, la lista no la nombra **y** la tabla muestra la fila. No es un faltante ni una duda.
+6. **Prueba no tomada = no aparece en ningún lado**: ni tabla, ni gráfico (`null` en su posición de
+   `grafico1`; `grafico2` = `null` si no hubo K-10), ni prosa (se omiten o adaptan las frases que la
+   nombran). Un área sin ninguna fila ⇒ `areas.<área>` = `null`: el script borra la sección y el
+   recap no la menciona.
+7. **Todas las direcciones del Excel se corrieron.** Única fuente: `mapeo-excel-a-word.md` §1.
 
 ## 🚩 Antes de escribir `datos.json` — leer las reglas de contenido
 
@@ -66,12 +95,12 @@ es un volcado del Excel: cada clave tiene reglas propias, y son las mismas que e
 | `anamnesis` | `mapeo-excel-a-word.md` §3 + la sección `MOTIVO DE CONSULTA` de `ejemplo-informe.md`. **Prosa, nunca viñetas rotuladas.** Las notas de protocolo no se redactan; de una nota truncada se conserva la afirmación y se descarta sólo el fragmento cortado. |
 | `screening` | `mapeo-excel-a-word.md` §4.1 — el esqueleto de 6 frases está transcrito **literal**. Copiarlo, no reescribirlo. |
 | `areas` | `mapeo-excel-a-word.md` §4.2 — léxico Z→palabra, sigla→función, y las dos prohibiciones duras: **ni siglas ni valores Z en la prosa**. `CE` no se narra nunca; `Sem` se dice como *bajo beneficio de la facilitación de claves semánticas*. |
-| `sintesis` | `orden-filas-sintesis.md` — las 36 filas en orden posicional, el cap de ±3, y el **autochequeo obligatorio** contra las columnas `E:L` del Excel. |
+| `sintesis` | `orden-filas-sintesis.md` — las 39 filas posibles con su **clave**, cuáles van (sólo las que tienen dato), el cap de ±3, y el **autochequeo obligatorio** contra las columnas `E:L` del Excel. |
+| `pruebas` | el listado `A73:B86` de `mapeo-excel-a-word.md` §1 — sólo los `Si`, texto literal. |
 | `grafico1` / `grafico2` | `orden-categorias-graficos.md` — orden de las categorías, redondeo y cap. |
 | `recap`, `cierre`, `sugerencias` | `regla-diagnostica.md` — la categoría se **propone**, la decide el médico; el orden del recap; el paréntesis de hábitos se deriva de la anamnesis. |
 
-⚠️ El detalle de cada clave está en **«Contenido de los 12 bloques»**, más abajo en este archivo. Ese
-apartado sigue vigente tal cual: lo único que cambió es cómo se entrega, no qué se escribe.
+⚠️ El detalle de cada clave está en **«Contenido de los 12 bloques»**, más abajo en este archivo.
 
 ## Al terminar
 
@@ -79,108 +108,118 @@ apartado sigue vigente tal cual: lo único que cambió es cómo se entrega, no q
 2. **Pegar en el chat el resumen que imprime el script**, literal. Es la evidencia de que la corrida
    fue completa:
    ```
+   encabezado: Breyna (encabezado-breyna.png)
+   firma: Agustina (firma-agustina.png)
    datos personales: 6 filas, 2 sobrantes eliminadas
    anamnesis: N párrafos (la plantilla traía 6)
-   pruebas administradas: 12 ítems (la plantilla traía 11)
-   tabla de síntesis: 36 filas, N celdas escritas
+   pruebas administradas: N ítems (la plantilla traía 11)
+   tabla de síntesis: N filas, N celdas escritas · N filas borradas (claves…)
    screening + 4 secciones por área: 9 párrafos
    conclusiones: recap + cierre · N viñetas (la plantilla traía 4)
-   gráfico 1: 14 puntos + 14 celdas del libro embebido
+   gráfico 1: N puntos + N celdas del libro embebido
    gráfico 2: 10 puntos + 10 celdas del libro embebido
    ```
+   Chequear contra el Excel: el logo y la firma coinciden con `B9`/`B10`, los ítems de la lista son
+   los `Si` del listado, y las filas borradas son exactamente las de PB vacío.
 3. Escribir el **bloque 12 (faltantes y dudas)** como texto en el chat.
 
-Si el script **aborta**, no entregar nada: reportar el error tal cual y, si corresponde, caer al modo
-de bloques de respaldo diciéndolo explícitamente.
+Si el script **aborta**, no entregar nada: leer el mensaje, corregir el `datos.json` y volver a
+correr. Si el error es `protocolo` o `evaluador` no reconocido, **preguntar al usuario** (chequeo de
+entrada 0) en vez de elegir por cuenta propia. Sólo si el error no es del JSON (falta la plantilla o
+un recurso) o se repite, reportarlo tal cual y caer al **modo de respaldo** diciéndolo explícitamente.
 
 ## Qué recibe esta skill
 
-Un único Excel adjunto en el chat (`excelEvaluacionCompletoV5.xlsx` o equivalente). **Sólo se lee la
+Un único Excel adjunto en el chat (`excelEvaluacionCompletoV6.xlsx` o equivalente). **Sólo se lee la
 hoja `TABLA DE FORMULAS`**; las otras seis (`Stroop`, `MMSE`, `Puntajes Equivalentes`, `PRUEBAS`,
 `FLUENCIAS`, `BACK UP`) son tablas de normas que ya alimentaron los `VLOOKUP` y no se leen.
 
-Esquema de la hoja (detalle completo, con las fórmulas, en `mapeo-excel-a-word.md` §1):
+Esquema de la hoja V6 (detalle completo, con las fórmulas y la clave de cada fila, en
+`mapeo-excel-a-word.md` §1):
 
 | Rango | Contenido |
 |---|---|
-| `B2:B10` | Demográficos **y** parámetros: nombre, edad, fecha de nacimiento, nivel educativo, lateralidad, fecha de evaluación, acompañamiento, derivante, riesgo de evolución. |
-| `B3`, `B5` | Edad y nivel educativo — **drivers de todas las fórmulas**, y los mismos que van al Word: **un solo lugar, no hay duplicado**. |
-| `A11:L50` | Cuadro de pruebas: `A`=Área `B`=Prueba `C`=PB `D`=Z `E:L`=los 8 tramos de rango. Filas 11 y 12 = encabezados. |
-| `A13`, `A19`, `A34`, `A44`, `A49` | Rótulos de las 5 áreas, en celdas **combinadas** (`A13:A18`, `A19:A33`, `A34:A43`, `A44:A48`, `A49:A50`). |
-| `C14`, `C15` | Orientación temporal / espacial (`Si`/`No`/`Medio`). **No son filas de la tabla de síntesis** — alimentan la frase 3 del screening. |
-| `D17`, `D18` | Interpretación de AVD y de KPDS-10 (texto, pass-through). Ojo: van en la columna `Z`. **Las dos por fórmula** desde el 2026-09-17. |
-| `C34`, `C35`, `C36` | Ensayos BEM–MS AS1 / AS2 / AS3 — **son filas del cuadro desde V5** (antes vivían en `P35:P37`). |
+| `B2:B7` | Los 6 datos personales: nombre, edad, fecha de nacimiento, nivel educativo, lateralidad, fecha de evaluación. |
+| `B8` | Asiste acompañado (`Si`/`No`) → primera frase de la anamnesis. |
+| **`B9`** | **Protocolo** (`Breyna` / `Xtend`) → `protocolo` en el JSON (logo). |
+| **`B10`** | **Evaluado por** (`Dra. Josefina González Aguilar` / `Dra. María Agustina Aceiro`) → `evaluador` en el JSON (firma). |
+| `B11`, `B12` | Derivado por (no se usa) · Riesgo de evolución (`Si`/`No`). |
+| `B3`, `B5` | Edad y nivel educativo — **drivers de todas las fórmulas**, y los mismos que van al Word. |
+| `A13:L55` | Cuadro de pruebas: `A`=Área `B`=Prueba `C`=PB `D`=Z `E:L`=los 8 tramos de rango. Filas 13 y 14 = encabezados. |
+| `C16`, `C17` | Orientación temporal / espacial (`Si`/`No`/`Medio`). **No son filas de la tabla de síntesis** — alimentan la frase 3 del screening. |
+| `D19`, `D20` | Interpretación de AVD y de KPDS-10 (texto por fórmula, pass-through). Van en la columna `Z`. |
+| **`C36`, `C37`** | Recuperación disejecutiva · ROC estrategia (sin Z). |
+| **`C55`** | ROC copia (sin Z). |
 | `E:L` | Las 8 columnas de rango, **con la X ya calculada por fórmula** en las 15 filas con Z. |
-| `Q32:R46` | Media y desvío por prueba (`VLOOKUP`). Sólo backend: no se lee para el informe. |
-| `B53:B62` | Los 10 ítems del K-10, en orden del gráfico. `B63` = `SUMA`. |
-| `B65` | Puntaje del C-QSM (vacío si no se tomó). |
-| `A68:A76` | Notas crudas de la anamnesis, una viñeta por celda (filas combinadas `A:G`). |
+| `B58:B67` | Los 10 ítems del K-10, en orden del gráfico. `B68` = `SUMA`. |
+| `B70` | Puntaje del C-QSM (vacío si no se tomó). |
+| **`A73:B86`** | Listado de pruebas administradas: nombre literal + `Si`/`No`. |
+| **`A89`** | Anamnesis: **todas las notas en una celda**, separadas por salto de línea (+ `A90:A113` si hubiera más). |
 
-`B4` y `B7` son **seriales de fecha** de Excel: convertir a `dd/mm/aaaa`, no imprimir el número.
+`B4` y `B7` son **fechas**: según cómo se lea el archivo llegan como fecha o como serial numérico de
+Excel. En los dos casos van al Word como `dd/mm/aaaa`; nunca imprimir el número ni la hora.
 
-### 🚩 V5 cambió las direcciones — y cambió qué tiene que calcular la skill
+🚩 **Usar sólo las direcciones de esta tabla y de `mapeo-excel-a-word.md` §1.** V6 corrió todo el
+cuadro respecto de versiones anteriores, y una dirección vieja no falla: devuelve otro dato en
+silencio (p. ej. `C37` hoy es ROC estrategia, no AST; `B63` es un ítem del K-10, no el total).
 
-**Todas las direcciones del cuadro de pruebas se corrieron respecto de V3/V4** (AS1/AS2/AS3 pasaron a
-ser filas propias y empujaron 3 filas todo lo de abajo; el K-10 quedó en `B53:B62`). Si una referencia
-dice `C34` para AST, `D43` para TBA o `B60` como total del K-10, es de una versión vieja. (Ojo: esas
-celdas **existen** en V5, con otro contenido — `C34` es AS1 y `B60` es el ítem 8 del K-10. Una
-dirección vieja no falla: devuelve el dato equivocado en silencio.)
-
-Y, sobre todo, **hay tres formas distintas de leer el cuadro**:
+Y **hay tres formas distintas de leer el cuadro**:
 
 | Rango | Qué devuelve al leerlo por código | Qué hace la skill |
 |---|---|---|
 | `E:L` (los 8 tramos) | `"X"` o `""` — el resultado de la fórmula | **transcribe la X**; ya no decide el tramo |
-| `D19:D46` (el Z) | el Z **crudo** (`-3.1067…`) | **aplica el cap** de ±3 ella misma (en el Excel el cap es sólo formato de número) |
+| `D21:D50` (el Z) | el Z **crudo** (`-3.1067…`) | **aplica el cap** de ±3 ella misma (en el Excel el cap es sólo formato de número) |
 | todo lo demás | valor normal | pass-through |
 
-➡️ Esto **no elimina los autochequeos** del bloque 4: los vuelve más fuertes, porque pasan de
-verificar un cálculo propio a **cruzar contra lo que ya calculó el Excel**. Si una X propia no coincide
-con la del Excel, eso es un hallazgo: decirlo en el bloque 12.
+➡️ Los autochequeos del bloque 4 **cruzan contra lo que ya calculó el Excel**: si una X no coincide
+con la de `E:L`, eso es un hallazgo y va al bloque 12.
 
 ### Chequeos de entrada — qué verificar y avisar, sin rellenar
 
-✅ **`excelEvaluacionCompletoV5.xlsx` (2026-09-16) cierra los faltantes bloqueantes** que tenían las
-versiones anteriores: los 10 ítems del K-10, el flag de riesgo de evolución, la orientación
-temporal/espacial, el C-QSM, el `IFS Índice MT` como texto, la unificación del bloque demográfico y
-las 8 columnas de rango por fórmula. **Ya no hay ningún bloque del informe que no se pueda generar
-desde el Excel**, salvo lo que abajo se marca.
+✅ **`excelEvaluacionCompletoV6.xlsx` (2026-09-28) trae todo lo que necesita el informe**, incluidos
+el logo (`B9`), la firma (`B10`) y qué pruebas se administraron (`A73:B86`). **Ya no hay ningún bloque
+del informe que no se pueda generar desde el Excel**, salvo lo que abajo se marca.
 
 Lo que sí hay que chequear en cada archivo que llegue:
 
-1. **`B65` (C-QSM) puede venir vacía.** El C-QSM **no se toma en toda evaluación**
-   (`informeFinal.docx` no lo lista; `informeFinal2.docx` sí) y **su puntaje nunca aparece en el
-   informe**: no es fila de la tabla, no está en los gráficos y no se cita en la prosa. Lo único que
-   decide es media frase del screening. Sin puntaje, la observación de quejas subjetivas **se deriva
-   de la anamnesis** y **hay que avisar en el bloque 12 que la línea del C-QSM se borra de
-   `PRUEBAS ADMINISTRADAS`** del Word. Si hay puntaje, quejas presentes = **> 3**. Nunca inventar uno,
-   y **nunca escribirlo en el informe** aunque exista.
-2. **PB derivados: `C37` (AST) y `C41` (CE).** Salen por fórmula — `C37`=`=TRUNCAR(V38;2)` (promedio
-   de los 3 ensayos) y `C41`=`=TRUNCAR(U43;2)` (promedio de Sem y Rec). En archivos anteriores están
-   tipeados a mano: comparar cada uno con su fórmula y, si no coinciden, decirlo en el bloque 12.
-   **Nunca recalcular el Z** — viene del Excel, incluso si el PB no cierra.
-3. 🚩 **Total del K-10 — el chequeo de mayor impacto clínico.** `C18` tiene que ser `=B63`
-   (`=SUMA(B53:B62)`), así que el PB de la tabla de síntesis, el gráfico 2 y el corte ≥ 25 salen del
-   mismo lugar. Si `C18` está tipeado y difiere de `B63`, **señalarlo y no elegir por cuenta propia**:
-   puede ser un override deliberado del corte anímico. **Caso real:** una versión intermedia de V5
-   traía `C18`=`30` con los ítems sumando `24` — la tabla decía `Malestar severo` y correspondía
-   `Normal`, cruzando el corte que decide la categoría diagnóstica.
-4. 🚩 **`D17` (interpretación de AVD) tiene que venir por fórmula.** Desde el 2026-09-17 se calcula
-   con `=SI(C17>=8;"Autónomo";…)` (ver `regla-diagnostica.md`). Si llega **tipeada a mano**, el valor
-   igual se usa tal cual —es pass-through— pero **avisarlo en el bloque 12**: significa que ese archivo
-   quedó con la versión vieja y la palabra puede no corresponder al puntaje. Chequeo barato: contrastar
-   `D17` contra `C17` usando la tabla de tramos.
-5. **`B8` (`Asiste acompañado con`) tiene rótulo y dominio ambiguos.** Leerlo así: `No` o vacío ⇒
-   `asiste solo/a`; cualquier otro texto ⇒ `asiste acompañado/a por <texto>`. Anotarlo en el bloque 12.
-6. **Campos Sí/No.** V5 tiene validación de lista en `B5`, `B6`, `B10` y `C14:C15`. Igual normalizar
-   tolerantemente (`Sí`/`si`/`SI`/`No`/`no`) por si llega un archivo viejo. **`C14`/`C15` admiten un
-   tercer valor, `Medio`**: no colapsarlo a `Si` — redactar la frase 3 en consecuencia o señalarlo. Si
-   un valor no es interpretable, **señalarlo** en vez de asumir. **Nunca inferir el riesgo de
-   evolución de los puntajes.**
-7. **Las dos filas de TRO pueden traer valores distintos** (`C16` screening vs `C49`
+0. **`B9` (protocolo) y `B10` (evaluado por) tienen que estar cargados.** Se copian tal cual al JSON
+   y el script los reconoce tolerando tildes y espacios. Si faltan o traen otra cosa, el script aborta:
+   **preguntar al usuario** en vez de elegir un logo o una firma por cuenta propia.
+1. **`B70` (C-QSM) puede venir vacía.** **Su puntaje nunca aparece en el informe**: no es fila de la
+   tabla, no está en los gráficos y no se cita en la prosa. Lo único que decide es media frase del
+   screening. Sin puntaje, la observación de quejas subjetivas **se deriva de la anamnesis**. Si hay
+   puntaje, quejas presentes = **> 3**. Nunca inventar uno. (Que el C-QSM figure en `PRUEBAS
+   ADMINISTRADAS` lo decide el listado, `B84`, no esta celda.)
+2. **PB derivados: `C41` (AST) y `C45` (CE).** Salen por fórmula — `C41`=`=TRUNCAR(V42;2)` (promedio
+   de los 3 ensayos) y `C45`=`=TRUNCAR(U47;2)` (promedio de Sem y Rec). Si llegan tipeados a mano,
+   comparar cada uno con su fórmula y, si no coinciden, decirlo en el bloque 12. **Nunca recalcular el
+   Z** — viene del Excel, incluso si el PB no cierra.
+3. 🚩 **Total del K-10 — el chequeo de mayor impacto clínico.** `C20` tiene que ser `=B68`
+   (`=SUMA(B58:B67)`), así que el PB de la tabla de síntesis, el gráfico 2 y el corte ≥ 25 salen del
+   mismo lugar. Si `C20` está tipeado y difiere de `B68`, **señalarlo y no elegir por cuenta propia**:
+   puede ser un override deliberado del corte anímico. **Caso real:** un archivo traía el PB en `30`
+   con los ítems sumando `24` — la tabla decía `Malestar severo` y correspondía `Normal`, cruzando el
+   corte que decide la categoría diagnóstica.
+4. 🚩 **`D19` (interpretación de AVD) tiene que venir por fórmula** (`=SI(C19>=8;"Autónomo";…)`, ver
+   `regla-diagnostica.md`). Si llega **tipeada a mano**, el valor igual se usa tal cual —es
+   pass-through— pero **avisarlo en el bloque 12**. Chequeo barato: contrastar `D19` contra `C19`
+   usando la tabla de tramos.
+5. **Espacios de más.** Los valores elegidos de una lista desplegable pueden traer un espacio adelante
+   (las listas de `B9`, `B10`, `C36` y `C37` tienen espacios después de la coma). **Recortarlos** antes
+   de escribirlos en la tabla o en la prosa; `protocolo` y `evaluador` el script los tolera igual.
+   **`B8` (`Asiste acompañado`) es `Si`/`No` desde V6.** `No` o vacío ⇒ `asiste solo/a`; `Si` ⇒
+   `asiste acompañado/a`. El Excel no dice por quién: si la anamnesis lo menciona se usa; si no, va la
+   ranura `[acompañado por …]` y se anota en el bloque 12. ⚠️ La regla vieja (`acompañado/a por
+   <texto>`) escribiría `acompañado por Si`.
+6. **Campos Sí/No.** V6 valida `B8`, `B12`, `B73:B86`, `C16:C17`, `C36` y `C37`. Igual normalizar
+   tolerantemente (`Sí`/`si`/`SI`/`No`/`no`). **`C16`/`C17` admiten un tercer valor, `Medio`**: no
+   colapsarlo a `Si` — redactar la frase 3 en consecuencia o señalarlo. En **`C36`, `No` es un
+   resultado** (la fila va con `No`), no "no se tomó". Si un valor no es interpretable,
+   **señalarlo** en vez de asumir. **Nunca inferir el riesgo de evolución de los puntajes.**
+7. **Las dos filas de TRO pueden traer valores distintos** (`C18` screening vs `C53`
    visoconstrucción). **Copiar cada celda en su fila, no reconciliarlas**, y anotar la diferencia en
    el bloque 12 si existe.
-8. **Celdas `X/Y` con pinta de fecha.** V3 las guarda como texto, pero si alguna vez llega un número
+8. **Celdas `X/Y` con pinta de fecha.** Hoy vienen como texto, pero si alguna vez llega un número
    entre ~45000 y ~48000 en una celda que debería decir `7/10`, es una autoconversión de Excel y **es
    reversible**: formatear el serial como `d/m` devuelve lo tipeado. Chequeo obligatorio: el
    denominador recuperado tiene que ser el máximo del subtest. Si pasa → usar el valor y anotarlo en
@@ -195,18 +234,14 @@ Lo que sí hay que chequear en cada archivo que llegue:
   mismas viñetas y en el mismo orden (ver ahí qué sí se localiza).
 - **No reinterpretar la anamnesis.** Ver el bloque 4 abajo — es el bloque de mayor riesgo.
 - **No auto-enviar nada.** El informe se entrega a la profesional para que lo revise y lo firme.
-  ⚠️ La versión anterior de esta línea decía *"no generar el `.docx` final porque los gráficos son
-  objetos OLE"*. **Eso era falso y quedó sin efecto (2026-09-17):** se verificó en `informeFinal.docx`
-  que no hay ningún objeto OLE — son gráficos nativos cuyos valores se reescriben en el caché del
-  propio gráfico. Generar el `.docx` es ahora el comportamiento por default.
 - **No "corregir" las inconsistencias de la plantilla.** La leyenda que menciona trazado diagonal, y
   el `del área` / `por área` de las secciones, se reproducen tal cual.
 
 ## Gotcha técnico — guardar el Excel antes de subirlo
 
 El Excel se lee con código, y las celdas con fórmula (la columna `D` de las filas con Z, **las 8
-columnas `E:L`**, `Q32:R46`, `V38`, `U43`, `B63`, `C18`, **`D17`**, `D18`, `C37`, `C41`) sólo tienen el
-valor calculado cacheado si el archivo fue **guardado en Excel**. Si se sube sin guardar, o fue
+columnas `E:L`**, las medias y desvíos de `Q`/`R`, `V42`, `U47`, `B68`, `C20`, **`D19`**, `D20`, `C41`,
+`C45`) sólo tienen el valor calculado cacheado si el archivo fue **guardado en Excel**. Si se sube sin guardar, o fue
 editado con otro programa, pueden leerse vacías. Avisar al usuario si se detecta ese patrón.
 
 ---
@@ -237,77 +272,96 @@ Dos excepciones acotadas, y sólo esas:
   adentro.
 - **Celda de tabla sin dato → celda vacía.** Nunca texto.
 
-En los dos casos, el bloque 12 lo repite con el detalle. ⚠️ Fallo observado en la revisión
-2026-09-08 (`../ejemplos/revision-salida-ia-vs-informeFinal2.md` §B9).
+En los dos casos, el bloque 12 lo repite con el detalle.
 
 ---
 
-## 🚩 Cómo se entrega: **un `.docx` completo** (desde el 2026-09-17)
+## 🚩 Cómo se entrega: **un `.docx` completo**
 
-La skill **no devuelve 12 bloques para pegar a mano**. Genera **el informe entero en Word**, listo
-para que la profesional lo revise, edite y firme.
+La skill **no devuelve 12 bloques para pegar a mano**: genera **el informe entero en Word** con el
+script (ver «Lo primero» y «Al terminar», arriba). Los 12 bloques de abajo son las **partes de
+contenido** del informe; en el modo normal, los bloques 1 a 11 son claves de `datos.json` y sólo el
+**bloque 12 (faltantes y dudas)** va como texto en el chat.
 
-El procedimiento es siempre el mismo y **no admite improvisar**:
-
-1. Leer el Excel y **producir un `datos.json`** con las partes variables (esquema abajo).
-2. Ejecutar `python generar_informe.py datos.json informe.docx` — el script está en este paquete.
-3. **Ofrecer el `.docx` para descargar** + pegar en el chat el resumen que imprime el script.
-4. Escribir el **bloque 12 (faltantes y dudas) como texto en el chat**. Ése es el único que no va al
-   documento.
-
-⚠️ **No construir el documento con `python-docx` ni armar el XML a mano.** El script **clona
-`plantilla-informe.docx`** y reemplaza sólo lo variable; todo el formato —tabla de 12 columnas con
-sus grises y celdas combinadas, los dos gráficos, el encabezado, la leyenda, la firma— viene de la
-plantilla. Reconstruirlo es exactamente lo que no hay que hacer.
-
-⚠️ **Si el script aborta, NO entregar un informe parcial.** Aborta a propósito cuando no encuentra una
-sección o cuando un conteo no cierra (36 filas, 14 y 10 valores de gráfico). Reportar el error en el
-bloque 12 y, si hace falta, caer al modo de bloques.
+El script aborta a propósito —sin escribir nada— cuando no encuentra una sección, cuando un conteo no
+cierra (14 y 10 valores de gráfico), cuando `protocolo` o `evaluador` no se reconocen, cuando una
+clave de `sintesis` no existe, o cuando `grafico1`/`areas` no coinciden con las filas de la tabla.
 
 ### Esquema de `datos.json`
 
 | Clave | Contenido | Bloque |
 |---|---|---|
+| `protocolo` | `B9` tal cual (`Breyna` / `Xtend`) — elige el logo del encabezado | — |
+| `evaluador` | `B10` tal cual — elige la firma (Agustina / Josefina) | — |
 | `personales` | 6 strings: paciente, edad (`61 años`), nacimiento, nivel educativo, lateralidad, evaluación | 1 |
 | `anamnesis` | lista de párrafos (cantidad variable) | 2 |
-| `pruebas` | los 12 ítems de la lista canónica | 3 |
-| `sintesis` | **36** objetos `{"pb":…, "z":…, "x": 0-8}` en el orden de `orden-filas-sintesis.md` (`x` = en qué tramo va la X, `0` = ninguno) | 4 |
-| `grafico1` | **14** números | 5 |
-| `grafico2` | **10** enteros | 6 |
+| `pruebas` | los ítems del listado `A73:A86` que dicen `Si`, texto literal y en ese orden | 3 |
+| `sintesis` | **objeto** `{clave: {"pb":…, "z":…, "x": 1-8}}` **sólo con las filas que tienen dato**. Las claves (`mmse`, `tro_screening`, `dd`, `ff_atencion`, `recuperacion`, `roc_copia`…) están en `orden-filas-sintesis.md`. `z` y `x` se omiten donde no aplican. Fila omitida = fila borrada | 4 |
+| `grafico1` | **14** números en el orden de `orden-categorias-graficos.md`, con **`null`** en las pruebas no tomadas | 5 |
+| `grafico2` | **10** enteros, o **`null`** si el K-10 no se tomó | 6 |
 | `screening` | un párrafo | 7 |
-| `areas` | `atencion`/`memoria`/`lenguaje`/`visoconstruccion`, cada una `[impresión, párrafo]` | 8 |
+| `areas` | `atencion`/`memoria`/`lenguaje`/`visoconstruccion`, cada una `[impresión, párrafo]`, o **`null`** si el área no tiene ninguna fila en la tabla | 8 |
 | `recap`, `cierre` | un párrafo y una oración | 9 y 10 |
 | `sugerencias` | lista de viñetas (cantidad variable) | 11 |
 
-Ejemplo completo: `../pruebas/ejemplo-datos.json` (fuera del paquete).
+Forma de `sintesis`: ver el ejemplo de `orden-filas-sintesis.md`. Esqueleto del resto:
 
-🚩 **En el JSON los números van con punto** (`-0.9`) — es formato de archivo. La **coma** es para los
-valores que se pegan a mano en el Excel de un gráfico, que es otra cosa. No confundirlos.
+```json
+{
+  "protocolo": "Breyna",
+  "evaluador": "Dra. María Agustina Aceiro",
+  "personales": ["Bertagni, Paula", "62 años", "02/04/1964", "Universitario", "Diestra", "14/08/2026"],
+  "anamnesis": ["La Sra. Bertagni asiste sola a la consulta …", "…"],
+  "pruebas": ["Actividades instrumentales de la vida diaria (AIVD de Lawton y Brody)", "…"],
+  "sintesis": {"mmse": {"pb": "29/30"}, "dd": {"pb": "8", "z": "1,14", "x": 6}},
+  "grafico1": [1.14, -0.35, 1.33, 1.25, -0.34, -0.13, -1.17, -1.32, -1.32, -0.27, 0.72, 3, 1.37, 0.86],
+  "grafico2": [2, 3, 2, 1, 3, 2, 1, 2, 3, 2],
+  "screening": "Discurso fluido y organizado, …",
+  "areas": {"atencion": ["Impresión diagnóstica del área: rendimiento cognitivo conservado-alto", "…"],
+            "memoria": ["…", "…"], "lenguaje": ["…", "…"], "visoconstruccion": ["…", "…"]},
+  "recap": "La Sra. Bertagni presentó …",
+  "cierre": "En conclusión, …",
+  "sugerencias": ["Interpretar estos resultados …", "…"]
+}
+```
+
+Es un esqueleto: en un caso real `sintesis` lleva una clave por cada fila con dato, y `grafico1`
+tiene que coincidir con ella (`null` justo donde falta la fila).
+
+🚩 **Dos formatos de número distintos, no confundirlos:**
+- En **`sintesis`** los valores son **texto tal como se ven en la tabla**: coma decimal y cero final
+  (`"-0,90"`, `"≤-3"`).
+- En **`grafico1`/`grafico2`** los valores son **números JSON**, con punto y sin comillas (`-0.9`,
+  `3`). Si llega texto (`"0,45"`), el script aborta.
 
 ### Lo que el `.docx` resuelve solo
 
+- El **logo del encabezado** (Breyna o Xtend) y la **firma** (Agustina o Josefina) se cambian solos
+  según `protocolo` y `evaluador`. Las imágenes están en `recursos/`.
+- Las **filas de la tabla sin dato se borran**, y si se borra la fila que abría un área, el rótulo del
+  área pasa a la siguiente. Un área con `null` se borra entera (título, impresión y párrafo).
+- Las **categorías del gráfico 1 con `null` se borran**, y el gráfico 2 desaparece si va `null`.
 - La fila `Deriva:` de la plantilla **se borra**, no se deja vacía.
-- La leyenda al pie y la firma **ya vienen**: no hay nada que copiar de un informe anterior.
+- La leyenda al pie **ya viene**: no hay nada que copiar de un informe anterior.
 - La tabla entra en la página sin el viejo ajuste de ancho al 130 %.
 - La cantidad de párrafos de anamnesis, de ítems de pruebas y de viñetas de sugerencias **se adapta**
   a cada paciente, aunque difiera de la plantilla.
 
-### Modo de respaldo: los 12 bloques para copy/paste
+### Modo de respaldo: los bloques sueltos para copy/paste
 
-Si no está disponible la creación de archivos de claude.ai (ver el requisito de plan en el bloque 1),
-o si la profesional pide los bloques sueltos, emitirlos como antes — con los formatos que describe cada
-bloque abajo — y **decirlo en el bloque 12**. Las reglas de contenido son las mismas en los dos modos.
+**Sólo** en dos casos: el script abortó por algo que no se arregla corrigiendo el JSON (ver «Al
+terminar»), o la profesional pide explícitamente los bloques sueltos. Entonces se emiten los bloques
+1 a 11 con los formatos de respaldo que se describen en los bloques 1 y 4, y el resto como texto en el
+chat. **Decirlo en el bloque 12.** Las reglas de contenido son las mismas en los dos modos.
 
 ---
 
 ## Contenido de los 12 bloques
 
-> Esto define **qué dice** cada parte. En el modo `.docx` cada bloque es una clave de `datos.json`;
-> los títulos de sección los pone la plantilla y **no se inventan ni se renumeran**.
-
 Lo de abajo define **qué dice cada parte del informe**, y vale igual para el `.docx` y para el modo de
-respaldo. En el modo `.docx`, cada bloque es una clave del JSON; los formatos de pegado que se
-mencionan (`.docx` suelto, HTML, tabla en el chat) **sólo aplican al modo de respaldo**.
+respaldo. En el modo `.docx` cada bloque es una clave de `datos.json`; los títulos de sección los pone
+la plantilla y **no se inventan ni se renumeran**. Las subsecciones marcadas «sólo para el modo de
+respaldo» no aplican en el modo normal.
 
 El mapeo completo de qué sale de dónde está en `mapeo-excel-a-word.md` §2, y las direcciones de celda
 en §1 (**única fuente**; este archivo las repite). Para el **tono y el fraseo** de los bloques
@@ -336,33 +390,29 @@ sección `MOTIVO DE CONSULTA Y ANTECEDENTES` de `ejemplo-informe.md` antes de re
 |---|---|---|
 | `Paciente` | `B2` | tal cual |
 | `Edad` | `B3` | `<B3> años` |
-| `Fecha de nacimiento` | `B4` | `dd/mm/aaaa` (es un serial de Excel) |
+| `Fecha de nacimiento` | `B4` | `dd/mm/aaaa` (fecha o serial de Excel) |
 | `Nivel educativo alcanzado` | `B5` | tal cual |
 | `Lateralidad` | `B6` | tal cual |
-| `Fecha de evaluación` | `B7` | `dd/mm/aaaa` (es un serial de Excel) |
+| `Fecha de evaluación` | `B7` | `dd/mm/aaaa` (fecha o serial de Excel) |
 
-🚩 **Ninguna fila más, nunca** (decisión del 2026-09-17). `B8` (acompañamiento), `B9` (derivante) y
-`B10` (riesgo de evolución) **no van en esta tabla**, aunque el Excel los traiga cargados y aunque la
-plantilla de Word tenga una fila `Deriva:` — esa fila se deja vacía o la borra la profesional; la
-skill no la completa. Tampoco se inventan DNI ni ocupación. El dato de `B8` no se pierde: alimenta la
-frase de acompañamiento del bloque 7.
+🚩 **Ninguna fila más, nunca** (decisión del 2026-09-17). `B8` (acompañamiento), `B9` (protocolo),
+`B10` (evaluado por), `B11` (derivante) y `B12` (riesgo de evolución) **no van en esta tabla**,
+aunque el Excel los traiga cargados y aunque la plantilla de Word tenga una fila `Deriva:` — el
+script la borra. Tampoco se inventan DNI ni ocupación. `B8` alimenta la frase de acompañamiento de la
+anamnesis; `B9` y `B10` van al JSON como `protocolo` y `evaluador`.
 
-⛔ **Y tampoco se pregunta por ella en el bloque 12.** Aunque `B9` traiga un derivante cargado, **no**
-escribir nada del tipo *"confirmar si la plantilla tiene la fila `Deriva:`"*: la profesional ya
-confirmó los 6 campos el 2026-09-17 y no quiere que se le vuelva a preguntar. `B9` cargado **no es**
+⛔ **Y tampoco se pregunta por ella en el bloque 12.** Aunque `B11` traiga un derivante cargado,
+**no** escribir nada del tipo *"confirmar si la plantilla tiene la fila `Deriva:`"*: la profesional ya
+confirmó los 6 campos el 2026-09-17 y no quiere que se le vuelva a preguntar. `B11` cargado **no es**
 un faltante ni una duda — es un dato del Excel que este informe no usa.
 
-### Formato — **sólo para el modo de respaldo**: `.docx` descargable
+### Formato — **sólo para el modo de respaldo**: `.docx` con esta tabla sola
 
-> En el modo normal esta tabla va dentro del informe completo y no se entrega suelta. Lo de abajo
-> aplica únicamente si se cayó al modo de bloques.
-
-✅ **Éste es el default.** Generar con code execution (`python-docx`) un `.docx` que contenga **sólo
+En el modo normal esta tabla va dentro del informe completo y no se entrega suelta. En el modo de
+respaldo, primera opción: generar con code execution (`python-docx`) un `.docx` que contenga **sólo
 esta tabla**, y ofrecerlo para descargar. La profesional lo abre, `Ctrl+A`, `Ctrl+C`, y pega en su
-informe. Word contra Word: el pegado es fiel siempre, sin depender de cómo renderice el chat.
-
-**No es el informe final** — es sólo este bloque. La prohibición de generar el `.docx` completo sigue
-en pie (ver "Qué NO debe hacer esta skill").
+informe. Las únicas excepciones a la prohibición de `python-docx` son las tablas sueltas de los
+bloques 1 y 4, y sólo en el modo de respaldo: nunca para armar el informe entero.
 
 Receta exacta del archivo, aprobada por el usuario en la prueba del 2026-09-17:
 
@@ -375,10 +425,6 @@ Receta exacta del archivo, aprobada por el usuario en la prueba del 2026-09-17:
 | Columna 1 | **negrita** (las etiquetas) |
 | Columna 2 | normal (los valores) |
 | Interlineado | simple, sin espacio posterior |
-
-⚠️ **Requiere la creación de archivos de claude.ai** (preview en Max/Team/Enterprise; Pro se fue
-incorporando después). **Si no está disponible**, caer a la alternativa de abajo y **decirlo en el
-bloque 12** — no fallar en silencio.
 
 ### Alternativa: tabla Markdown en el chat
 
@@ -393,13 +439,16 @@ código**, con encabezado vacío para que no aparezca una fila de títulos:
 
 Se selecciona con el mouse sobre la tabla ya dibujada y se pega. ⚠️ **Advertirle que este camino
 depende del cliente:** copiar el código fuente en vez de la tabla renderizada produce el fallo
-`PacienteBunader, José AlbertoEdad61 años…` (observado el 2026-09-08 y de nuevo el 2026-09-17), con
+`PacienteBertagni, PaulaEdad62 años…` (observado el 2026-09-08 y de nuevo el 2026-09-17), con
 los `|` a la vista y las líneas `|---|` convertidas en rayas por el autoformato de Word. Si pasa, se
 corrige con **Pegar → Mantener formato de origen**.
 
-**2. `MOTIVO DE CONSULTA Y ANTECEDENTES`** — redacción de las viñetas de `A68:A76` a prosa en tercera
-persona y presente, una viñeta ≈ un párrafo, mismo orden, conservando las citas textuales entre
-comillas. Formas fijas del primer y último párrafo, verbos de reporte y concordancia de género: ver
+**2. `MOTIVO DE CONSULTA Y ANTECEDENTES`** — redacción de las notas de `A89` a prosa en tercera
+persona y presente, una nota ≈ un párrafo, mismo orden, conservando las citas textuales entre
+comillas. 🚩 **Todas las notas vienen en esa única celda**: partir el texto por los saltos de línea,
+quitar el `- ` inicial de cada viñeta (y los espacios duros sobrantes), y sumar `A90:A113` si alguna
+trae texto. La primera línea (sin guion) suele ser el motivo de consulta. Formas fijas del primer y
+último párrafo, verbos de reporte y concordancia de género: ver
 `mapeo-excel-a-word.md` §3.
 
 > ⚠️ **Bloque de mayor riesgo del pipeline.** No suavizar, reinterpretar ni reencuadrar el contenido
@@ -415,7 +464,8 @@ comillas. Formas fijas del primer y último párrafo, verbos de reporte y concor
 > que se corte sea el ejemplo**. En ese caso **el hecho clínico SÍ va al informe** y lo único que se
 > omite es el fragmento inutilizable.
 >
-> **Caso de referencia, `A70`:** `QSM: olvida cosas puntuales (fue a un partido y por ahi `
+> **Caso de referencia** (una nota real de un archivo anterior): `QSM: olvida cosas puntuales (fue a un
+> partido y por ahi `
 >
 > | | |
 > |---|---|
@@ -449,240 +499,144 @@ comillas. Formas fijas del primer y último párrafo, verbos de reporte y concor
 
 **3. `PRUEBAS ADMINISTRADAS`** — la lista de la batería tomada.
 
-⚠️ **Este bloque NO se deriva del Excel.** Es el boilerplate de la plantilla (clasificado `FIJO/FUERA`
-en `mapeo-excel-a-word.md` §2). La skill lo reproduce literal, en este orden:
+🚩 **Desde V6 este bloque SE DERIVA del Excel** (decisión del usuario, 2026-09-28 — **reemplaza** la
+lista canónica fija de 12 ítems del 2026-09-17, la regla "el C-QSM va siempre" y el "límite
+conocido" que obligaba a avisar en cada informe). Sale del listado **`A73:B86`**:
 
-```
-Actividades instrumentales de la vida diaria (AIVD de Lawton y Brody)
-Mini mental state examination (MMSE)
-Batería de eficiencia mnésica de Signoret – subtest memoria seriada (BEM-MS)
-Batería de eficiencia mnésica de Signoret – subtest memoria lógica (BEM-ML)
-Trail making test A (TMT A) y B (TMT B)
-Fluencia verbal fonológica (FF) y semántica (FS)
-Test de denominación de Boston abreviado (TBA)
-Span de dígitos directos (DD) e inversos (DI)
-Test del reloj a la orden (TRO)
-Ineco frontal screening (IFS)
-Escala de malestar psicológico (K-10)
-Cuestionario de quejas subjetivas de memoria (C-QSM)
-```
+- Van **sólo los ítems con `Si`** en la columna `B`, **en el orden del Excel**.
+- El texto se copia **literal de la columna `A`**, sin "corregir" mayúsculas (va `Mini mental state
+  examination`, `Trail making test`, `Test de Stroop`, `Figura de Rey`).
+- Los que dicen `No` (o están vacíos) **no van**, aunque sus puntajes estén cargados en el cuadro. El
+  listado no se cruza con el cuadro: ni se agrega una prueba porque tenga puntaje, ni se saca porque
+  no lo tenga.
 
-🚩 **Lista canónica indicada por el usuario el 2026-09-17: siempre estos 12 ítems, en este orden y con
-estas mayúsculas.** Copiar literal, sin \"corregir\" la capitalización (va `Mini mental state
-examination`, `Trail making test`, `Ineco frontal screening`, `Test de denominación de Boston
-abreviado` — en minúsculas después de la primera palabra).
+Los 14 ítems posibles (`A73:A86`): AIVD · MMSE · BEM-MS · BEM-ML · TMT A y B · Fluencias · TBA · Span de
+dígitos · TRO · IFS · K-10 · C-QSM · Test de Stroop · Figura de Rey.
 
-⚠️ **Difiere de `informeFinal.docx`** en el orden (ahí `TBA` va después de `TRO`) y en las mayúsculas.
-**Manda esta lista, no la de la plantilla.**
+Si el listado viene **entero vacío** (archivo anterior a V6), no inventar la lista: decirlo en el
+bloque 12 y pedirla.
 
-⚠️ **El C-QSM va siempre, aunque `B65` esté vacía** — esto reemplaza la regla anterior, que lo hacía
-condicional y mandaba borrar la línea cuando el cuestionario no se había tomado.
+No lleva `.docx` en el modo de respaldo: son líneas de texto plano que se pegan directo.
 
-🚩 **Límite conocido, decirlo en el bloque 12 en cada informe:** si alguna de las otras 11 pruebas no
-se tomó, **la skill igual la va a listar** — el Excel no registra qué batería se administró, sólo los
-puntajes. Que una celda de PB esté vacía no es evidencia suficiente de que la prueba no se tomó.
-**La profesional tiene que cotejar esta lista contra lo que realmente administró.** Hacerlo derivable
-requiere un campo por prueba en el Excel → pendiente en `../preguntasParaLaProfesional.md`.
+**4. Tabla `SÍNTESIS DEL RENDIMIENTO`** — `orden-filas-sintesis.md`.
 
-No lleva `.docx`: son 11–12 líneas de texto plano que se pegan directo.
+🚩 **La cantidad de filas varía por paciente.** La plantilla trae las **39 filas posibles** y en el
+informe van **sólo las que tienen dato en el Excel**: en `sintesis` se escribe una clave por fila con
+PB, y el script borra las demás y reubica el rótulo del área si hace falta. `Recuperación
+disejecutiva`, `ROC estrategia` y `ROC copia` son **cualitativas** (PB con el texto, sin Z ni X).
 
-**4. Tabla `SÍNTESIS DEL RENDIMIENTO` — se genera ENTERA, no como valores sueltos.**
+Los tres patrones de llenado:
 
-✅ **Decisión de la profesional (2026-09-08): no hace falta conservar la tabla que ya está en el
-Word.** La skill entrega una **tabla nueva y completa** que la reemplaza. No tiene que ser
-visualmente idéntica; tiene que **cumplir con lo que informa** la original.
+- **Con Z**: PB numérico · Z a **2 decimales con coma, con el cero final** (`-0,90`, no `-0,9`) o el
+  cap · **1 X** en la columna de rango que corresponde.
+- **Cualitativa simple**: el texto entero va en **PB** (`29/30`, `3 normal`, `Normal`, `No`) · Z
+  vacía · sin X.
+- **AVD y KPDS-10**: PB numérico · la palabra de `D19`/`D20` en Z · sin X.
 
-### Formato — **sólo para el modo de respaldo**: `.docx` clonando la tabla real
-
-> En el modo normal el script ya arma esta tabla dentro del informe. Lo de abajo aplica únicamente si
-> se cayó al modo de bloques.
-
-✅ **Éste es el default.** Generar con code execution un `.docx` que contenga **sólo esta tabla**, con
-el formato exacto de la que ya está en el informe. Ella lo abre, `Ctrl+A`, `Ctrl+C`, y reemplaza la
-tabla vieja. Nada de guardar `.html` ni pasar por el navegador.
-
-🚩 **Método recomendado: clonar, no reconstruir.** El formato de esta tabla es demasiado específico
-para rehacerlo de memoria (12 columnas, sin bordes verticales, sangría negativa, dos niveles de
-sombreado, celdas verticalmente combinadas por área). Si se dispone del XML de una tabla previa,
-**copiarla y reemplazar sólo tres cosas por fila**: el texto de `PB`, el texto de `Z`, y en qué celda
-va la `X`. Nunca tocar `tcPr` (anchos, sombreados, `vMerge`, `gridSpan`): ahí vive el formato.
-
-Especificación, extraída de `../ejemplos/informeFinal.docx` el 2026-09-17:
-
-| Parámetro | Valor |
-|---|---|
-| Filas | **39**: 1 de agrupación + 1 de encabezados + **36 de datos** + 1 de leyenda |
-| Columnas | 13 en la grilla: `1727` `1701` `1034` `708` `581` `684` `941` `667` `677` `650` `645` `572` `64` twips |
-| Ancho / sangría | `tblW` = `10651` dxa · `tblInd` = **`-714`** · layout `fixed` |
-| Bordes | todos `nil` **salvo `insideH` = `single sz=4` negro**. Sin líneas verticales ni marco exterior. |
-| Fuente | Arial en todo |
-| Fila de agrupación | 7 pt (`sz=14`) negrita, centrada |
-| Encabezados `ÁREA`/`PRUEBA`/`PB`/`Z` y rótulos de área | 9 pt (`sz=18`) negrita, centrados |
-| Nombre de prueba | 9 pt regular, **alineado a la derecha** |
-| `PB` y `Z` | 8 pt (`sz=16`) centrados |
-| Sombreado de tramos (filas con Z) | cols 1–2 = `A6A6A6` (gris oscuro) · col 3 = `D9D9D9` (gris claro) · cols 4–8 sin sombrear |
-| Filas sin Z (cualitativas) | las 9 celdas (`Z` + los 8 tramos) en `D9D9D9` |
-| Rótulo de área | celda con `vMerge restart` + `vMerge` en las filas siguientes del grupo |
-| Interlineado | `line=276 auto` |
-
-⚠️ **La sangría negativa `tblInd = -714` es lo que hace entrar las 12 columnas en la página.** Con
-ella, la tabla entra bien y **ya no hace falta el viejo ajuste de "Autoajustar al contenido + ancho
-130 %"** que se usaba con el paste desde HTML.
-
-✅ **La leyenda al pie es la fila 39 de la tabla**, no un párrafo aparte: viene incluida y no hay que
-copiarla de ningún lado. (Versiones anteriores de este archivo decían lo contrario.)
-
-⚠️ **No validar las X contra la tabla de un informe viejo:** `informeFinal.docx` tiene al menos una
-fila mal (Lenguaje `FF`, sin X). La referencia son **las columnas `E:L` del Excel**, como dice el
-autochequeo de abajo.
-
-### Alternativa: HTML
-
-Sólo si no se puede generar el `.docx` (ver el requisito de plan en el bloque 1). Bloque de código
-HTML, que ella guarda como `.html`, abre en el navegador, selecciona y copia a Word — camino
-verificado el 2026-09-08, pero con 5 pasos manuales. En ese caso **sí** hace falta el ajuste de ancho
-post-paste (clic derecho → **Autoajustar → Autoajustar al contenido** → **Propiedades de tabla →
-Tabla → Ancho preferido → 130 %**) y la leyenda hay que copiarla de un informe anterior. Si se cae a
-este camino, **decirlo en el bloque 12**.
-
-### Partes de la tabla
-
-Un solo bloque, con:
-
-1. Título `SÍNTESIS DEL RENDIMIENTO – PERFIL COGNITIVO`.
-2. Fila de agrupación de rangos, **con `colspan`**: `Deterioro significativo`=2 (`< -3`, `-3 a -2`) ·
-   `Puntajes bajos`=1 (`-2 a -1`) · `Puntajes promedio`=2 (`-1 a 0`, `0 a +1`) ·
-   `Puntajes superiores`=3 (`+1 a +2`, `+2 a +3`, `> +3`).
-3. Encabezado de **12 columnas**: `ÁREA` · `PRUEBA` · `PB` · `Z` + los 8 tramos de rango.
-4. Las **36 filas de datos**, en el orden exacto de `orden-filas-sintesis.md`.
-
-**La leyenda al pie NO se genera.** ✅ Decisión de la profesional (2026-09-08): es **idéntica en todos
-los informes**, así que se conserva la de su plantilla y la skill no la emite.
-
-> ⚠️ **Avisar esto en el bloque 12:** en el Word, la leyenda es la **última fila de la propia tabla**
-> (39 filas = 2 de encabezado + 36 de datos + 1 de leyenda), no un párrafo suelto. Si se borra la
-> tabla vieja entera para pegar la nueva, **la leyenda se va con ella**. Hay que volver a ponerla —
-> como nunca cambia, alcanza con copiarla de cualquier informe anterior.
->
-> Corolario: la discusión sobre el `trazado diagonal` que la leyenda menciona y no existe deja de
-> afectar la salida de la skill. Sigue abierta como decisión de ella sobre su propia plantilla
-> (`../preguntasParaLaProfesional.md` §C.1), pero la skill ya no la toca ni la reproduce.
-
-**Columna `ÁREA`: celdas fusionadas verticalmente (`rowspan`), como en la plantilla original.**
-✅ Decisión 2026-09-08 — revierte la uniformidad anterior (que repetía el nombre en cada fila para
-simplificar la generación). Sólo la **primera fila de cada uno de los 5 grupos** lleva la celda
-`ÁREA` (con su `rowspan`); las demás filas del grupo **omiten esa celda por completo** — por eso
-tienen **11** `<td>` en vez de 12. Esto sólo es posible en HTML (Markdown no soporta `rowspan`), otra
-razón por la que la tabla se entrega siempre en HTML. Los 5 grupos y su `rowspan`:
-
-| Área | Filas | `rowspan` |
-|---|---|---|
-| `Screening cognitivo y psiquiátrico` | 1–4 | 4 |
-| `Atención y funciones ejecutivas` | 5–19 | 15 |
-| `Memoria episódica` | 20–29 | 10 |
-| `Lenguaje` | 30–34 | 5 |
-| `Visoconstrucción` | 35–36 | 2 |
-
-Los tres patrones de llenado siguen igual:
-
-- **Con Z** (15 filas): PB numérico · Z a **2 decimales con coma, con el cero final** (`-0,90`, no
-  `-0,9`) o el cap · **1 X** en la columna de rango que corresponde · las otras 7 **vacías**.
-- **Cualitativa simple** (19 filas): el texto entero va en **PB** (`29/30`, `3 normal`, `Normal`) ·
-  **celda vacía, sin texto**, con fondo gris `#D9D9D9` en Z y en las 8 columnas de rango.
-- **AVD y KPDS-10** (2 filas): PB numérico · la palabra de `D17`/`D18` en Z · **celda vacía, sin
-  texto**, con fondo gris `#D9D9D9` en las 8 de rango.
-
-En una frase: **la X se completa si y solo si Z es numérico**, el texto cualitativo va en PB salvo en
-AVD y KPDS-10, y **el fondo gris `#D9D9D9` marca las celdas donde la prueba no lleva puntaje Z** — sin
-ningún texto adentro.
-
-✅ **Cambio 2026-09-08: ya no se escribe `N/A`.** La celda queda **vacía, sólo con el fondo gris** —
-así lo hacía el Word original antes de que la skill agregara el texto como sustituto del color en
-Markdown. En HTML el color sobrevive el paste (verificado en Word real), así que el texto ya no hace
-falta y sólo agrandaba las columnas. Las columnas de severidad de las filas con Z llevan `#A6A6A6`
-(`< -3`, `-3 a -2`) y `#D9D9D9` (`-2 a -1`), **vacías**, igual que antes.
-
-> 🚩 **El gris de "no aplica" no es lo mismo que una celda vacía sin sombrear.** En una fila **con Z**,
-> las 7 columnas de rango sin `X` **van vacías y sin sombreado propio** (salvo las bandas de severidad,
-> que llevan su color fijo en todas las filas): esos tramos sí aplican, el puntaje simplemente no cae
-> ahí. El gris `#D9D9D9` uniforme en Z + las 8 de rango de las filas cualitativas/AVD/KPDS-10 significa
-> algo distinto: "esta prueba no tiene puntaje Z". Ninguna de las dos lleva texto — la diferencia la
-> hace sólo el patrón de sombreado.
-> Control: **187 celdas vacías por no llevar puntaje Z** (19 filas cualitativas × 9 + 2 de AVD/KPDS-10
-> × 8, todas con fondo `#D9D9D9`) y **15 filas con una `X`**.
+En una frase: **la X se completa si y solo si Z es numérico**, y el texto cualitativo va en PB salvo
+en AVD y KPDS-10. Nunca se escribe texto en una celda que no lleva dato (ni `N/A`, ni `—`, ni un
+pendiente): el sombreado gris de la plantilla ya marca "no aplica".
 
 Cap: `Z ≥ +3` → `≥3`, `Z ≤ −3` → `≤-3`; el valor capado igual lleva X en la columna del extremo.
 ⚠️ **El cap lo aplica la skill.** El Excel lo muestra capado, pero eso es un formato de número: al leer
 el archivo por código sale el Z crudo (`-3.1067…`), nunca `≤-3`.
 
-> ✅ **La X ya viene calculada en el Excel (V5).** Las 8 columnas `E:L` traen `"X"` o `""` por fórmula
-> en las 15 filas con Z. **Leerlas y transcribirlas** en vez de decidir el tramo. La regla de tramos de
-> `orden-filas-sintesis.md` sigue documentada porque es lo que hay que **verificar**, no lo que hay que
-> derivar. La skill **sigue armando la tabla entera** — lo que cambia es de dónde sale la X.
+> ✅ **La X ya viene calculada en el Excel.** Las 8 columnas `E:L` traen `"X"` o `""` por fórmula en
+> las filas con Z. **Leerlas y transcribirlas** (`x` = 1 a 8, de `E` a `L`) en vez de decidir el
+> tramo. La regla de tramos de `orden-filas-sintesis.md` está para **verificar**, no para derivar.
 
 ### 🚩 Autochequeo obligatorio — declararlo en la salida
 
-Son 36 filas escritas a mano: los errores de transcripción son el riesgo principal y **todos estos
+Son filas escritas a mano: los errores de transcripción son el riesgo principal y **todos estos
 números son verificables antes de entregar**. Contarlos y decir el resultado:
 
 | Chequeo | Valor esperado |
 |---|---|
 | **X contra el Excel** | cada `X` emitida coincide con la de `E:L` de esa fila. **Si alguna no coincide, es un hallazgo: no "corregir" el Excel en silencio — decirlo en el bloque 12.** |
-| Filas de datos | **36**, en el orden de `orden-filas-sintesis.md` |
-| Celdas por fila | **12** en las **5** filas que abren grupo de área (llevan el `rowspan`) · **11** en las **31** filas restantes (sin celda `ÁREA`, fusionada hacia arriba) |
-| Celdas `ÁREA` emitidas | **5** (una por grupo, no 36) — suma de sus `rowspan` = **36** (4+15+10+5+2) |
-| Suma de los `colspan` de la fila de agrupación | **8** (2+1+2+3) |
-| Celdas vacías sin puntaje Z (fondo `#D9D9D9`) | **187** (19 filas cualitativas × 9 + 2 de AVD/KPDS-10 × 8) |
-| Filas con `X` | **15**, una `X` por fila, sólo donde Z es numérico |
-| Leyenda al pie | **ausente** |
+| **Filas presentes** | una clave en `sintesis` por **cada fila del cuadro con PB cargado** (de las 39 de `orden-filas-sintesis.md`), y ninguna por las vacías. La línea `tabla de síntesis: N filas · … borradas (…)` del script tiene que listar exactamente las de PB vacío. |
+| Filas cualitativas nuevas | `recuperacion` / `roc_estrategia` / `roc_copia` presentes **si y sólo si** `C36` / `C37` / `C55` tienen valor (`No` en `C36` cuenta como valor) |
+| `grafico1` vs tabla | `null` exactamente en las posiciones cuya fila no está (el script aborta si no coincide) |
+| Filas con `X` | una `X` por cada fila con Z numérico (15 en una batería completa), ninguna en el resto |
 
-El conteo de celdas vacías y el de `X` sólo valen para una batería completa; si falta alguna prueba,
-recalcular y decir de dónde sale la diferencia.
+### Formato — **sólo para el modo de respaldo**: `.docx` clonando la tabla de la plantilla
 
-⚠️ **El chequeo del `colspan` nació de un error real** (prueba en Word del 2026-09-08): sin los
-`colspan`, cada rótulo ocupaba una sola columna, los cuatro tramos de la derecha quedaban sin rótulo
-y los anchos se deformaban. Se detectó recién al mirar la tabla ya armada en Word.
+En el modo normal el script arma esta tabla dentro del informe. En el modo de respaldo, primera
+opción: un `.docx` que contenga **sólo esta tabla**, clonada de `plantilla-informe.docx` (es la
+segunda tabla del documento). **Clonar, no reconstruir:** copiar el XML de la tabla, borrar las filas
+sin dato y reemplazar sólo tres cosas por fila: el texto de `PB`, el texto de `Z` y en qué celda va la
+`X`. Nunca tocar `tcPr` (anchos, sombreados, `vMerge`, `gridSpan`): ahí vive el formato. Si se borra
+la fila que abre un área, pasar la celda `ÁREA` (con `vMerge restart` y el rótulo) a la primera fila
+que queda del grupo. La profesional lo abre, `Ctrl+A`, `Ctrl+C`, y reemplaza la tabla vieja.
 
-Hay un generador de referencia en `../ejemplos/generar-tabla-sintesis.js` con el HTML exacto que se
-validó (estructura, colores, colspan). **Usarlo como plantilla de la que se copia la forma**,
-cambiando los datos — no reinventar el markup en cada corrida.
+Referencia de la tabla de la plantilla, para verificar que el clon no se deformó:
 
-> ⚠️ **Por qué cambió el enfoque:** antes se pegaban sólo los valores, con tabs, dentro de la tabla
-> existente. En la primera corrida real los valores eran **todos correctos** y el pegado se habría
-> desalineado igual, porque los tabs finales se pierden en el chat y se perdían distinto según la fila
-> (filas de 9 y de 7 campos donde todas debían tener 10) — revisión 2026-09-08, §B1. Además nunca se
-> probó si el cursor de Word baja a la celda `PB` de la fila siguiente o a la primera columna. Al
-> generar la tabla entera, **los dos riesgos desaparecen**. El enfoque viejo queda documentado como
-> alternativa en `orden-filas-sintesis.md`.
+| Parámetro | Valor |
+|---|---|
+| Filas | **42**: 1 de agrupación + 1 de encabezados + **39 de datos posibles** + 1 de leyenda |
+| Columnas | 13 en la grilla: `1727` `1701` `1034` `708` `581` `684` `941` `667` `677` `650` `645` `572` `64` twips |
+| Ancho / sangría | `tblW` = `10651` dxa · `tblInd` = **`-714`** (lo que hace entrar las 12 columnas en la página) · layout `fixed` |
+| Bordes | todos `nil` **salvo `insideH` = `single sz=4` negro** |
+| Sombreado de tramos (filas con Z) | cols 1–2 = `A6A6A6` (gris oscuro) · col 3 = `D9D9D9` (gris claro) · cols 4–8 sin sombrear |
+| Filas sin Z (cualitativas) | `Z` + los 8 tramos en `D9D9D9` |
+| Leyenda | última fila de la tabla: viene con el clon, no hay que copiarla de otro lado |
 
-**5. Valores del gráfico 1** (14 valores Z) — `orden-categorias-graficos.md`. 🚩 **Coma decimal**
-(`0,45`), igual que la tabla de síntesis — el Excel de los gráficos está en configuración regional
-española. **Sin** el cero final, eso sí (`-0,9`, no `-0,90`).
-Mismos valores redondeados y capados que la columna Z de la tabla (el cap va como número `-3`/`3`, no
-como texto). Instrucción de pegado **posicional**: empezar en la celda inmediatamente debajo del
-encabezado con el año, porque la columna destino cambia según el archivo.
+### Alternativa: HTML
 
-**6. Valores del gráfico 2** (10 ítems del K-10) — ✅ **sale del Excel**: `B53:B62`, en ese orden,
+Sólo si tampoco se puede generar ese `.docx`. Bloque de código HTML que ella guarda como `.html`, abre
+en el navegador, selecciona y copia a Word. Controles de forma:
+
+- Fila de agrupación **con `colspan`** que suma **8**: `Deterioro significativo`=2 (`< -3`,
+  `-3 a -2`) · `Puntajes bajos`=1 (`-2 a -1`) · `Puntajes promedio`=2 (`-1 a 0`, `0 a +1`) ·
+  `Puntajes superiores`=3 (`+1 a +2`, `+2 a +3`, `> +3`). Sin `colspan`, los rótulos se corren y los
+  anchos se deforman (error real del 2026-09-08).
+- Encabezado de **12 columnas**: `ÁREA` · `PRUEBA` · `PB` · `Z` + los 8 tramos.
+- Columna `ÁREA` fusionada con **`rowspan` = cantidad de filas presentes del grupo**; las demás filas
+  del grupo omiten esa celda.
+- Gris con `style="background-color:#D9D9D9"` en las celdas que no llevan puntaje Z y `#A6A6A6` en
+  las columnas de deterioro significativo; celdas vacías, sin texto.
+- La leyenda **no** va en el HTML: después de pegar hay que recuperarla de un informe anterior, y
+  ajustar el ancho (clic derecho → **Autoajustar → Autoajustar al contenido** → **Propiedades de
+  tabla → Tabla → Ancho preferido → 130 %**). Avisar las dos cosas en el bloque 12.
+
+**5. Valores del gráfico 1** (14 valores Z) — `orden-categorias-graficos.md`. Mismos valores
+redondeados y capados que la columna Z de la tabla, pero **como números JSON** (`-0.9`, `0.45`, cap
+`-3`/`3`), y **`null` en la posición de cada prueba no tomada** — el script borra esa categoría (y
+aborta si no coincide con la tabla).
+Sólo en el modo de respaldo, cuando se pegan a mano en el Excel del gráfico: **coma decimal** y sin
+el cero final (`-0,9`), empezando en la celda inmediatamente debajo del encabezado con el año.
+
+**6. Valores del gráfico 2** (10 ítems del K-10) — ✅ **sale del Excel**: `B58:B67`, en ese orden,
 enteros sin decimales ni cap. Etiquetas y celdas destino en `orden-categorias-graficos.md`. Chequeo:
-la suma de los 10 tiene que dar `B63`, y `B63` debería coincidir con `C18` (el PB de la tabla de
-síntesis); si no coincide, decirlo.
+la suma de los 10 tiene que dar `B68`, y `B68` debería coincidir con `C20` (el PB de la tabla de
+síntesis); si no coincide, decirlo. 🚩 **Si el K-10 no se tomó** (ítems vacíos), `grafico2` = `null`
+y el script borra el gráfico.
 
 **7. Sección de screening** — **esqueleto de 6 frases, transcrito literal en
 `mapeo-excel-a-word.md` §4.1: copiarlo de ahí.** Sólo una de las seis lleva puntajes
-(`(MMSE=29/30; TRO= 10/10; INECO=27,5/30)`, de `C13`, `C16` y `C24`); las otras cinco son
-observación conductual invariante y **van siempre** — discurso, nivel de alerta y fatiga,
+(`(MMSE=29/30; TRO= 10/10; INECO=27,5/30)`, de `C15`, `C18` y `C26`; **la prueba que no se tomó sale
+del paréntesis**); las otras cinco **van siempre** — discurso, nivel de alerta y fatiga,
 orientación, malestar psicológico + quejas subjetivas, autonomía en AVD. **El Word lo llama INECO; el
 Excel, IFS Total.** Va como un solo párrafo corrido, sin puntajes entre paréntesis fuera de la frase
-4. ⚠️ En la primera corrida real se emitió sólo la frase de puntajes y se perdieron tres frases fijas
-(revisión 2026-09-08, §B4). Además:
-- **Orientación temporal/espacial:** sale de `C14` y `C15` (`Si`/`No`). Con las dos en `Si` va el
-  boilerplate `Orientación temporal y espacial conservadas.`; si alguna dice `No`, **invertir la
+4. ⚠️ En la primera corrida real se emitió sólo la frase de puntajes y se perdieron tres frases
+fijas. Además:
+- **Orientación temporal/espacial:** sale de `C16` y `C17` (`Si`/`No`/`Medio`). Con las dos en `Si`
+  va el boilerplate `Orientación temporal y espacial conservadas.`; si alguna dice `No`, **invertir la
   frase para esa orientación** en vez de emitir el boilerplate. Si las celdas están vacías, va la
   forma afirmativa y el pendiente se lista en el bloque 12, nunca dentro de la oración.
-- **Quejas subjetivas de memoria (C-QSM):** sale de `B65`. Con puntaje, quejas presentes = **> 3**.
-  Si la celda está **vacía** (no se tomó), la observación deriva de la anamnesis / motivo de consulta
-  y hay que avisar en el bloque 12 que se borra esa línea de `PRUEBAS ADMINISTRADAS`. No inventar un
-  puntaje ni escribirlo en el informe.
+- **Quejas subjetivas de memoria (C-QSM):** sale de `B70`. Con puntaje, quejas presentes = **> 3**.
+  Si la celda está **vacía**, la observación deriva de la anamnesis / motivo de consulta. No inventar
+  un puntaje ni escribirlo en el informe. (Que el C-QSM figure en la lista lo decide el listado,
+  `B84`, no esta celda.)
+- **Malestar psicológico sin K-10:** si el K-10 no se tomó, esa mitad de la frase 5 también se deriva
+  de la anamnesis, y el bloque 12 avisa que la categoría diagnóstica se propuso sin el corte ≥ 25.
+
+**Pruebas no tomadas en la prosa (bloques 7–10).** Lo que no se tomó no se narra: se omiten o se
+adaptan las frases que lo nombran (sin TMT no hay rastreo visual ni flexibilidad cognitiva; sin BEM-ML
+no hay material contextualizado; etc.). Un área **sin ninguna fila** en la tabla va `null` en `areas`
+y **tampoco aparece en el recap**. Las frases fijas de apertura de cada sección que sí se imprime
+(nivel de alerta, comprensión/expresión…) se mantienen. **`Recuperación disejecutiva`, `ROC
+estrategia` y `ROC copia` no se narran nunca**: van sólo en la tabla (decisión del usuario,
+2026-09-28).
 
 **8. Cuatro secciones por área cognitiva** — cada una con título, la línea
 `Impresión diagnóstica del área: rendimiento cognitivo <calificación>` y un párrafo. Reproducir la
@@ -734,17 +688,14 @@ clínicas (`recuperación de la memoria`) y **sin siglas ni índices**.
 celdas sospechosas y todo lo que quedó marcado como dudoso. Este bloque no se pega en el Word: es
 para el profesional. Incluye además:
 
-- **Los valores recuperados** (p. ej. `C25` reconstruida desde el serial), para que los confirme.
+- **Los valores recuperados** (p. ej. `C27` reconstruida desde el serial), para que los confirme.
 - **Las oraciones con ranura** (`[solo / acompañado por …]`), citadas textualmente.
 - **El razonamiento del paréntesis de hábitos**: qué se descartó de la anamnesis y por qué.
-- **Los conteos de campos** de los 3 bloques de pegado.
-- **Sólo si el bloque 4 cayó al camino HTML**: avisar que hay que ajustar el ancho de la tabla después
-  de pegarla (Autoajustar al contenido + Ancho preferido 130 %) y recuperar la leyenda al pie de un
-  informe anterior. Con el `.docx` **no hace falta ninguna de las dos cosas** — no mencionarlas.
-- **Ediciones a hacer sobre la plantilla del Word**, no sólo datos faltantes. La más frecuente:
-  **`PRUEBAS ADMINISTRADAS` es una lista fija que incluye `Cuestionario de quejas subjetivas de
-  memoria (C-QSM)`, y el C-QSM a veces no se toma** — si no se tomó, avisar que **hay que borrar esa
-  línea** del informe. Mismo criterio para cualquier prueba de la lista sin dato en el Excel.
+- **La categoría diagnóstica propuesta**, con los Z que la disparan y cuáles son submedidas.
+- **Sólo si se cayó al modo de respaldo**: que se cayó y por qué; y si el bloque 4 salió en HTML,
+  que hay que ajustar el ancho y recuperar la leyenda. En el modo normal **no mencionar nada de esto**.
+- **Ediciones a hacer sobre el Word**, si quedó alguna a mano. La lista de pruebas, las filas de la
+  tabla y los gráficos se ajustan solos: **no hay que avisar que se borre ninguna línea**.
 
 #### ⛔ Qué NO va nunca en el bloque 12
 
@@ -753,64 +704,53 @@ reabrir nada de esto, aunque el Excel traiga el dato cargado:
 
 | No preguntar por… | Porque… |
 |---|---|
-| la fila `Deriva:` / `B9` | los 6 campos del bloque 1 quedaron fijos el 2026-09-17 |
-| `B8` (acompañamiento) o `B10` (riesgo) como filas de la tabla | ídem — `B8` va a la prosa, `B10` a la categoría |
+| la fila `Deriva:` / `B11` | los 6 campos del bloque 1 quedaron fijos el 2026-09-17 |
+| `B8` (acompañamiento) o `B12` (riesgo) como filas de la tabla | ídem — `B8` va a la prosa, `B12` a la categoría |
+| una prueba con puntaje que el listado marca `No` (o al revés) | listado y cuadro son independientes por decisión del usuario (2026-09-28) |
+| si las filas ROC / Recuperación deberían narrarse | van sólo en la tabla (2026-09-28) |
 | `de control` vs `por control` | fijado en `por control` el 2026-09-17 |
-| el ajuste de ancho al 130 % o la leyenda al pie | ya no aplican con el `.docx` |
-| el separador decimal de los gráficos | fijado en **coma** el 2026-09-17 |
+| el ajuste de ancho al 130 % o la leyenda al pie | no aplican con el `.docx` |
+| el separador decimal | fijado: **coma** en la tabla y en el pegado manual (2026-09-17); **punto** sólo dentro del JSON de los gráficos |
 
 Regla general: **si una decisión está marcada con 🚩 y fecha en este paquete, está cerrada.** Si algo
 de eso parece mal para un caso puntual, decirlo **una vez** y en una línea, no como pregunta abierta.
 
 ## Reglas de negocio a aplicar
 
-- Sintomatología anímica: derivar de K-10 ≥ 25 por default; usar el flag manual del Excel si el
-  profesional lo sobrescribió.
+- Sintomatología anímica: se deriva de K-10 ≥ 25 (`C20`). No hay una celda de flag aparte: si la
+  profesional quiso sobrescribirlo, lo hizo pisando `C20` a mano — ver el chequeo de entrada 3.
 - AVD conservadas/comprometidas: 0–5 = comprometidas, 6–8 = conservadas. **La palabra que va al Word
-  sale de `D17`, no de esta tabla.**
+  sale de `D19`, no de esta tabla.**
 - Desempate en rangos cuando el Z cae justo en un límite: **pendiente de confirmar**. Propuesta:
   límite inferior inclusive, superior exclusivo. Si un Z cae exactamente en un borde, señalarlo.
-- FF y TRO aparecen dos veces en la tabla de síntesis — completar ambas filas, no omitir ninguna.
-- BEM–MS AST: el PB es el **promedio de los 3 trials truncado a 2 decimales** (idealmente ya sale por
-  fórmula del Excel). La skill lo usa tal como viene en `C37`, no lo recalcula.
-- IFS Índice MT (`C25`): deriva de **Dígitos Atrás + Memoria de Trabajo Visual**. Desde V3 es **texto**
+- FF y TRO aparecen dos veces en la tabla de síntesis — completar ambas filas (`ff_atencion` y
+  `ff_lenguaje`, `tro_screening` y `tro_viso`) si tienen dato.
+- BEM–MS AST: el PB es el **promedio de los 3 trials truncado a 2 decimales** (ya sale por fórmula del
+  Excel). La skill lo usa tal como viene en `C41`, no lo recalcula.
+- IFS Índice MT (`C27`): deriva de **Dígitos Atrás + Memoria de Trabajo Visual**. Es **texto**
   (`7/10`) y se copia tal cual; sólo aplica el rescate del chequeo 8 si alguna vez vuelve como número.
-- Orientación (`C14`/`C15`) y riesgo de evolución (`B10`) **no** son filas de la tabla de síntesis:
-  la tabla tiene 36 filas aunque el cuadro del Excel tenga 38.
+- Orientación (`C16`/`C17`) y riesgo de evolución (`B12`) **no** son filas de la tabla de síntesis:
+  la plantilla tiene 39 filas posibles aunque el cuadro del Excel tenga 41.
 
 ## Archivos de esta skill
 
-- `plantilla-informe.docx` — **la plantilla del Word.** Se clona y se le reemplaza lo variable. Trae el
-  encabezado vigente (el de `informeFinal2.docx`), los dos gráficos, la leyenda y la firma. 87 KB: se le
-  quitaron las fuentes embebidas, que pesaban 6,5 MB y no hacen falta (la fuente es Arial).
+- `plantilla-informe.docx` — **la plantilla del Word.** Se clona y se le reemplaza lo variable. Es el
+  **superconjunto** del informe: trae las 39 filas posibles de la tabla, los dos gráficos, las cuatro
+  secciones por área, la leyenda y la firma; el script borra lo que no corresponde. El logo que trae
+  adentro no importa: el script siempre lo reemplaza según `protocolo`. 88 KB: se le quitaron las
+  fuentes embebidas, que pesaban 6,5 MB y no hacen falta (la fuente es Arial).
 - `generar_informe.py` — **el generador.** Sólo biblioteca estándar. Ubica las secciones por el texto
   de sus encabezados, no por posición, así sobrevive a que se edite la plantilla. Aborta si falta un
-  ancla o si un conteo no cierra.
-
+  ancla, si un conteo no cierra o si el JSON no es coherente (claves, gráficos y áreas contra la tabla).
+- `recursos/` — las imágenes que elige el script: `encabezado-breyna.png`, `encabezado-xtend.png`,
+  `firma-agustina.png`, `firma-josefina.png`.
 - `mapeo-excel-a-word.md` — **esquema del Excel + de dónde sale cada bloque del Word.** El mapa
-  principal.
-- `orden-filas-sintesis.md` — las 36 filas, celda de origen, patrones de llenado, mecánica de paste.
-- `orden-categorias-graficos.md` — los dos gráficos: orden, redondeo/cap, celdas destino.
+  principal y la única fuente de direcciones de celda.
+- `orden-filas-sintesis.md` — las 39 filas posibles con su clave, celda de origen, patrones de llenado.
+- `orden-categorias-graficos.md` — los dos gráficos: orden, redondeo/cap, valores `null`.
 - `regla-diagnostica.md` — las 6 categorías + cortes de K-10/AVD + qué se adapta de los templates.
-- `excel-unificado-spec.md` — estado del Excel entregado y ajustes propuestos.
-- `../preguntasParaLaProfesional.md` — todo lo que falta confirmar con la profesional (fuera del
-  paquete de la skill; es documentación interna, no se sube).
-- `../ejemplos/revision-salida-ia-vs-informeFinal2.md` — **comparación de una corrida real de la
-  skill contra el informe que la profesional escribió a mano desde el mismo Excel** (2026-09-08).
-  Es de dónde salen las advertencias `⚠️ Fallo observado` de estos archivos: qué validó bien (todos
-  los PB/Z/X y los 14 valores del gráfico) y los 11 fallos corregidos. Fuera del paquete, no se sube.
 - `ejemplo-informe.md` — **informe modelo completo (datos ficticios)**, referencia de tono, estructura
-  y fraseo. **Está dentro del paquete**: no hay que adjuntar ningún informe modelo al chat, la skill
-  ya lo tiene. Para los bloques narrativos, seguir el registro de este archivo.
+  y fraseo para los bloques narrativos. No hay que adjuntar ningún informe modelo al chat.
 
-## ⚠️ Datos sensibles del paquete de la skill
-
-El informe modelo del paquete (`ejemplo-informe.md`) usa **datos ficticios** — es seguro para subir a
-claude.ai. Se derivó de `../ejemplos/informeFinal.docx`, que ya era ficticio.
-
-⚠️ **No reemplazarlo por `../ejemplos/informeFinal2.docx` sin anonimizar:** ese informe (y su Excel
-`../ejemplos/excelEvaluacionCompletoV5.xlsx` y sus versiones anteriores) son de **pacientes reales** (nombre, fecha de nacimiento,
-antecedente familiar, citas de la entrevista). Lo que se sube al paquete queda publicado de forma
-persistente. Si algún día se quiere el tono exacto de `informeFinal2`, primero anonimizarlo.
-
-El Excel del paciente **no** va dentro de la skill: es el input que se adjunta en cada pedido.
+Nombres, fechas y citas de paciente del paquete son **ficticios** o anónimos. El Excel del paciente **no** va dentro de
+la skill: es el input que se adjunta en cada pedido.

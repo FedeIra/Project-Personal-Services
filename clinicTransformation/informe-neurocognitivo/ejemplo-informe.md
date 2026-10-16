@@ -13,7 +13,7 @@
 
 ## EVALUACIÓN NEUROCOGNITIVA
 
-**Datos personales** (se entrega como `.docx` descargable — ver SKILL.md §1)
+**Datos personales**
 
 |   |   |
 |---|---|
@@ -24,8 +24,7 @@
 | Lateralidad | Diestra |
 | Fecha de evaluación | 14/08/2026 |
 
-> Seis filas, siempre estas. Acá van en Markdown sólo para que se lean en este archivo de referencia;
-> lo que recibe la profesional es un `.docx` con esta misma tabla, listo para `Ctrl+A` / `Ctrl+C`.
+> Seis filas, siempre estas (`B2:B7`).
 
 ## MOTIVO DE CONSULTA Y ANTECEDENTES
 
@@ -48,21 +47,24 @@ Vive con su esposo y, según autoreporte, es autónoma en las actividades de la 
 ## PRUEBAS ADMINISTRADAS
 
 - Actividades instrumentales de la vida diaria (AIVD de Lawton y Brody)
-- Mini Mental State Examination (MMSE)
+- Mini mental state examination (MMSE)
 - Batería de eficiencia mnésica de Signoret – subtest memoria seriada (BEM-MS)
 - Batería de eficiencia mnésica de Signoret – subtest memoria lógica (BEM-ML)
-- Trail Making Test A (TMT A) y B (TMT B)
+- Trail making test A (TMT A) y B (TMT B)
 - Fluencia verbal fonológica (FF) y semántica (FS)
+- Test de denominación de Boston abreviado (TBA)
 - Span de dígitos directos (DD) e inversos (DI)
 - Test del reloj a la orden (TRO)
-- Test de Denominación de Boston Abreviado (TBA)
-- Ineco Frontal Screening (IFS)
+- Ineco frontal screening (IFS)
 - Escala de malestar psicológico (K-10)
+
+> Los ítems con `Si` del listado `A73:B86`, en ese orden y con el texto literal de la columna `A`.
 
 ## SÍNTESIS DEL RENDIMIENTO – PERFIL COGNITIVO
 
 > Ejemplo del llenado real (PB, Z, y en qué tramo de rango va la X). Estructura completa de la tabla:
-> ver `orden-filas-sintesis.md`.
+> ver `orden-filas-sintesis.md`. Acá `—` significa **celda vacía**: en el informe no se escribe nada
+> y en `sintesis` se omiten `z`/`x`.
 
 | Área | Prueba | PB | Z | Columna con X |
 |---|---|---|---|---|
@@ -115,9 +117,9 @@ Discurso fluido y organizado, con conservada capacidad de comprensión y expresi
 conservado a lo largo de toda la consulta, sin presencia de fatiga que pudo haber interferido
 negativamente. Orientación temporal y espacial conservadas. Rendimiento cognitivo general inicial
 (evaluado a partir de pruebas de screening) con puntajes conservados (MMSE=29/30; TRO= 10/10;
-INECO=27.5/30) para su edad y nivel educativo. Según autoreporte sobre funcionalidad e independencia,
-la autonomía en las actividades básicas de la vida diaria está conservada. La paciente no reporta
-sintomatología vinculada al malestar psicológico.
+INECO=27.5/30) para su edad y nivel educativo. La paciente no reporta sintomatología vinculada al
+malestar psicológico. Según autoreporte sobre funcionalidad e independencia, la autonomía en las
+actividades básicas de la vida diaria está conservada.
 
 ## ATENCIÓN, VELOCIDAD DE PROCESAMIENTO Y FUNCIONES EJECUTIVAS
 
@@ -166,8 +168,8 @@ y alternante, fue conservado; al igual que en memoria lógica. El rendimiento en
 fue conservado. A su vez, presentó un rendimiento normal en la capacidad de codificación, evocación y
 bajo almacenamiento de la prueba de memoria seriada.
 
-La Sra. Bertagni presentó un rendimiento cognitivo dentro de parámetros normales en la mayoría de las
-áreas evaluadas, acorde a su edad y nivel educativo.
+En conclusión, la Sra. Bertagni presentó un rendimiento cognitivo dentro de parámetros normales en la
+mayoría de las áreas evaluadas, acorde a su edad y nivel educativo.
 
 **Se sugiere:**
 

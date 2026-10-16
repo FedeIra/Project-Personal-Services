@@ -105,7 +105,6 @@ historial ni persistencia, calidad dependiente del prompt.
 | `informe-neurocognitivo/orden-filas-sintesis.md` | Las 36 filas de la tabla de síntesis, celda de origen, patrones de llenado, paste. |
 | `informe-neurocognitivo/orden-categorias-graficos.md` | Los 2 gráficos: orden, redondeo/cap, celdas destino. |
 | `informe-neurocognitivo/regla-diagnostica.md` | Las 6 categorías + sugerencias + cortes K-10/AVD. |
-| `informe-neurocognitivo/excel-unificado-spec.md` | Estado del Excel V5 y los ajustes que quedan. |
 | `informe-neurocognitivo/plantilla-informe.docx` | **La plantilla del Word** que se clona (87 KB, sin fuentes embebidas). |
 | `informe-neurocognitivo/generar_informe.py` | **El generador**: clona la plantilla y reemplaza lo variable. |
 
@@ -171,12 +170,12 @@ a los `.md` de la skill). Quedó definido:
   desde la anamnesis.
 - **Cambios al Excel acordados:** 10 ítems del K-10, riesgo de evolución Sí/No, acompañamiento,
   orientación temporal/espacial, C-QSM opcional, AST e IFS Índice MT por fórmula. **V3 aplicó casi
-  todos** → estado por punto en `informe-neurocognitivo/excel-unificado-spec.md`.
+  todos** → estado por punto en el historial de git (`excel-unificado-spec.md`, eliminado el 2026-09-29).
 
 ### Pendiente
 
-**Del Excel (V5)** — ninguno bloquea la generación del informe; detalle en
-`informe-neurocognitivo/excel-unificado-spec.md` §A. **V5 cerró §A.4, §A.6, §A.8, §A.9 y agregó §A.12
+**Del Excel (V5)** — ninguno bloquea la generación del informe; detalle en el historial de git
+(`excel-unificado-spec.md` §A, eliminado el 2026-09-29). **V5 cerró §A.4, §A.6, §A.8, §A.9 y agregó §A.12
 (las 8 columnas de rango), todo verificado por código.** Queda:
 - **Confirmar el formato de `B8`** (`Asiste acompañado con`: ¿Sí/No o con quién?) y **si las dos
   filas de TRO llevan valores distintos a propósito** (`C16` = `10/10` vs `C49` = `9.5/10`).

@@ -14,7 +14,7 @@
 ## ✅ Respondidas por la profesional (2026-09-07)
 
 La mayoría de las preguntas ya tienen respuesta. Resumen (el detalle ya se volcó a los `.md` de la
-skill y al `excel-unificado-spec.md`):
+skill; el viejo `excel-unificado-spec.md` quedó en el historial de git):
 
 | Pregunta | Respuesta / decisión |
 |---|---|
@@ -178,8 +178,8 @@ clínico. Emite una ranura acotada y lo lista como pendiente.
 > (La segunda opción ahorra una edición por informe, pero implica que en algún caso el borrador diga
 > `solo` sin que nadie lo haya afirmado.)
 
-Relacionado: la celda `Acompañado` Sí/No + quién ya está acordada para el Excel
-(`excel-unificado-spec.md`). Cuando exista, la pregunta se vuelve irrelevante.
+Relacionado: desde el Excel V6, `B8` (`Asiste acompañado`) es `Si`/`No`; el Excel sigue sin decir
+por quién.
 
 ### B.3 El léxico Z → palabra
 

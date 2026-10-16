@@ -1,6 +1,6 @@
 # Regla diagnóstica y sugerencias
 
-> Extraído de `modeloDiagnosticoYSugerencias.docx`. 6 categorías, elegidas por Z + AVD + K-10 +
+> Extraído del modelo diagnóstico de la profesional. 6 categorías, elegidas por Z + AVD + K-10 +
 > riesgo de evolución. La skill elige UNA categoría y parte de su texto, completando los "(…)" según
 > el paciente.
 
@@ -38,7 +38,7 @@ clásico)**, pero el informe real es **categoría 2 (normal con fallas aisladas)
 >    recap, ni en la frase de cierre. Es valor de tabla y de gráfico, nada más. Lo mismo vale para
 >    `Sem` como etiqueta: un Sem bajo se redacta como `bajo beneficio de la facilitación de claves
 >    semánticas`, **nunca** como una falla de memoria semántica. Ver `mapeo-excel-a-word.md` §4.2.
->    ⚠️ La IA nombró CE en los tres lugares y etiquetó Sem como déficit (revisión 2026-09-08, §B3/§B6).
+>    ⚠️ La IA nombró CE en los tres lugares y etiquetó Sem como déficit (revisión 2026-09-08).
 
 ## ⚠️ Los templates se adaptan, no se copian literalmente
 
@@ -68,7 +68,7 @@ decir, la localización debe leer la anamnesis, no ser genérica.
 
 ### Forma del paréntesis: sintagma nominal corto, sin explicar el razonamiento
 
-⚠️ **Fallo observado (revisión 2026-09-08, §B8).** La IA eligió bien **qué** poner (leyó la anamnesis:
+⚠️ **Fallo observado (revisión 2026-09-08).** La IA eligió bien **qué** poner (leyó la anamnesis:
 ya hace actividad física, duerme mal, refiere estrés) y mal **cómo**:
 
 > ❌ `Promover hábitos de vida saludables (ya realiza actividad física regular —yoga y gimnasio—, por
@@ -89,7 +89,7 @@ Reglas:
 
 ## Cortes de referencia
 
-- **K-10 (sintomatología anímica):** suma de los 10 ítems (`B53:B62`, total en `B63`) ≥ **25** ⇒ "sintomatología anímica
+- **K-10 (sintomatología anímica):** suma de los 10 ítems (`B58:B67`, total en `B68`, Excel V6) ≥ **25** ⇒ "sintomatología anímica
   relevante" presente. (No 24,5: el K-10 es una suma de 10 enteros, un resultado exacto de 24,5 es
   imposible — 25 es el mismo corte sin la falsa precisión decimal.) **Se deriva del K-10 por
   default; el profesional puede sobrescribirlo manualmente en el Excel.**
@@ -107,16 +107,16 @@ Reglas:
   original no distingue conservadas/comprometidas), ya confirmado.
 
   ⚠️ **Esta tabla clasifica; no dicta el texto del informe.** La palabra que va en la columna Z de la
-  tabla de síntesis sale de `D17` y **se copia tal cual**. No "corregir" el Excel contra esta tabla:
-  `D17` es pass-through, esté tipeado o salga por fórmula.
+  tabla de síntesis sale de `D19` y **se copia tal cual**. No "corregir" el Excel contra esta tabla:
+  `D19` es pass-through, esté tipeado o salga por fórmula.
 
-  🚩 **Acordado el 2026-09-17: `D17` pasa a calcularse por fórmula**, como ya lo hace `D18` (K-10):
+  🚩 **`D19` se calcula por fórmula** (acordado el 2026-09-17), como `D20` (K-10):
 
   ```excel
-  =SI(C17="";"";SI(C17>=8;"Autónomo";SI(C17>=6;"Dependencia leve";SI(C17>=4;"Dependencia moderada";SI(C17>=2;"Dependencia severa";"Dependencia total")))))
+  =SI(C19="";"";SI(C19>=8;"Autónomo";SI(C19>=6;"Dependencia leve";SI(C19>=4;"Dependencia moderada";SI(C19>=2;"Dependencia severa";"Dependencia total")))))
   ```
 
-  | `C17` | `D17` |
+  | `C19` | `D19` |
   |---|---|
   | 8 | `Autónomo` |
   | 6–7 | `Dependencia leve` |
@@ -129,15 +129,14 @@ Reglas:
 
   `Autónomo` va así para cualquier paciente: es la forma que usa la profesional. **No corregirlo por
   género ni señalarlo como pendiente.**
-- **K-10:** la interpretación que va al Word sale de `D18` del Excel (columna `Z` de la fila 18) (`Normal` en `informeFinal2`,
-  con total 15). El corte ≥ 25 se usa para **elegir categoría diagnóstica**, no para redactar esa
+- **K-10:** la interpretación que va al Word sale de `D20` del Excel (columna `Z` de la fila 20),
+  p. ej. `Normal` con un total de 15. El corte ≥ 25 se usa para **elegir categoría diagnóstica**, no para redactar esa
   celda.
 - **Riesgo de evolución:** flag 100% manual, criterio clínico/observación en vivo durante la
   entrevista. La skill **nunca** debe intentar inferirlo — llega ya decidido en el Excel.
-  ✅ **Ya está en el Excel: `B10` (`Riesgo de evolución`, `Si`/`No`)**, desde V3 (2026-09-15), **con
-  validación de lista desde V4**. Habilita la **categoría 5**. En archivos viejos puede llegar como
-  `Sí`/`si`/`SI`/`No`/`no`: normalizar tolerantemente y, si el valor no es interpretable como sí/no,
-  **señalarlo** en vez de asumir "No". Ver `mapeo-excel-a-word.md` §5.e.
+  ✅ **Está en el Excel: `B12` (`Riesgo de evolución`, `Si`/`No`, con validación de lista).**
+  Habilita la **categoría 5**. Normalizar tolerantemente (`Sí`/`si`/`SI`/`No`/`no`) y, si el valor no
+  es interpretable como sí/no, **señalarlo** en vez de asumir "No". Ver `mapeo-excel-a-word.md` §5.e.
 
 ## Las 6 categorías
 
@@ -243,5 +242,6 @@ Se sugiere:
 ## Orden de prioridad cuando varias reglas podrían aplicar
 
 Si Z < -1,5 + AVD conservadas y aplican simultáneamente compromiso anímico Y riesgo de evolución,
-**falta definir cuál prevalece** (o si el informe debe mencionar ambas). No está resuelto en
-`modeloDiagnosticoYSugerencias.docx` — a confirmar con el profesional antes de cerrar el `SKILL.md`.
+**falta definir cuál prevalece** (o si el informe debe mencionar ambas): el modelo de la profesional
+no lo resuelve. Mientras tanto, la skill **lo señala explícitamente** en el bloque 12 y no elige en
+silencio.
